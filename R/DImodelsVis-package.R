@@ -1,0 +1,49 @@
+#' @title DImodelsVis: Visualising Diversity-Interactions (DI) Models
+#'
+#' @description Aid in better understanding Diveristy Interactions (DI) models by creating novel visualisations showing the effects of multiple dimensions of biodiversity on ecosystem functions.
+#'
+#' @details
+#' \strong{Introduction to Diversity-Interactions models} \cr
+#' Diversity-Interactions (DI) models (Kirwan et al 2009) are a set of tools for analysing and interpreting data from experiments that explore the effects of species diversity on community-level responses; for example, the effect of increasing community diversity on biomass production in a grassland ecosystem. Most analyses of diversity experiments quantify community diversity in terms of species richness, the number of species present. The DI method modifies this presence/absence approach in mixed communities by taking species relative abundance in the community into account. So, instead of ignoring differences in community responses across communities with the same species but with different species relative abundances, the DI approach aims to understand and explain these differences.
+#'
+#' @author
+#' \strong{Maintainter:} Rishabh Vishwakarma \email{vishwakr@@tcd.ie} (\href{https://orcid.org/0000-0002-4847-3494}{ORCID})
+#'
+#' \strong{Authors:} \cr
+#' \itemize{
+#'     \item{Caroline Brophy}
+#'     \item{Catherine Hurley}
+#' }
+#'
+#' @references
+#' \itemize{
+#'     \item{Brophy C, A Dooley, L Kirwan, JA Finn, J McDonnell, T Bell, MW Cadotte and J Connolly. (2017) Biodiversity and ecosystem function: Making sense of numerous species interactions in multi-species communities. Ecology 98, 1771-1778.}
+#'     \item{Connolly J, T Bell, T Bolger, C Brophy, T Carnus, JA Finn, L Kirwan, F Isbell, J Levine, A Lüscher, V Picasso, C Roscher, MT Sebastia, M Suter and A Weigelt (2013) An improved model to predict the effects of changing biodiversity levels on ecosystem function. Journal of Ecology, 101, 344-355.}
+#'     \item{Kirwan L, J Connolly, JA Finn, C Brophy, A Lüscher, D Nyfeler and MT Sebastia (2009) Diversity-interaction modelling - estimating contributions of species identities and interactions to ecosystem function. Ecology, 90, 2032-2038.}
+#' }
+#'
+#'
+#' @examples
+#' ## Load libraries
+#' library(DImodels)
+#' library(DImodelsVis)
+#'
+#' ## Load data
+#' data(sim2)
+#'
+#' ## Fit Diversity Interactions model
+#' mod <- DI(y = "response", prop = 3:6,
+#'           DImodel = "FG", FG = c("G", "G", "H", "H"),
+#'           estimate_theta = TRUE, data = sim2)
+#'
+#' ## Get model diagnostics
+#' model_diagnostics(mod)
+#'
+#' ## Visualise effects of adding a species to an existing community
+#' effects_plot(mod)
+#'
+#' ## Visualise slices of the 4-d simplex
+#' conditional_ternary(mod, conditional = "p4", resolution = 1)
+#' @keywords internal
+"_PACKAGE"
+NULL

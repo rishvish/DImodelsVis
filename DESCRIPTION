@@ -1,0 +1,30 @@
+Package: DImodelsVis
+Title: Visualising Diversity Interactions (DI) models
+Version: 0.0.0.9000
+Authors@R: 
+    c(person("Rishabh", "Vishwakarma", email = "vishwakr@tcd.ie", role = c("aut", "cre"),
+             comment = c(ORCID = "0000-0002-4847-3494")),
+      person("Caroline", "Brophy", role = "aut"),
+      person("Catherine", "Hurley", role = "aut"))
+Description: Visualising and interpreting Diversity Interactions (DI) models.
+License: GPL (>= 3)
+Encoding: UTF-8
+LazyData: true
+Imports: 
+    DImodels,
+    dplyr (>= 1.0.0),
+    forcats,
+    ggfortify,
+    ggplot2,
+    glue,
+    grDevices,
+    methods,
+    metR,
+    modelr,
+    PieGlyph,
+    plotwidgets,
+    rlang,
+    stats,
+    tidyr,
+    utils
+RoxygenNote: 7.2.3
