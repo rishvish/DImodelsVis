@@ -2,44 +2,76 @@
 % Please edit documentation in R/ModelDiagnostics.R
 \name{model_diagnostics}
 \alias{model_diagnostics}
-\title{Regression diagnostics plots}
+\title{Regression diagnostics plots with pie-glyphs}
 \usage{
 model_diagnostics(
   model,
   which = c(1, 2, 3, 5),
+  prop = NULL,
   npoints = 3,
   cook.levels = c(0.5, 1),
-  title = "Diagnostic Plots",
+  pie_radius = 0.25,
+  pie_colours = NULL,
+  only_extremes = FALSE,
+  label_size = 4,
+  points_size = 3,
   nrow = 0,
   ncol = 0
 )
 }
 \arguments{
-\item{model}{A Diversity Interactions model object fit by using the \code{\link[DImodels:DI]{DI()}} function from the \code{\link[DImodels:DImodels-package]{DImodels}} package.}
+\item{model}{A statistical regression model object.}
 
-\item{which}{a subset of the numbers 1 to 6, by default 1, 2, 3, and 5, referring to
-1. - "Residuals vs Fitted", aka ‘Tukey-Anscombe’ plot
-2. - "Normal Q-Q" plot, an enhanced qqnorm(resid(.))
-3. - "Scale-Location"
-4. - "Cook's distance"
-5. - "Residuals vs Leverage"
-6. - "Cook's dist vs Lev./(1-Lev.)"}
+\item{which}{A subset of the numbers 1 to 6, by default 1, 2, 3, and 5,
+referring to
+    1. - "Residuals vs Fitted", aka ‘Tukey-Anscombe’ plot
+    2. - "Normal Q-Q" plot, an enhanced qqnorm(resid(.))
+    3. - "Scale-Location"
+    4. - "Cook's distance"
+    5. - "Residuals vs Leverage"
+    6. - "Cook's dist vs Lev./(1-Lev.)"}
 
-\item{npoints}{number of points to be labelled in each plot, starting with the most extreme.}
+\item{prop}{A character vector giving names of columns containing
+proportions to show in the pie-chart glyphs. If not specified,
+black points (geom_point) will be shown for each observation in
+the model. Note: `\code{prop}` can be left blank and will be
+interpreted if model is a \code{Diversity-Interactions (DI)}
+model object fit using the\code{\link[DImodels:DI]{DI()}}
+function from the \code{\link[DImodels:DImodels-package]{DImodels}}
+package.}
 
-\item{cook.levels}{levels of Cook's distance at which to draw contours.}
+\item{npoints}{Number of points to be labelled in each plot, starting
+with the most extreme.}
 
-\item{title}{Title for the plot}
+\item{cook.levels}{A numeric vector specifying levels of Cook's distance
+at which to draw contours.}
+
+\item{pie_radius}{A numeric value specifying the radius (in cm) for the
+pie-chart glyphs.}
+
+\item{pie_colours}{A character vector specifying the colours for the slices
+within the pie-chart glyphs.}
+
+\item{only_extremes}{A logical value indicating whether to show pie-glyphs
+only for extreme observations.}
+
+\item{label_size}{A numeric value specifying the size of the labels
+identifying extreme observations.}
+
+\item{points_size}{A numeric value specifying the size of points (when
+pie-glyphs not shown) shown in the plots.}
 
 \item{nrow}{Number of rows in which to arrange the final plot}
 
 \item{ncol}{Number of columns in which to arrange the final plot}
 }
 \value{
-A ggmultiplot class object
+A ggmultiplot (ggplot if single plot is returned) class object
 }
 \description{
-This function returns regression diagnostics plots for a Diversity Interactions (DI) model with points replaced by pie-chart glyphs making it easier to track various communities in the plots
+This function returns regression diagnostics plots for a model with points
+replaced by pie-chart glyphs making it easier to track various data points
+in the plots.
 }
 \examples{
 library(DImodels)
@@ -47,26 +79,30 @@ library(DImodels)
 ## Load data
 data(sim1)
 
-## Fit DI model
-mod1 <- DI(y = "response", prop = 3:6, data = sim1, DImodel = "ADD")
+## Fit model
+mod1 <- lm(response ~ 0 + (p1 + p2 + p3 + p4)^2, data = sim1)
 
+\dontrun{
 ## Get diagnostics plot
-diagnostics <- model_diagnostics(mod1)
+## Recommend to store plot in a variable, to access individual plots later
+diagnostics <- model_diagnostics(mod1, prop = c("p1", "p2", "p3", "p4"))
 print(diagnostics)
-
-## Get all plots
-diagnostics <- model_diagnostics(mod1, which = 1:6)
 
 ## Access individual plots
 print(diagnostics[[1]])
-print(diagnostics[[6]])
+print(diagnostics[[4]])
 
 ## Change plot arrangement
-model_diagnostics(mod1, which = c(1, 3), nrow = 2, ncol = 1)
+model_diagnostics(mod1, prop = c("p1", "p2", "p3", "p4"),
+                  which = c(1, 3), nrow = 2, ncol = 1)
 
-## Modify contour levels for residual vs leverage plot
-model_diagnostics(mod1, which = 5, cook.levels = c(0.02, 0.04, 0.06))
+## Show only extreme points as pie-glyphs to avoid overplotting
+model_diagnostics(mod1, prop = c("p1", "p2", "p3", "p4"),
+                  which = 2, npoints = 5, only_extremes = TRUE)
 
-## Change number of extreme points to be flagged
-model_diagnostics(mod1, which = 2, npoints = 5)
+## If model is a DImodels object, the don't need to specify prop
+DI_mod <- DI(y = "response", prop = c("p1", "p2", "p3", "p4"),
+             DImodel = "FULL", data = sim1)
+model_diagnostics(DI_mod, which = 1)
+}
 }

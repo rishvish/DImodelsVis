@@ -8,47 +8,94 @@ conditional_ternary(
   model,
   conditional = NULL,
   values = c(0.2, 0.5, 0.8),
+  exp_str = list(),
   resolution = 3,
   nlevels = 7,
   colours = NULL,
   lower_lim = NULL,
   upper_lim = NULL,
-  .contour_text = TRUE,
-  .axis_guides = FALSE,
+  contour_text = TRUE,
+  show_axis_labels = TRUE,
+  show_axis_guides = FALSE,
   axis_label_size = 4,
-  vertex_label_size = 5
+  vertex_label_size = 5,
+  nrow = 0,
+  ncol = 0
 )
 }
 \arguments{
-\item{model}{A Diversity Interactions model object fit by using the \code{\link[DImodels:DI]{DI()}} function from the \code{\link[DImodels:DImodels-package]{DImodels}} package.}
+\item{model}{A Diversity Interactions model object fit by using the
+\code{\link[DImodels:DI]{DI()}} function from the
+\code{\link[DImodels:DImodels-package]{DImodels}} package.}
 
-\item{conditional}{A character string describing the species to condition the ternary slices on.}
+\item{conditional}{A character vector describing the variable(s) in the
+direction of which to condition the high dimensional
+simplex for taking the slices.}
 
-\item{values}{A vector of numbers between 0 and 1 describing the values at which to takes slices of the ternary}
+\item{values}{A vector of numbers between 0 and 1 describing the values
+at which to takes slices of the high dimensional simplex.}
 
-\item{resolution}{A number between 1 and 5 describing the resolution of the resultant graph. A high value would result in a higher definition figure but at the cost of being computationlly expernsive.}
+\item{exp_str}{A list specifying values for additional experimental
+structures in the model other than the proportions.
+This would be useful to compare the predictions across
+different values for a categorical variable.
+One plot will be generated for each unique combination
+of values specified here.}
 
-\item{nlevels}{The number of levels for the contour map}
+\item{resolution}{A number between 1 and 5 describing the resolution of the
+resultant graph.
+A high value would result in a higher definition figure
+but at the cost of being computationally expensive.}
 
-\item{colours}{The colours for the contour map. The default colours scheme is the terrain.colors from hcl.pals()}
+\item{nlevels}{The number of levels to show on the contour map.}
 
-\item{lower_lim}{A number to set a custom lower limit for the contour. The default is minimum of the prediction}
+\item{colours}{A character vector or function specifying the colours for the
+contour map. The number of colours should be same as `nlevels`.
+The default colours scheme is the
+\code{\link[grDevices:terrain.colors]{terrain.colors()}}.}
 
-\item{upper_lim}{A number to set a custom upper limit for the contour. The default is maximum of the prediction}
+\item{lower_lim}{A number to set a custom lower limit for the contour.
+The default is minimum of the prediction.}
 
-\item{.contour_text}{A boolean value indicating whether to include labels on the contour lines showing their values}
+\item{upper_lim}{A number to set a custom upper limit for the contour.
+The default is maximum of the prediction.}
 
-\item{.axis_guides}{A boolean value indicating whether to show axis guides in the ternary}
+\item{contour_text}{A boolean value indicating whether to include labels on
+the contour lines showing their values. The default is
+\code{TRUE}.}
 
-\item{axis_label_size}{A numeric value to adjust the size of the axis labels in the contour}
+\item{show_axis_labels}{A boolean value indicating whether to show axis
+labels along the edges of the ternary. The default
+is \code{TRUE}.}
 
-\item{vertex_label_size}{A numeric value to adjust the size of the vertex labels in the contour}
+\item{show_axis_guides}{A boolean value indicating whether to show axis
+guides within the interior of the ternary. The
+default is \code{FALSE}.}
+
+\item{axis_label_size}{A numeric value to adjust the size of the axis labels
+in the ternary plot. The default size is 4.}
+
+\item{vertex_label_size}{A numeric value to adjust the size of the vertex
+labels in the ternary plot. The default size is 5.}
+
+\item{nrow}{Number of rows in which to arrange the final plot}
+
+\item{ncol}{Number of columns in which to arrange the final plot}
 }
 \value{
-A ggplot object
+A ggmultiplot (ggplot if single plot is returned) class object
 }
 \description{
-Conditional ternary diagrams
+Conditional ternary diagrams are a way to visualise n-dimensional
+compositional data residing in the n-1 dimensional space as 2-d ternary
+diagrams. We slice the high dimensional simplex at various values along
+the range of a particular  variable and visualise the change in the
+response with respect to the remaining three variables in a ternary
+diagram where the proportions within the ternary would sum to 1 - x,
+where x is the value of the conditioning variable at which the simplex is
+sliced. Taking multiple 2-d slices across multiple variables should allow to
+create an approximation of how the response varies across the n-dimensional
+simplex.
 }
 \examples{
 library(DImodels)
@@ -63,5 +110,5 @@ m2 <- DI(y = "response", prop = paste0("p", 1:6),
          DImodel = "AV", data = sim4)
 
 conditional_ternary(m2, conditional = c("p4", "p5", "p6"),
-                    resolution = 1)
+                    resolution = 1, values = c(0.2, 0.5))
 }

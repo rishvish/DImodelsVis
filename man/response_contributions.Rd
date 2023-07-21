@@ -2,24 +2,76 @@
 % Please edit documentation in R/ResponseContributions.R
 \name{response_contributions}
 \alias{response_contributions}
-\title{Split response into contributions by species identities and interactions}
+\title{Split response into contributions by species identities,
+       species interactions and any additional experimental structures}
 \usage{
-response_contributions(model, communities = NULL, no_random = 3, FG = NULL)
+response_contributions(
+  model,
+  data = NULL,
+  no_random = 3,
+  exp_str = list(),
+  groups = list(),
+  conf.level = 0.95,
+  se = FALSE,
+  FG = NULL,
+  nrow = 0,
+  ncol = 0
+)
 }
 \arguments{
-\item{model}{A Diversity Interactions model object fit by using the \code{\link[DImodels:DI]{DI()}} function from the \code{\link[DImodels:DImodels-package]{DImodels}} package.}
+\item{model}{A Diversity Interactions model object fit by using the
+\code{\link[DImodels:DI]{DI()}} function from the
+\code{\link[DImodels:DImodels-package]{DImodels}} package.}
 
-\item{communities}{A dataframe specifying communities of interest for which user wants to compare response. If left blank, a random selection of communities from the original data used to fit the model would be selected}
+\item{data}{A dataframe specifying communities of interest for which user
+wants to compare response. If left blank, a random selection
+of communities from the original data used to fit the model
+would be selected.}
 
-\item{no_random}{Number of random communities to select from each level of richness from original data if communities are not specified}
+\item{no_random}{Number of random communities to select from each level of
+richness from original data if communities are not specified.}
 
-\item{FG}{The functional grouping of the species in the design. Species belonging to the same functional group will be assigned with different shades of the same colour. The user can manually specify a character vector giving the functional group each species belongs to. If left empty the functional will try to get a functional grouping from the original \code{\link[DImodels:DI]{DI}} model object.}
+\item{exp_str}{A list specifying values for additional experimental
+structures in the model other than the proportions.
+This would be useful to compare the predictions across
+different values for a categorical variable. One plot will
+be generated for each unique combination of values specified
+here and they will be arranged in a grid according to the
+value specified in `nrow` and `ncol`.}
+
+\item{groups}{A list specifying groupings to arrange coefficients into.
+The coefficients within a group will be added together and
+shown as a single entity on the plot. This could be useful for
+grouping the species interactions into a single term for
+better visibility.}
+
+\item{conf.level}{The confidence level for calculating confidence or
+prediction intervals.}
+
+\item{se}{A logical value indicating whether to show prediction intervals
+for predictions in the plot.}
+
+\item{FG}{The functional grouping of the species in the design. Species
+belonging to the same functional group will be assigned with
+different shades of the same colour. The user can manually specify
+a character vector giving the functional group each species
+belongs to. If left empty the function will try to get a functional
+grouping from the original \code{\link[DImodels:DI]{DI}} model
+object.}
+
+\item{nrow}{Number of rows in which to arrange the final plot
+(when `exp_str` is specified).}
+
+\item{ncol}{Number of columns in which to arrange the final plot
+(when `exp_str` is specified).}
 }
 \value{
-A ggplot object
+A ggmultiplot (ggplot if single plot is returned) class object
 }
 \description{
-Split response into contributions by species identities and interactions
+Helper function to simplify the creation of the response contributions plot
+for models fit using the \code{\link[DImodels:DI]{DI()}} function from the
+\code{\link[DImodels:DImodels-package]{DImodels}} package.
 }
 \examples{
 #' ## Load DImodels package to fit the model
@@ -46,7 +98,7 @@ my_comms <- data.frame(p1 = c(1, 0, 0,   0.5, 1/3, 0.25),
                        p3 = c(0, 1, 0.5, 0,   1/3, 0.25),
                        p4 = c(0, 0, 0,   0.5, 0,   0.25))
 
-response_contributions(model1, communities = my_comms)
+response_contributions(model1, data = my_comms)
 
 ## Group species by functional groups
 response_contributions(model1, FG = c("G", "G", "H", "H"))

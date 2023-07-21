@@ -12,19 +12,26 @@ model_selection(
 )
 }
 \arguments{
-\item{models}{List of Diversity Interaction (DI) models fit by using the \code{\link[DImodels:DI]{DI()}} function from the \code{\link[DImodels:DImodels-package]{DImodels}} package.}
+\item{models}{List of statistical regression model objects.}
 
-\item{metric}{Metric used for comparisons between models. Takes values from c("AIC", "BIC", "AICc", "BICc", "logLik"), Can choose a single or multiple metrics for comparing the different models}
+\item{metric}{Metric used for comparisons between models. Takes values
+from c("AIC", "BIC", "AICc", "BICc", "logLik").
+Can choose a single or multiple metrics for comparing the
+different models.}
 
-\item{sort}{A boolean value indicating whether to sort the model from highest to lowest value of chosen metric}
+\item{sort}{A boolean value indicating whether to sort the model from
+highest to lowest value of chosen metric.}
 
-\item{model_names}{A character string describing the names to display on X-axis for each model in order they appear in the models parameter}
+\item{model_names}{A character string describing the names to display
+on X-axis for each model in order they appear in the
+models parameter.}
 }
 \value{
 A ggplot object
 }
 \description{
-This function helps to visualise model selection by showing a visual comparison between models using information criteria
+This function helps to visualise model selection by showing a
+visual comparison between models using information criteria.
 }
 \examples{
 library(DImodels)
@@ -60,7 +67,8 @@ model_selection(models = models_list,
 model_selection(models = models_list,
                 metric = c("AIC"), sort = TRUE)
 
-## If multiple metrics are specified then sorting will be done on first metric
+## If multiple metrics are specified then sorting
+## will be done on first metric
 model_selection(models = models_list,
                 metric = c("AIC", "logLik", "BIC"), sort = TRUE)
 

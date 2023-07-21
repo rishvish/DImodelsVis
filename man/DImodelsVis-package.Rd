@@ -6,7 +6,7 @@
 \alias{DImodelsVis-package}
 \title{DImodelsVis: Visualising Diversity-Interactions (DI) Models}
 \description{
-Aid in better understanding Diveristy Interactions (DI) models by creating novel visualisations showing the effects of multiple dimensions of biodiversity on ecosystem functions.
+Aid in better understanding Diversity Interactions (DI) models by creating novel visualisations showing the effects of multiple dimensions of biodiversity on ecosystem functions.
 }
 \details{
 \strong{Introduction to Diversity-Interactions models} \cr
@@ -26,13 +26,18 @@ mod <- DI(y = "response", prop = 3:6,
           estimate_theta = TRUE, data = sim2)
 
 ## Get model diagnostics
-model_diagnostics(mod)
+#model_diagnostics(mod)
 
 ## Visualise effects of adding a species to an existing community
-effects_plot(mod)
+visualise_effects(mod)
 
 ## Visualise slices of the 4-d simplex
 conditional_ternary(mod, conditional = "p4", resolution = 1)
+
+## Visualise the response as contributions from individuals
+## species and their interactions
+response_contributions(mod)
+
 }
 \references{
 \itemize{
