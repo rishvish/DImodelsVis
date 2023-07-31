@@ -153,7 +153,13 @@ functional_ternary_data <- function(prop, FG,
 
     for (FGs in focus){
       ids <- FG_mapping[[FGs]]
-      triangle[, prop[ids]] <- (triangle[, FGs] %o% values[ids])
+      sp_props <- (triangle[, FGs] %o% values[ids])
+      # Special condition for when there is only one species per FG
+      # As value gets stored as matrix otherwise
+      if(length(ids) == 1){
+        sp_props <- as.numeric(sp_props)
+      }
+      triangle[, prop[ids]] <- sp_props
     }
 
     cond_data <- triangle

@@ -303,12 +303,25 @@ get_comm_sum <- function(data, species){
 }
 
 #' @importFrom stats AIC BIC logLik
+#' @importFrom insight n_obs n_parameters
 #' @usage NULL
 NULL
-AICc <- utils::getFromNamespace("AICc.default", "DImodels") #function(mod) {UseMethod("AICc", mod)} #
+AICc <- function(model) {
+  aic <- AIC(model)
+  p <- insight::n_parameters(x = model, remove_nonestimable = TRUE) + 1
+  n <- insight::n_obs(x = model)
+  aicc <- aic + (2*p^2 + 2*p)/(n - p - 1)
+  return(aicc)
+}
 #' @usage NULL
 NULL
-BICc <- utils::getFromNamespace("BICc.default", "DImodels")
+BICc <- function(model) {
+  bic <- BIC(model)
+  p <- insight::n_parameters(x = model, remove_nonestimable = TRUE) + 1
+  n <- insight::n_obs(x = model)
+  bicc <- bic + (log(n)*(p+1)*p)/(n - p - 1)
+  return(bicc)
+}
 
 # Create vectorized versions of the functions of information criteria
 #' @usage NULL

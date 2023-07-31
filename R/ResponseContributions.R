@@ -58,10 +58,10 @@
 #' ## to specify the data with all columns corresponding to each coefficient
 #' coef_data <- sim2 %>%
 #'                mutate(`p1:p2` = p1*p2, `p1:p3` = p1*p2, `p1:p4` = p1*p4,
-#'                      `p2:p3` = p2*p3, `p2:p4` = p2*p4, `p3:p4` = p3*p4) %>%
+#'                       `p2:p3` = p2*p3, `p2:p4` = p2*p4, `p3:p4` = p3*p4) %>%
 #'                select(p1, p2, p3, p4,
-#'                      `p1:p2`, `p1:p3`, `p1:p4`,
-#'                      `p2:p3`, `p2:p4`, `p3:p4`) %>%
+#'                       `p1:p2`, `p1:p3`, `p1:p4`,
+#'                       `p2:p3`, `p2:p4`, `p3:p4`) %>%
 #'                slice(1,5,9,11)
 #' print(coef_data)
 #' print(mod$coefficients)
@@ -424,12 +424,14 @@ response_contributions <- function(model, data = NULL, no_random = 3,
 
   # Split the predicted response into respective contributions
   plot_data <- response_contributions_data(data = data, model = model,
+                                           groups = groups,
                                            conf.level = conf.level)
 
   # Colours for species
 
   ## Colours for ID effects
-  ID_cols <- get_colours(vars = model_species, FG = FG)
+  mod_ids <- if (is.null(model$DIcall$ID)) model_species else eval(model$DIcall$ID)
+  ID_cols <- get_colours(vars = mod_ids, FG = FG)
 
   ## Colours for interaction effects
   ## Number of interaction terms
