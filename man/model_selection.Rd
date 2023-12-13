@@ -6,8 +6,10 @@
 \usage{
 model_selection(
   models,
-  metric = c("AIC", "BIC", "AICc", "BICc", "logLik"),
+  metric = c("AIC", "BIC", "AICc", "BICc", "deviance"),
   sort = FALSE,
+  breakup = FALSE,
+  plot = TRUE,
   model_names = names(models)
 )
 }
@@ -22,16 +24,26 @@ different models.}
 \item{sort}{A boolean value indicating whether to sort the model from
 highest to lowest value of chosen metric.}
 
+\item{breakup}{A boolean value indicating whether to breakup the metric value
+into goodness of fit (defined as -2*loglikelihood) and
+penalty components. Will work only if a single metric out of
+"AIC", "AICc", "BIC", or "BICc" is chosen to plot.}
+
+\item{plot}{A boolean variable indicating whether to create the plot or return
+the prepared data instead. The default `TRUE` creates the plot while
+`FALSE` would return the prepared data for plotting. Could be useful
+for if user wants to modify the data first and then call the plotting}
+
 \item{model_names}{A character string describing the names to display
 on X-axis for each model in order they appear in the
 models parameter.}
 }
 \value{
-A ggplot object
+A ggplot object or data-frame (if `plot == FALSE`)
 }
 \description{
 This function helps to visualise model selection by showing a
-visual comparison between models using information criteria.
+visual comparison between the information criteria for different models.
 }
 \examples{
 library(DImodels)
@@ -51,44 +63,61 @@ mod_FULL_theta <- DI(prop = 3:6, DImodel = "FULL", data = sim2,
 mod_FG_theta <- DI(prop = 3:6, DImodel = "FG", FG = c("G","G","L","L"),
                    data = sim2, y = "response", estimate_theta = TRUE)
 
-models_list <- list(mod_AV, mod_FULL, mod_FG,
-                    mod_AV_theta, mod_FULL_theta, mod_FG_theta)
+models_list <- list("AV model" = mod_AV, "Full model" = mod_FULL,
+                    "FG model" = mod_FG, "AV model_t" = mod_AV_theta,
+                    "Full model_t" = mod_FULL_theta,
+                    "FG model_t" = mod_FG_theta)
 
-## Compare different information criteria for the different models
-model_selection(models = models_list,
-                metric = c("AIC", "AICc"))
-
-## If single metric is specified then breakup of metric
-## between loglik and penalty will be shown
+## Specific metric
 model_selection(models = models_list,
                 metric = c("AIC"))
 
+## Multiple metrics can be plotted together as well
+model_selection(models = models_list,
+                metric = c("AIC", "BIC"))
+
+## If single metric is specified then breakup of metric
+## between goodness of fit and penalty can also be visualised
+model_selection(models = models_list,
+                metric = c("AICc"),
+                breakup = TRUE)
+
 ## Sort models
 model_selection(models = models_list,
-                metric = c("AIC"), sort = TRUE)
+                metric = c("AICc"),
+                breakup = TRUE, sort = TRUE)
 
 ## If multiple metrics are specified then sorting
-## will be done on first metric
+## will be done on first metric specified in list (AIC in this case)
 model_selection(models = models_list,
-                metric = c("AIC", "logLik", "BIC"), sort = TRUE)
+                metric = c("AIC", "BIC", "AICc", "BICc"), sort = TRUE)
 
+## If the list specified in models is not named then
 ## By default the labels on the X-axis for the models will be
 ## created by assigning a unique ID to each model sequentially
 ## in the order they appear in the models object
+names(models_list) <- NULL
 model_selection(models = models_list,
-                metric = c("AIC", "logLik", "BIC"), sort = TRUE)
+                metric = c("AIC", "BIC", "AICc"), sort = TRUE)
 
-## When possible the variables names of objects contatining the
+## When possible the variables names of objects containing the
 ## individual models would be used as axis labels
 model_selection(models = list(mod_AV, mod_FULL, mod_FG,
                               mod_AV_theta, mod_FULL_theta, mod_FG_theta),
-                metric = c("AIC", "logLik", "BIC"), sort = TRUE)
+                metric = c("AIC", "BIC"), sort = TRUE)
 
 ## If neither of these two situations are desirable custom labels
 ## for each model can be specified using the model_names parameter
 model_selection(models = list(mod_AV, mod_FULL, mod_FG,
                               mod_AV_theta, mod_FULL_theta, mod_FG_theta),
-                metric = c("AIC", "logLik", "BIC"), sort = TRUE,
+                metric = c("AIC", "BIC"), sort = TRUE,
+                model_names = c("AV model", "Full model", "FG model",
+                                "AV theta", "Full theta", "FG theta"))
+
+## Specify `plot = FALSE` to not create the plot but return the prepared data
+model_selection(models = list(mod_AV, mod_FULL, mod_FG,
+                              mod_AV_theta, mod_FULL_theta, mod_FG_theta),
+                metric = c("AIC", "BIC"), sort = TRUE, plot = FALSE,
                 model_names = c("AV model", "Full model", "FG model",
                                 "AV theta", "Full theta", "FG theta"))
 }

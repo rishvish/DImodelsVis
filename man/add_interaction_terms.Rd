@@ -7,17 +7,21 @@
 add_interaction_terms(data, model)
 }
 \arguments{
-\item{data}{A dataframe with species proportions that sum to 1 to create the appropriate interaction structures}
+\item{data}{A data-frame with species proportions that sum to 1 to create
+the appropriate interaction structures.}
 
-\item{model}{A Diversity Interactions model object fit by using the \code{\link[DImodels:DI]{DI()}} function from the \code{\link[DImodels:DImodels-package]{DImodels}} package.}
+\item{model}{A Diversity Interactions model object fit by using the
+\code{\link[DImodels:DI]{DI()}} function from the
+\code{\link[DImodels:DImodels-package]{DImodels}} package.}
 }
 \value{
-A data-frame with additional columns describing the interactions terms present in the model object.
+The original data-frame with additional columns appended at the end
+describing the interactions terms present in the model object.
 }
 \description{
 Utility function that accepts a fitted Diversity-Interactions (DI) model
-object and a data frame and adds the necessary interaction structures to
-the data for making predictions.
+object along with a data frame and adds the necessary interaction structures to
+the data for making predictions using the model object specified in `model`.
 }
 \examples{
 library(DImodels)
@@ -38,5 +42,4 @@ add_interaction_terms(data = newdata, model = mod1)
 add_interaction_terms(data = newdata, model = mod2)
 add_interaction_terms(data = newdata, model = mod3)
 add_interaction_terms(data = newdata, model = mod4)
-
 }

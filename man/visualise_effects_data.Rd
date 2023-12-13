@@ -2,36 +2,47 @@
 % Please edit documentation in R/VisualiseEffects.R
 \name{visualise_effects_data}
 \alias{visualise_effects_data}
-\title{Create data for visualising the effect of species loss or addition from a community.}
+\title{Effects plots for compositional data}
 \usage{
 visualise_effects_data(
   data,
   prop,
-  species_interest = NULL,
-  effect = c("addition", "loss"),
+  var_interest = NULL,
+  effect = c("increase", "decrease", "both"),
+  add_var = list(),
   prediction = TRUE,
   ...
 )
 }
 \arguments{
 \item{data}{A dataframe specifying the initial communities of interest for which
-to visualise the effect of species loss or addition.
+to visualise the effect of increasing/decreasing a variable.
 If a model object is specified then this data should contain all the
-variables present in the model object including any experimental structures.
+variables present in the model object including any additional variables
+not part of the simplex design.
 If a coefficient vector is specified then data should contain same number of
 columns as the number of elements in the coefficient vector and a one-to-one
 positional mapping would be assumed between the data columns and the
 elements of the coefficient vector.}
 
 \item{prop}{A vector of column names or indices identifying the columns containing the
-species proportions in the data.}
+variable proportions (i.e., compositional columns) in the data.}
 
-\item{species_interest}{A character vector specifying the species for which to visualise
-the effect of addition or loss on the response. If left blank,
-all species would be assumed to be of interest.}
+\item{var_interest}{A character vector specifying the variable for which to visualise
+the effect of change on the response. If left blank,
+all variables would be assumed to be of interest.}
 
-\item{effect}{A character string with one value from c("addition", "loss") whether to
-visualise the effect of addition or loss of a species.}
+\item{effect}{One of "increase", "decrease" or "both" to indicate whether to
+look at the effect of increasing the proportion, decreasing the
+proportion or doing both simultaneously, respectively on the response.
+The default in "increasing".}
+
+\item{add_var}{A list specifying values for additional variables
+in the model other than the proportions (i.e. not part of the simplex design).
+This would be useful to compare the predictions across
+different values for a categorical variable.
+One plot will be generated for each unique combination
+of values specified here.}
 
 \item{prediction}{A logical value indicating whether to pass the final data to
 `\link{add_prediction}` and add predictions to the data.
@@ -43,13 +54,32 @@ manually call the `\link{add_prediction}` function.}
 \item{...}{
   Arguments passed on to \code{\link[=add_prediction]{add_prediction}}
   \describe{
-    \item{\code{model}}{A regression model object which will be used to make predictions for the observations in `data`.
-Will override `coefficients` if specified.}
-    \item{\code{coefficients}}{If a regression model is not available (or can't be fit in R), the regression coefficients from a model fit in some other language can be used to calculate predictions.
-However, the user would have to ensure there's an appropriate one-to-one positional mapping between the data columns and the coefficient values.
-Further, it would not be possible to calculate confidence/prediction intervals using this method.}
-    \item{\code{coeff_cols}}{If `coefficients` are specified and there isn't a one-to-one positional mapping between}
-    \item{\code{conf.level}}{The confidence level for calculating confidence/prediction intervals. Default is 0.95.}
+    \item{\code{model}}{A regression model object which will be used to make predictions
+for the observations in `data`. Will override `coefficients`
+if specified.}
+    \item{\code{coefficients}}{If a regression model is not available (or can't be fit in R),
+the regression coefficients from a model fit in some other
+language can be used to calculate predictions. However, the
+user would have to ensure there's an appropriate one-to-one
+positional mapping between the data columns and the
+coefficient values. Further, the would also have to provide
+a variance-covariance matrix of the coefficients in the `vcov`
+parameter if they want the associated CI for the prediction or
+it would not be possible to calculate confidence/prediction
+intervals using this method.}
+    \item{\code{vcov}}{If regression coefficients are specified, then the variance-covariance
+matrix of the coefficients can be specified here to calculate the
+associated confidence interval around each prediction. Failure to do
+so would result in no confidence intervals being returned. Ensure
+`coefficients` and `vcov` have the same positional mapping with the data.}
+    \item{\code{coeff_cols}}{If `coefficients` are specified and a one-to-one positional
+mapping between the data-columns and coefficient vector is
+not present. A character string or numeric index can be specified
+here to reorder the data columns and match the corresponding
+coefficient value to the respective data column. See the
+"Use model coefficients for prediction" section in examples.}
+    \item{\code{conf.level}}{The confidence level for calculating confidence/prediction
+intervals. Default is 0.95.}
     \item{\code{interval}}{Type of interval to calculate:
 \describe{
   \item{"none" (default)}{No interval to be calculated.}
@@ -61,31 +91,40 @@ Further, it would not be possible to calculate confidence/prediction intervals u
 \value{
 A data frame with the following columns appended at the end
  \describe{
-   \item{.Sp}{An identifier column to discern the species of interest being modified in each curve.}
-   \item{.Proportion}{The value of the species of interest within the community.}
+   \item{.Sp}{An identifier column to discern the variable of interest being modified in each curve.}
+   \item{.Proportion}{The value of the variable of interest within the community.}
    \item{.Group}{An identifier column to discern between the different curves.}
-   \item{.Pred}{The predicted response for each community.}
+   \item{.add_str_ID}{An identifier column for grouping the cartesian product
+                      of all additional columns specified in `add_var`
+                      parameter (if `add_var` is specified).}
+   \item{.Pred}{The predicted response for each observation.}
    \item{.Lower}{The lower limit of the prediction/confidence interval for each observation.}
    \item{.Upper}{The upper limit of the prediction/confidence interval for each observation.}
    \item{.Marginal}{The marginal change in the response (first derivative) with respect to the
                     gradual change in the proportion of the species of interest.}
    \item{.Threshold}{A numeric value indicating the maximum proportion of the species of interest
                      within a particular community which results in a positive marginal effect on the response.}
-   \item{.MarEffect}{A character string entailing whether the addition/loss of the species of interest from the
+   \item{.MarEffect}{A character string entailing whether the increase/decrease of the species of interest from the
                      particular community would result in a positive or negative marginal effect on the response.}
-   \item{.Effect}{An identifier column signifying whether considering the effect of species addition or species loss.}
+   \item{.Effect}{An identifier column signifying whether considering the effect of species addition or species decrease.}
  }
 }
 \description{
-The helper function to create the underlying data for visualising effects plots.
-For each species community in data, several intermediary communities would be created between the initial
-community and the monoculture of the species of interest (if looking at effect of species addition) or
-between the original community and the community without the species of interest (if look at effect of species loss)
-whilst maintaining the same ratio of the original species in the community.
-The model object or coefficients vector would then be used to calculated the predicted response for each
-intermediary community allowing us to visualise the effect of the addition/loss of the species of interest.
-This function is particularly useful if the model object is not of class `\link[DImodels:DI]{DI()}` or only model
-coefficients are available for prediction.
+The helper function to create the underlying data for visualising the effect
+of increasing or decreasing (or both) the proportion of a variable from a
+set of compositional variables. This is a special case of the
+\code{\link{suggest_name}} function where the end points are either the
+monoculture (i.e. variable of interest = 1, while all others equal 0) of the
+variable of interest (when increasing the proportion) or a community without
+the variable of interest (when decreasing the proportion). The observations
+specified in `data` are connected to the respective communities with a straight
+line across the simplex, this has the effect of changing the proportion of
+the variable of interest whilst adjusting the proportion of the other variables
+but keeping their proportions unchanged, thereby preserving the compositional
+nature of the data. This enables us to visualise the effect of changing the
+proportion of a variable of interest. See examples for more information.
+The output of this function can be passed to the
+\code{\link{visualise_effects_plot}} function to visualise the results.
 }
 \examples{
 library(DImodels)
@@ -96,23 +135,61 @@ data(sim1)
 ## Fit model
 mod <- glm(response ~ p1 + p2 + p3 + p4 + 0, data = sim1)
 
-## Create data for visualising effect of adding species 1 to
-## the original communities in the data
+## Create data for visualising effect of increasing the proportion of
+## variable p1 in data
+## Notice how the proportion of `p1` increases while the proportion of
+## the other variables decreases whilst maintaining their relative proportions
 head(visualise_effects_data(data = sim1, prop = c("p1", "p2", "p3", "p4"),
-                            species_interest = "p1", effect = "addition",
+                            var_interest = "p1", effect = "increase",
                             model = mod))
 
-## Create data for visualising effect of losing species 2 from
+## Create data for visualising the effect of decreasing the proportion
+## variable p1 in data using `effect = "decrease"`
+head(visualise_effects_data(data = sim1, prop = c("p1", "p2", "p3", "p4"),
+                            var_interest = "p1", effect = "decrease",
+                            model = mod))
+
+## Create data for visualising the effect of increasing and decreasing the
+## proportion variable p3 in data using `effect = "both"`
+head(visualise_effects_data(data = sim1, prop = c("p1", "p2", "p3", "p4"),
+                            var_interest = "p3", effect = "decrease",
+                            model = mod))
+
+## Getting prediction intervals at a 99\% confidence level
+head(visualise_effects_data(data = sim1, prop = c("p1", "p2", "p3", "p4"),
+                            var_interest = "p1", effect = "decrease",
+                            model = mod, conf.level = 0.99,
+                            interval = "prediction"))
+
+## Adding additional variables to the data using `add_var`
+## Notice the new .add_str_ID column in the output
+sim1$block <- as.numeric(sim1$block)
+new_mod <- update(mod, ~ . + block, data = sim1)
+head(visualise_effects_data(data = sim1[, 3:6], prop = c("p1", "p2", "p3", "p4"),
+                            var_interest = "p1", effect = "both",
+                            model = new_mod,
+                            add_var = list("block" = c(1, 2))))
+
+## Create data for visualising effect of decreasing variable p2 from
 ## the original communities in the data but using model coefficients
 ## When specifying coefficients the data should have a one-to-one
 ## positional mapping with specified coefficients.
-## Note that no confidence intervals can be generated when specifying
-## model coefficients.
 init_comms <- sim1[, c("p1", "p2", "p3", "p4")]
 head(visualise_effects_data(data = init_comms, prop = 1:4,
-                            species_interest = "p2",
-                            effect = "loss",
+                            var_interest = "p2",
+                            effect = "decrease",
+                            interval = "none",
                             coefficients = mod$coefficients))
+
+## Note that to get confidence interval when specifying
+## model coefficients we'd also need to provide a variance covariance
+## matrix using the `vcov` argument
+head(visualise_effects_data(data = init_comms, prop = 1:4,
+                            var_interest = "p2",
+                            effect = "decrease",
+                            interval = "confidence",
+                            coefficients = mod$coefficients,
+                            vcov = vcov(mod)))
 
 ## Can also create only the intermediary communities without predictions
 ## by specifying prediction = FALSE.
@@ -122,10 +199,12 @@ head(visualise_effects_data(data = init_comms, prop = 1:4,
 ## not contain information about the marginal effect of changing the species
 ## interest
 effects_data <- visualise_effects_data(data = init_comms, prop = 1:4,
-                                       species_interest = "p2",
-                                       effect = "loss",
+                                       var_interest = "p2",
+                                       effect = "decrease",
                                        prediction = FALSE)
 head(effects_data)
+## Prediction using model object
 head(add_prediction(data = effects_data, model = mod, interval = "prediction"))
+## Prediction using regression coefficients
 head(add_prediction(data = effects_data, coefficients = mod$coefficients))
 }

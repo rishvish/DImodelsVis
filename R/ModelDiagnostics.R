@@ -6,15 +6,15 @@
 #'
 #' @importFrom PieGlyph geom_pie_glyph pieGrob
 #' @importFrom dplyr bind_rows desc filter arrange slice
-#'                   select all_of mutate .data
+#'                   select all_of mutate .data as_tibble
 #' @importFrom stats family residuals qqnorm weights quantile qnorm
 #' @importFrom ggplot2 fortify xlim ylim xlab ylab ggtitle geom_hline
 #'                     geom_text geom_abline geom_linerange geom_segment
 #'                     aes ggplot scale_fill_manual unit labs guides
-#'                     scale_y_continuous expansion
+#'                     scale_y_continuous expansion sec_axis
 #' @importFrom methods new
 #' @importFrom ggtext geom_richtext
-#' @importFrom cli cli_progress_bar cli_progress_update cli_process_done
+#' @importFrom cli cli_progress_bar cli_progress_update cli_process_done cli_bullets
 #' @importClassesFrom ggfortify ggmultiplot
 #'
 #' @param model A statistical regression model object.
@@ -28,7 +28,7 @@
 #'                  6. - "Cook's dist vs Lev./(1-Lev.)"
 #' @param npoints Number of points to be labelled in each plot, starting
 #'                with the most extreme.
-#' @param cook.levels A numeric vector specifying levels of Cook's distance
+#' @param cook_levels A numeric vector specifying levels of Cook's distance
 #'                    at which to draw contours.
 #' @param nrow Number of rows in which to arrange the final plot
 #' @param ncol Number of columns in which to arrange the final plot
@@ -50,8 +50,12 @@
 #'                    pie-glyphs not shown) shown in the plots.
 #' @param only_extremes A logical value indicating whether to show pie-glyphs
 #'                      only for extreme observations.
+#' @param plot A boolean variable indicating whether to create the plot or return
+#'             the prepared data instead. The default `TRUE` creates the plot while
+#'             `FALSE` would return the prepared data for plotting. Could be useful
+#'             for if user wants to modify the data first and then call the plotting
 #'
-#' @return A ggmultiplot (ggplot if single plot is returned) class object
+#' @return A ggmultiplot (ggplot if single plot is returned) class object or data-frame (if `plot = FALSE`)
 #' @export
 #'
 #' @examples
@@ -63,7 +67,6 @@
 #' ## Fit model
 #' mod1 <- lm(response ~ 0 + (p1 + p2 + p3 + p4)^2, data = sim1)
 #'
-#' \dontrun{
 #' ## Get diagnostics plot
 #' ## Recommend to store plot in a variable, to access individual plots later
 #' diagnostics <- model_diagnostics(mod1, prop = c("p1", "p2", "p3", "p4"))
@@ -85,27 +88,32 @@
 #' DI_mod <- DI(y = "response", prop = c("p1", "p2", "p3", "p4"),
 #'              DImodel = "FULL", data = sim1)
 #' model_diagnostics(DI_mod, which = 1)
-#' }
+#'
+#' ## Specify `plot = FALSE` to not create the plot but return the prepared data
+#' model_diagnostics(DI_mod, which = 1, plot  = FALSE)
 model_diagnostics <- function(model, which = c(1,2,3,5), prop = NULL,
-                              npoints = 3, cook.levels = c(0.5, 1),
-                              pie_radius = 0.25, pie_colours = NULL,
+                              npoints = 3, cook_levels = c(0.5, 1),
+                              pie_radius = 0.2, pie_colours = NULL,
                               only_extremes = FALSE, label_size = 4,
-                              points_size = 3, nrow = 0, ncol = 0){
+                              points_size = 3, plot = TRUE,
+                              nrow = 0, ncol = 0){
   # Sanity checks
   sanity_checks(model = model,
                 numerics = list("which" = which, "npoints" = npoints,
-                                "cook.levels" = cook.levels,
+                                "cook_levels" = cook_levels,
                                 "pie_radius" = pie_radius,
                                 "label_size" = label_size,
                                 "points_size" = points_size,
                                 "nrow" = nrow, "ncol" = ncol),
-                booleans = list("only_extremes" = only_extremes),
+                booleans = list("only_extremes" = only_extremes,
+                                "plot" = plot),
                 colours = pie_colours,
                 unit_lengths = list("pie_radius" = pie_radius,
                                     "label_size" = label_size,
                                     "points_size" = points_size,
                                     "nrow" = nrow, "ncol" = ncol,
                                     "npoints" = npoints,
+                                    "plot" = plot,
                                     "only_extremes" = only_extremes))
 
   # Data will all diagnostic metrics added
@@ -221,315 +229,333 @@ model_diagnostics <- function(model, which = c(1,2,3,5), prop = NULL,
   pie_grob <- pieGrob(values = 1:4,
                       radius = ifelse(pies, pie_radius, points_size/15))
 
-  # Progress bar to be shown if plots take long time
-  p_bar <- cli_progress_bar(
-    total = length(which),
-    format = "Creating plot {pb_current} of {pb_total} |
+
+  if(isTRUE(plot)){
+    # Progress bar to be shown if plots take long time
+    p_bar <- cli_progress_bar(
+      total = length(which),
+      format = "Creating plot {pb_current} of {pb_total} |
              {pb_bar} {pb_percent} | ETA: {pb_eta}"
-  )
+    )
 
-  plots <- list()
+    plots <- list()
 
-  if(show[1L]){
-    # Best fit line across points
-    smoothing_line <- smoothing_fun(plot_data$.fitted,  plot_data$.resid)
+    if(show[1L]){
+      # Best fit line across points
+      smoothing_line <- smoothing_fun(plot_data$.fitted,  plot_data$.resid)
 
-    # Base plot with points and other aesthetics
-    pl <- ggplot(plot_data, aes(.data$.fitted, .data$.resid))+
-            theme_bw()+
-            geom_point(size = 3)+
-            geom_line(data = smoothing_line,
-                      aes(x = .data$x, y = .data$y),
-                      colour = "red", linetype = 1) +
-            geom_hline(yintercept=0, col="black", linetype="dashed")
+      # Base plot with points and other aesthetics
+      pl <- ggplot(plot_data, aes(.data$.fitted, .data$.resid))+
+        theme_bw()+
+        geom_point(size = 3)+
+        geom_line(data = smoothing_line,
+                  aes(x = .data$x, y = .data$y),
+                  colour = "red", linetype = 1) +
+        geom_hline(yintercept=0, col="black", linetype="dashed")
 
-    # If possible then replace points with pie-chart glyphs showing proportions
-    if(pies){
-      # Show extreme observations with pie-chart glyphs
-      if(only_extremes){
-        pl <- add_pies(pl = pl, colours = colours,
-                       data = show.r, slices = model_species,
-                       colour = "black", radius = pie_radius)
-      # Else show all points as pie-glyphs
-      } else {
-        pl <- add_pies(pl = pl, colours = colours,
-                       slices = model_species, colour = "black",
-                       radius = pie_radius)
+      # If possible then replace points with pie-chart glyphs showing proportions
+      if(pies){
+        # Show extreme observations with pie-chart glyphs
+        if(only_extremes){
+          pl <- add_pies(pl = pl, colours = colours,
+                         data = show.r, slices = model_species,
+                         colour = "black", radius = pie_radius)
+          # Else show all points as pie-glyphs
+        } else {
+          pl <- add_pies(pl = pl, colours = colours,
+                         slices = model_species, colour = "black",
+                         radius = pie_radius)
+        }
       }
+
+      # Flag extreme observations
+      pl <- add_label(pl = pl, data = show.r,
+                      grob_obj = pie_grob,
+                      label_size = label_size) +
+        labs(x = "Fitted Values", y = "Residuals",
+             title = "Residual vs Fitted")+
+        scale_y_continuous(expand = expansion(mult = 0.1))
+
+      plots[["ResivsFit"]] <- pl
+      cli_progress_update(id = p_bar, set = sum(show[1L]))
     }
 
-    # Flag extreme observations
-    pl <- add_label(pl = pl, data = show.r,
-                    grob_obj = pie_grob,
-                    label_size = label_size) +
-      labs(x = "Fitted Values", y = "Residuals",
-           title = "Residual vs Fitted")+
-      scale_y_continuous(expand = expansion(mult = 0.1))
+    if(show[2L]){
+      pl <- ggplot(plot_data, aes(.data$.qq, .data$.stdresid))+
+        theme_bw()+
+        geom_point(size = 3, na.rm = TRUE)+
+        geom_abline(slope = qq_slope, intercept = qq_intercept)
 
-    plots[["ResivsFit"]] <- pl
-    cli_progress_update(id = p_bar, set = sum(show[1L]))
-  }
-
-  if(show[2L]){
-    pl <- ggplot(plot_data, aes(.data$.qq, .data$.stdresid))+
-            theme_bw()+
-            geom_point(size = 3, na.rm = TRUE)+
-            geom_abline(slope = qq_slope, intercept = qq_intercept)
-
-    if(pies){
-      # Show extreme observations with pie-chart glyphs
-      if(only_extremes){
-        pl <- add_pies(pl = pl, colours = colours,
-                       data = show.r, slices = model_species,
-                       colour = "black", radius = pie_radius)
-      # Else show all points as pie-glyphs
-      } else {
-        pl <- add_pies(pl = pl, colours = colours,
-                       slices = model_species, colour = "black",
-                       radius = pie_radius)
+      if(pies){
+        # Show extreme observations with pie-chart glyphs
+        if(only_extremes){
+          pl <- add_pies(pl = pl, colours = colours,
+                         data = show.r, slices = model_species,
+                         colour = "black", radius = pie_radius)
+          # Else show all points as pie-glyphs
+        } else {
+          pl <- add_pies(pl = pl, colours = colours,
+                         slices = model_species, colour = "black",
+                         radius = pie_radius)
+        }
       }
+
+      pl <- add_label(pl = pl, data = show.r,
+                      grob_obj = pie_grob,
+                      label_size = label_size) +
+        xlab("Theoretical Quantiles")+
+        ylab("Std. Pearson Residuals")+
+        scale_y_continuous(expand = expansion(mult = 0.1))+
+        ggtitle("Normal Q-Q")
+
+      plots[["QQplot"]] <- pl
+      cli_progress_update(id = p_bar, set = sum(show[1L:2L]))
     }
 
-    pl <- add_label(pl = pl, data = show.r,
-                    grob_obj = pie_grob,
-                    label_size = label_size) +
-      xlab("Theoretical Quantiles")+
-      ylab("Std. Pearson Residuals")+
-      scale_y_continuous(expand = expansion(mult = 0.1))+
-      ggtitle("Normal Q-Q")
+    if(show[3L]){
+      smoothing_line <- smoothing_fun(plot_data$.fitted,
+                                      sqrt(abs(plot_data$.stdresid)))
 
-    plots[["QQplot"]] <- pl
-    cli_progress_update(id = p_bar, set = sum(show[1L:2L]))
-  }
+      pl <- ggplot(plot_data, aes(.data$.fitted, sqrt(abs(.data$.stdresid))))+
+        theme_bw()+
+        geom_point(size = 3, na.rm=TRUE)+
+        geom_line(data = smoothing_line,
+                  aes(x = .data$x, y = .data$y),
+                  colour = "red", linetype = 1)
 
-  if(show[3L]){
-    smoothing_line <- smoothing_fun(plot_data$.fitted,
-                                    sqrt(abs(plot_data$.stdresid)))
-
-    pl <- ggplot(plot_data, aes(.data$.fitted, sqrt(abs(.data$.stdresid))))+
-            theme_bw()+
-            geom_point(size = 3, na.rm=TRUE)+
-            geom_line(data = smoothing_line,
-                      aes(x = .data$x, y = .data$y),
-                      colour = "red", linetype = 1)
-
-    if(pies){
-      # Show extreme observations with pie-chart glyphs
-      if(only_extremes){
-        pl <- add_pies(pl = pl, colours = colours,
-                       data = show.r, slices = model_species,
-                       colour = "black", radius = pie_radius)
-      # Else show all points as pie-glyphs
-      } else {
-        pl <- add_pies(pl = pl, colours = colours,
-                       slices = model_species, colour = "black",
-                       radius = pie_radius)
+      if(pies){
+        # Show extreme observations with pie-chart glyphs
+        if(only_extremes){
+          pl <- add_pies(pl = pl, colours = colours,
+                         data = show.r, slices = model_species,
+                         colour = "black", radius = pie_radius)
+          # Else show all points as pie-glyphs
+        } else {
+          pl <- add_pies(pl = pl, colours = colours,
+                         slices = model_species, colour = "black",
+                         radius = pie_radius)
+        }
       }
+
+      pl <- add_label(pl = pl, data = show.r,
+                      grob_obj = pie_grob,
+                      label_size = label_size) +
+        xlab("Fitted Value")+
+        ylab(expression(sqrt("|Std. Pearson residuals|")))+
+        scale_y_continuous(expand = expansion(mult = 0.1))+
+        ggtitle("Scale-Location")
+
+      plots[["Scale-Location"]] <- pl
+      cli_progress_update(id = p_bar, set = sum(show[1L:3L]))
     }
 
-    pl <- add_label(pl = pl, data = show.r,
-                    grob_obj = pie_grob,
-                    label_size = label_size) +
-      xlab("Fitted Value")+
-      ylab(expression(sqrt("|Std. Pearson residuals|")))+
-      scale_y_continuous(expand = expansion(mult = 0.1))+
-      ggtitle("Scale-Location")
+    if(show[4L]){
+      pl <- ggplot(plot_data, aes(x = .data$Obs, y = .data$.cooksd))+
+        theme_bw()+
+        geom_point(size = 3)+
+        geom_linerange(aes(ymax = .data$.cooksd, ymin = 0),
+                       linewidth = 1)
 
-    plots[["Scale-Location"]] <- pl
-    cli_progress_update(id = p_bar, set = sum(show[1L:3L]))
-  }
-
-  if(show[4L]){
-    pl <- ggplot(plot_data, aes(x = .data$Obs, y = .data$.cooksd))+
-            theme_bw()+
-            geom_point(size = 3)+
-            geom_linerange(aes(ymax = .data$.cooksd, ymin = 0),
-                           linewidth = 1)
-
-    if(pies){
-      # Show extreme observations with pie-chart glyphs
-      if(only_extremes){
-        pl <- add_pies(pl = pl, colours = colours,
-                       data = show.cook, slices = model_species,
-                       colour = "black", radius = pie_radius)
-      # Else show all points as pie-glyphs
-      } else {
-        pl <- add_pies(pl = pl, colours = colours,
-                       slices = model_species, colour = "black",
-                       radius = pie_radius)
+      if(pies){
+        # Show extreme observations with pie-chart glyphs
+        if(only_extremes){
+          pl <- add_pies(pl = pl, colours = colours,
+                         data = show.cook, slices = model_species,
+                         colour = "black", radius = pie_radius)
+          # Else show all points as pie-glyphs
+        } else {
+          pl <- add_pies(pl = pl, colours = colours,
+                         slices = model_species, colour = "black",
+                         radius = pie_radius)
+        }
       }
+
+      pl <- add_label(pl = pl, data = show.cook,
+                      grob_obj = pie_grob,
+                      label_size = label_size) +
+        xlab("Obs. Number")+
+        ylab("Cook's distance")+
+        scale_y_continuous(expand = expansion(mult = c(0.05, 0.1)))+
+        ggtitle("Cook's distance")
+
+      plots[["CooksD"]] <- pl
+      cli_progress_update(id = p_bar, set = sum(show[1L:4L]))
     }
 
-    pl <- add_label(pl = pl, data = show.cook,
-                    grob_obj = pie_grob,
-                    label_size = label_size) +
-      xlab("Obs. Number")+
-      ylab("Cook's distance")+
-      scale_y_continuous(expand = expansion(mult = c(0.05, 0.1)))+
-      ggtitle("Cook's distance")
+    if(show[5L]){
 
-    plots[["CooksD"]] <- pl
-    cli_progress_update(id = p_bar, set = sum(show[1L:4L]))
-  }
+      r.hat <- range(hii, na.rm = TRUE)
+      isConst.hat <- all(r.hat == 0) ||
+        diff(r.hat) < 1e-10 * mean(hii, na.rm = TRUE)
+      y_thresh <- max(abs(plot_data$.stdresid)) + 0.5
+      p <- model$rank
+      xmax <- max(hii) + 0.01
+      hh <- seq.int(min(r.hat[1L], r.hat[2L]/100), xmax, length.out = 101)
+      cook_contours <- data.frame(x = vector(),
+                                  y = vector(),
+                                  group = vector(),
+                                  label = vector())
 
-  if(show[5L]){
-
-    r.hat <- range(hii, na.rm = TRUE)
-    isConst.hat <- all(r.hat == 0) ||
-                       diff(r.hat) < 1e-10 * mean(hii, na.rm = TRUE)
-    y_thresh <- max(abs(plot_data$.stdresid)) + 0.5
-    p <- model$rank
-    xmax <- max(hii) + 0.01
-    hh <- seq.int(min(r.hat[1L], r.hat[2L]/100), xmax, length.out = 101)
-    cook_contours <- data.frame(x = vector(),
-                                y = vector(),
-                                group = vector(),
-                                label = vector())
-
-    if (length(cook.levels)) {
-      for (i in seq_along(cook.levels)) {
-        cl.h <- sqrt(cook.levels[i] * p * (1 - hh)/hh)
-        x <- rep(hh, times = 2)
-        y <- c(cl.h, -1 * cl.h)
-        group <- rep(c(2*i - 1, 2*i), each = 101)
-        label <- cook.levels[i]
-        cook_contours <- bind_rows(cook_contours,
-                                   data.frame(x, y, group, label))
+      if (length(cook_levels)) {
+        for (i in seq_along(cook_levels)) {
+          cl.h <- sqrt(cook_levels[i] * p * (1 - hh)/hh)
+          x <- rep(hh, times = 2)
+          y <- c(cl.h, -1 * cl.h)
+          group <- rep(c(2*i - 1, 2*i), each = 101)
+          label <- cook_levels[i]
+          cook_contours <- bind_rows(cook_contours,
+                                     data.frame(x, y, group, label))
+        }
       }
+
+      cook_contours <- cook_contours[abs(cook_contours$y) <= y_thresh, ]
+      smoothing_line <- smoothing_fun(plot_data$.hat, plot_data$.stdresid)
+
+      panel_plot <- ggplot(plot_data, aes(.data$.hat, .data$.stdresid))+
+        theme_bw()+
+        geom_point(size = 3, na.rm=TRUE)+
+        geom_line(data = smoothing_line,
+                  aes(x = .data$x, y = .data$y),
+                  colour = "red", linetype = 1)
+
+      if(nrow(cook_contours) > 0){
+        panel_plot <- panel_plot +
+          geom_line(data = cook_contours,
+                    aes(x = .data$x, y = .data$y, group = group),
+                    colour = 'grey20', linetype = 2) +
+          geom_text(data = cook_contours %>% filter(x == max(x)),
+                    aes(x = .data$x + 0.01, y = .data$y, label = .data$label),
+                    size = label_size, colour = 'grey20')
+      }
+
+      if(pies){
+        # Show extreme observations with pie-chart glyphs
+        if(only_extremes){
+          panel_plot <- add_pies(pl = panel_plot, colours = colours,
+                                 data = show.cook, slices = model_species,
+                                 colour = "black", radius = pie_radius)
+          # Else show all points as pie-glyphs
+        } else {
+          panel_plot <- add_pies(pl = panel_plot, colours = colours,
+                                 slices = model_species, colour = "black",
+                                 radius = pie_radius)
+        }
+      }
+
+      panel_plot <- add_label(pl = panel_plot, data = show.cook,
+                              grob_obj = pie_grob,
+                              label_size = label_size,
+                              lab_pos = c(0, 1.75, 0, 0)) +
+        xlab("Leverage")+
+        ylab("Std. Pearson Residuals")+
+        ggtitle("Residual vs Leverage Plot")+
+        scale_y_continuous(expand = expansion(mult = 0.1))+
+        guides(radius = "none")+
+        xlim(c(0, NA))
+
+      plots[["Leverage"]] <- panel_plot
+      cli_progress_update(id = p_bar, set = sum(show[1L:5L]))
     }
 
-    cook_contours <- cook_contours[abs(cook_contours$y) <= y_thresh, ]
-    smoothing_line <- smoothing_fun(plot_data$.hat, plot_data$.stdresid)
+    if(show[6L]){
+      p <- model$rank
+      g <- dropInf(hii/(1 - hii), hii)
+      bval <- pretty(sqrt(p * plot_data$.cooksd/g), 5)
+      xmax <- max(plot_data$.hat)
+      ymax <- max(plot_data$.cooksd)
 
-    panel_plot <- ggplot(plot_data, aes(.data$.hat, .data$.stdresid))+
-                    theme_bw()+
-                    geom_point(size = 3, na.rm=TRUE)+
-                    geom_line(data = smoothing_line,
-                              aes(x = .data$x, y = .data$y),
-                              colour = "red", linetype = 1)
+      smoothing_line <- smoothing_fun(plot_data$.hat, plot_data$.cooksd)
 
-    if(nrow(cook_contours) > 0){
+      panel_plot <- ggplot(plot_data, aes(.data$.hat, .data$.cooksd)) +
+        theme_bw()+
+        geom_point(size = 3, na.rm=TRUE)+
+        geom_line(data = smoothing_line,
+                  aes(x = .data$x, y = .data$y),
+                  colour = "red", linetype = 1)
+
+      abline_data <- data.frame("intercept" = vector(),
+                                "slope" = vector(),
+                                xi = vector(),
+                                yi = vector())
+
+      segment_data <- data.frame(x = vector(),
+                                 y = vector(),
+                                 xend = vector(),
+                                 yend = vector())
+
+      for (i in seq_along(bval)) {
+        bi2 <- bval[i]^2
+        if (p * ymax > bi2 * xmax) {
+          xi <- xmax + 0.05*xmax
+          yi <- bi2 * xi/p
+          abline_data <- bind_rows(abline_data,
+                                   c("intercept" = 0, "slope" = bi2,
+                                     xi = xi, yi = yi, label = bval[i]))
+
+        } else {
+          yi <- ymax + 0.01
+          xi <- p * yi/bi2
+          segment_data <- bind_rows(segment_data,
+                                    c("x" = 0 ,"y" = 0,
+                                      "xend" = xi, "yend" = yi, label = bval[i]))
+        }
+      }
+
       panel_plot <- panel_plot +
-        geom_line(data = cook_contours,
-                  aes(x = .data$x, y = .data$y, group = group),
-                  colour = 'grey20', linetype = 2) +
-        geom_text(data = cook_contours %>% filter(x == max(x)),
-                  aes(x = .data$x + 0.01, y = .data$y, label = .data$label),
-                  size = label_size, colour = 'grey20')
-    }
-
-    if(pies){
-      # Show extreme observations with pie-chart glyphs
-      if(only_extremes){
-        panel_plot <- add_pies(pl = panel_plot, colours = colours,
-                               data = show.cook, slices = model_species,
-                               colour = "black", radius = pie_radius)
-      # Else show all points as pie-glyphs
-      } else {
-        panel_plot <- add_pies(pl = panel_plot, colours = colours,
-                               slices = model_species, colour = "black",
-                               radius = pie_radius)
+        geom_abline(data = abline_data,
+                    aes(intercept = .data$intercept,
+                        slope = .data$slope), linetype = 2)+
+        geom_segment(data = segment_data,
+                     aes(x = .data$x, y = .data$y,
+                         xend = .data$xend, yend = .data$yend), linetype = 2)+
+        geom_text(data = segment_data,
+                  aes(x = .data$xend + (0.025 * .data$xend),
+                      y = .data$yend + (0.025 * .data$yend),
+                      label = .data$label))
+      if(pies){
+        # Show extreme observations with pie-chart glyphs
+        if(only_extremes){
+          panel_plot <- add_pies(pl = panel_plot, colours = colours,
+                                 data = show.cook, slices = model_species,
+                                 colour = "black", radius = pie_radius)
+          # Else show all points as pie-glyphs
+        } else {
+          panel_plot <- add_pies(pl = panel_plot, colours = colours,
+                                 slices = model_species, colour = "black",
+                                 radius = pie_radius)
+        }
       }
+
+      panel_plot <- add_label(pl = panel_plot, data = show.cook,
+                              grob_obj = pie_grob,
+                              label_size = label_size,
+                              lab_pos = c(0, 1.75, 0, 0)) +
+        xlab(str2expression("Leverage~h[ii]"))+
+        ylab("Cook's Distance")+
+        xlim(c(0, NA))+
+        scale_y_continuous(expand = expansion(mult = c(0.05, 0.1)),
+                           sec.axis = sec_axis(~ ., name = "",
+                                               breaks = abline_data$yi,
+                                               labels = abline_data$label))+
+        ggtitle(expression("Cook's dist vs Leverage* " * h[ii]/(1 - h[ii])))+
+        theme(axis.text.y.right = element_text(colour = "black", size = 12),
+              axis.ticks.y.right = element_blank())
+
+      plots[["CooksvsLev"]] <- panel_plot
+      cli_progress_update(id = p_bar, set = sum(show[1L:6L]))
     }
 
-    panel_plot <- add_label(pl = panel_plot, data = show.cook,
-                            grob_obj = pie_grob,
-                            label_size = label_size,
-                            lab_pos = c(0, 1.75, 0, 0)) +
-      xlab("Leverage")+
-      ylab("Std. Pearson Residuals")+
-      ggtitle("Residual vs Leverage Plot")+
-      scale_y_continuous(expand = expansion(mult = 0.1))+
-      guides(radius = "none")+
-      xlim(c(0, NA))
-
-    plots[["Leverage"]] <- panel_plot
-    cli_progress_update(id = p_bar, set = sum(show[1L:5L]))
-  }
-
-  if(show[6L]){
-    p <- model$rank
-    g <- dropInf(hii/(1 - hii), hii)
-    bval <- pretty(sqrt(p * plot_data$.cooksd/g), 5)
-    xmax <- max(plot_data$.hat)
-    ymax <- max(plot_data$.cooksd)
-
-    smoothing_line <- smoothing_fun(plot_data$.hat, plot_data$.cooksd)
-
-    panel_plot <- ggplot(plot_data, aes(.data$.hat, .data$.cooksd)) +
-                    theme_bw()+
-                    geom_point(size = 3, na.rm=TRUE)+
-                    geom_line(data = smoothing_line,
-                              aes(x = .data$x, y = .data$y),
-                              colour = "red", linetype = 1)
-
-    abline_data <- data.frame("intercept" = vector(),
-                              "slope" = vector())
-    segment_data <- data.frame(x = vector(),
-                               y = vector(),
-                               xend = vector(),
-                               yend = vector())
-
-    for (i in seq_along(bval)) {
-      bi2 <- bval[i]^2
-      if (p * ymax > bi2 * xmax) {
-        xi <- xmax + 1/3
-        yi <- bi2 * xi/p
-        abline_data <- bind_rows(abline_data,
-                                 c("intercept" = 0, "slope" = bi2))
-
-      } else {
-        yi <- ymax + 0.01
-        xi <- p * yi/bi2
-        segment_data <- bind_rows(segment_data,
-                                  c("x" = 0 ,"y" = 0,
-                                    "xend" = xi, "yend" = yi))
-      }
+    if(length(plots) > 1){
+      plot <- new("ggmultiplot", plots = plots, nrow = nrow, ncol = ncol)
+    } else {
+      plot <- plots[[1]]
     }
-
-    panel_plot <- panel_plot +
-      geom_abline(data = abline_data,
-                  aes(intercept = .data$intercept,
-                      slope = .data$slope), linetype = 2)+
-      geom_segment(data = segment_data,
-                   aes(x = .data$x, y = .data$y,
-                       xend = .data$xend, yend = .data$yend), linetype = 2)
-    if(pies){
-      # Show extreme observations with pie-chart glyphs
-      if(only_extremes){
-        panel_plot <- add_pies(pl = panel_plot, colours = colours,
-                               data = show.cook, slices = model_species,
-                               colour = "black", radius = pie_radius)
-      # Else show all points as pie-glyphs
-      } else {
-        panel_plot <- add_pies(pl = panel_plot, colours = colours,
-                               slices = model_species, colour = "black",
-                               radius = pie_radius)
-      }
-    }
-
-    panel_plot <- add_label(pl = panel_plot, data = show.cook,
-                            grob_obj = pie_grob,
-                            label_size = label_size,
-                            lab_pos = c(0, 1.75, 0, 0)) +
-      xlab(str2expression("Leverage~h[ii]"))+
-      ylab("Cook's Distance")+
-      xlim(c(0, NA))+
-      scale_y_continuous(expand = expansion(mult = c(0.05, 0.1)))+
-      ggtitle(expression("Cook's dist vs Leverage* " * h[ii]/(1 - h[ii])))
-
-    plots[["CooksvsLev"]] <- panel_plot
-    cli_progress_update(id = p_bar, set = sum(show[1L:6L]))
-  }
-
-  if(length(plots) > 1){
-    plot <- new("ggmultiplot", plots = plots, nrow = nrow, ncol = ncol)
+    cli_process_done(id = p_bar)
+    cli::cli_alert_success("Created all plots.")
+    return(plot)
   } else {
-    plot <- plots[[1]]
+    return(plot_data)
   }
-  cli_process_done(id = p_bar)
-  cli::cli_alert_success("Created all plots.")
-  return(plot)
 }
 
 # Helper functions to add pies

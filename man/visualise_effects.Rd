@@ -2,20 +2,21 @@
 % Please edit documentation in R/VisualiseEffects.R
 \name{visualise_effects}
 \alias{visualise_effects}
-\title{Visualise effect of species addition or loss}
+\title{Effects plot for compositional data}
 \usage{
 visualise_effects(
   model,
   data = NULL,
-  species_interest = NULL,
-  effect = c("addition", "loss"),
-  exp_str = list(),
-  equi = FALSE,
-  design = TRUE,
+  var_interest = NULL,
+  effect = c("increase", "decrease", "both"),
+  add_var = list(),
+  interval = c("confidence", "prediction", "none"),
+  conf.level = 0.95,
   se = FALSE,
   average = TRUE,
+  colours = NULL,
   FG = NULL,
-  conf.level = 0.95,
+  plot = TRUE,
   nrow = 0,
   ncol = 0
 )
@@ -26,62 +27,83 @@ visualise_effects(
 `\code{\link[DImodels:DImodels-package]{DImodels}}` package.}
 
 \item{data}{A dataframe specifying communities of interest for which user
-wants visualise the effect of species loss or addition.
+wants visualise the effect of species decrease or increase.
 If left blank, the communities from the original data used
 to fit the model would be selected.}
 
-\item{species_interest}{A character vector specifying the species for which to visualise
-the effect of addition or loss on the response. If left blank,
-all species would be assumed to be of interest.}
+\item{var_interest}{A character vector specifying the variable for which to visualise
+the effect of change on the response. If left blank,
+all variables would be assumed to be of interest.}
 
-\item{effect}{A character string with one value from c("addition", "loss") whether to
-visualise the effect of addition or loss of a species.}
+\item{effect}{One of "increase", "decrease" or "both" to indicate whether to
+look at the effect of increasing the proportion, decreasing the
+proportion or doing both simultaneously, respectively on the response.
+The default in "increasing".}
 
-\item{exp_str}{A list specifying values for additional experimental
-structures in the model other than the proportions.
+\item{add_var}{A list specifying values for additional variables
+in the model other than the proportions (i.e. not part of the simplex design).
 This would be useful to compare the predictions across
-different values for a categorical variable. One plot will
-be generated for each unique combination of values specified
-here and they will be arranged in a grid according to the
-value specified in `nrow` and `ncol`.}
+different values for a categorical variable.
+One plot will be generated for each unique combination
+of values specified here.}
 
-\item{equi}{A boolean variable indicating whether to include the
-equi-proportional community in the plot.}
+\item{interval}{Type of interval to calculate:
+\describe{
+  \item{"none"}{No interval to be calculated.}
+  \item{"confidence" (default)}{Calculate a confidence interval.}
+  \item{"prediction"}{Calculate a prediction interval.}
+}}
 
-\item{design}{A boolean variable to indicate whether to include the
-communities in the design in the plot.}
+\item{conf.level}{The confidence level for calculating confidence/prediction
+intervals. Default is 0.95.}
 
 \item{se}{A boolean variable indicating whether to plot confidence intervals associated with
-the effect of species addition or loss}
+the effect of species increase or decrease}
 
 \item{average}{A boolean variable indicating whether to add a line describing the "average"
-effect of species addition or loss}
+effect of species increase or decrease}
 
-\item{FG}{The functional grouping of the species in the design. Species
-belonging to the same functional group will be assigned with
+\item{colours}{A character vector indicating the colours for the slices in the pie-glyphs.
+If left NULL, the colour blind friendly colours will be for the pie-glyph slices.}
+
+\item{FG}{A higher level grouping for the compositional variables in the
+data. Variables belonging to the same group will be assigned with
 different shades of the same colour. The user can manually specify
-a character vector giving the functional group each species
-belongs to. If left empty the function will try to get a functional
-grouping from the original \code{\link[DImodels:DI]{DI}} model
-object.}
+a character vector giving the group each variable belongs to.
+If left empty the function will try to get a grouping
+from the original \code{\link[DImodels:DI]{DI}} model object.}
 
-\item{conf.level}{The confidence level for calculating confidence or
-prediction intervals.}
+\item{plot}{A boolean variable indicating whether to create the plot or return
+the prepared data instead. The default `TRUE` creates the plot while
+`FALSE` would return the prepared data for plotting. Could be useful
+for if user wants to modify the data first and then call the plotting
+function manually.}
 
 \item{nrow}{Number of rows in which to arrange the final plot
-(when `exp_str` is specified).}
+(when `add_var` is specified).}
 
 \item{ncol}{Number of columns in which to arrange the final plot
-(when `exp_str` is specified).}
+(when `add_var` is specified).}
 }
 \value{
-A \code{\link[ggplot2:ggplot]{ggplot2::ggplot}} ggplot or
-        \code{\link[ggfortify:ggmultiplot-class]{ggfortify::ggmultiplot}}
-        object.
+A ggmultiplot (ggplot if single plot is returned) class object or data-frame (if `plot = FALSE`)
 }
 \description{
-This function helps to visualise the effect of the addition or loss
-             of a species from a community on the response
+This function will prepare the underlying data and plot the results for visualising the
+the effect of increasing or decreasing the proportion of a variable from a
+set of compositional variables in a single function call. The generated plot will
+show a curve for each observation (whenever possible) in the data.
+`\code{\link[PieGlyph:PieGlyph-package]{Pie-glyphs}}` are
+used to highlight the compositions of the specified communities and the ending
+community after the variable interest either completes dominates the community
+(when looking at the effect of increase) or completely vanishes from the community
+(when looking at the effect of decrease) or both.
+This is a wrapper function specifically for statistical models fit using the
+\code{\link[DImodels:DI]{DI()}} function from the
+\code{\link[DImodels:DImodels-package]{DImodels}} R package and would implicitly
+call \code{\link{visualise_effects_data}} followed by
+\code{\link{visualise_effects_plot}}. If your model object isn't fit using
+DImodels, consider calling these functions manually.
 }
 \examples{
 library(DImodels)
@@ -95,18 +117,65 @@ mod <- DI(prop = 3:6, DImodel = "AV", data = sim1, y = "response")
 ## Get effects plot for all species in design
 visualise_effects(model = mod)
 
+## Choose a variable of interest using `var_interest`
+visualise_effects(model = mod, var_interest = c("p1", "p3"))
+
 ## Add custom communities to plot instead of design communities
-visualise_effects(model = mod, design = FALSE,
-                  data = data.frame("p1" = c(0.9, 0.1),
-                                    "p2" = c(0.1, 0.9)))
+## Any variable not specified will be assumed to be 0
+## Not showing the average curve using `average = FALSE`
+visualise_effects(model = mod, average = FALSE,
+                  data = data.frame("p1" = c(0.7, 0.1),
+                                    "p2" = c(0.3, 0.5),
+                                    "p3" = c(0,   0.4)),
+                  var_interest = c("p2", "p3"))
 
 ## Add uncertainty on plot
-visualise_effects(model = mod,
-                  data = data.frame("p1" = c(0.9, 0.1),
-                                    "p2" = c(0.1, 0.9)),
-                  se= TRUE)
+visualise_effects(model = mod, average = TRUE,
+                  data = data.frame("p1" = c(0.7, 0.1),
+                                    "p2" = c(0.3, 0.5),
+                                    "p3" = c(0,   0.4)),
+                  var_interest = c("p2", "p3"), se = TRUE)
 
-## Visualise effect of species loss for particular species
-visualise_effects(model = mod, effect = "loss",
-                  species_interest = c("p1", "p3"))
+## Visualise effect of species decrease for particular species
+## Show a 99\% confidence interval using `conf.level`
+visualise_effects(model = mod, effect = "decrease",
+                  average = TRUE, se = TRUE, conf.level = 0.99,
+                  data = data.frame("p1" = c(0.7, 0.1),
+                                    "p2" = c(0.3, 0.5),
+                                    "p3" = c(0,   0.4),
+                                    "p4" = 0),
+                  var_interest = c("p1", "p3"))
+
+## Show effects of both increase and decrease using `effect = "both"`
+## and change colours of pie-glyphs using colours
+visualise_effects(model = mod, effect = "both",
+                  average = FALSE,
+                  colours = c("steelblue1", "steelblue4", "orange1", "orange4"),
+                  data = data.frame("p1" = c(0.7, 0.1),
+                                    "p2" = c(0.3, 0.5),
+                                    "p3" = c(0,   0.4),
+                                    "p4" = 0),
+                  var_interest = c("p1", "p3"))
+
+## Specify `plot = FALSE` to not create the plot but return the prepared data
+visualise_effects(model = mod, effect = "both",
+                  average = FALSE, plot = FALSE,
+                  colours = c("steelblue1", "steelblue4", "orange1", "orange4"),
+                  data = data.frame("p1" = c(0.7, 0.1),
+                                    "p2" = c(0.3, 0.5),
+                                    "p3" = c(0,   0.4),
+                                    "p4" = 0),
+                  var_interest = c("p1", "p3"))
+
+# Add additional variables and create a separate plot for each
+visualise_effects(model = mod, effect = "both",
+                  average = FALSE,
+                  colours = c("steelblue1", "steelblue4", "orange1", "orange4"),
+                  data = data.frame("p1" = c(0.7, 0.1),
+                                    "p2" = c(0.3, 0.5),
+                                    "p3" = c(0,   0.4),
+                                    "p4" = 0),
+                  var_interest = c("p1", "p3"),
+                  add_var = list("block" = factor(c(1, 2),
+                                                  levels = c(1, 2, 3, 4))))
 }

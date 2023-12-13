@@ -2,9 +2,17 @@
 % Please edit documentation in R/VisualiseEffects.R
 \name{visualise_effects_plot}
 \alias{visualise_effects_plot}
-\title{Visualise the effects of species loss or species addition}
+\title{Effects plot for compositional data}
 \usage{
-visualise_effects_plot(data, prop, colours = NULL, se = FALSE, average = TRUE)
+visualise_effects_plot(
+  data,
+  prop,
+  colours = NULL,
+  se = FALSE,
+  average = TRUE,
+  nrow = 0,
+  ncol = 0
+)
 }
 \arguments{
 \item{data}{A data frame created using the \code{\link{visualise_effects_data}} function.}
@@ -13,21 +21,34 @@ visualise_effects_plot(data, prop, colours = NULL, se = FALSE, average = TRUE)
 species proportions in the data.}
 
 \item{colours}{A character vector indicating the colours for the slices in the pie-glyphs.
-If left NULL, the colour blind friednly colours will be for the pie-glyph slices.}
+If left NULL, the colour blind friendly colours will be for the pie-glyph slices.}
 
 \item{se}{A boolean variable indicating whether to plot confidence intervals associated with
-the effect of species addition or loss}
+the effect of species increase or decrease}
 
 \item{average}{A boolean variable indicating whether to add a line describing the "average"
-effect of species addition or loss}
+effect of species increase or decrease}
+
+\item{nrow}{Number of rows in which to arrange the final plot
+(when `add_var` is specified).}
+
+\item{ncol}{Number of columns in which to arrange the final plot
+(when `add_var` is specified).}
 }
 \value{
-A ggplot object
+A ggmultiplot (ggplot if single plot is returned) class object or data-frame (if `plot = FALSE`)
 }
 \description{
-The plotting function which would create the effects plot. The output of the
-`\code{\link{visualise_effects_data}}` function should be passed here to
-visualise the effect of adding or removing a particular species from a community.
+The plotting function to create plots showing the effect of increasing or
+decreasing the proportion of a variable from a set of compositional variables.
+The output of the `\code{\link{visualise_effects_data}}` function (with any
+desired modifications) should be passed here. The generated plot will show a
+curve for each observation (whenever possible) in the data.
+`\code{\link[PieGlyph:PieGlyph-package]{Pie-glyphs}}` are
+used to highlight the compositions of the specified communities and the ending
+community after the variable interest either completes dominates the community
+(when looking at the effect of increase) or completely vanishes from the community
+(when looking at the effect of decrease) or both.
 }
 \examples{
 library(DImodels)
@@ -40,17 +61,17 @@ mod <- glm(response ~ p1 + p2 + p3 + p4 + 0, data = sim1)
 
 ## Create data for visualising effect of adding species 1 to
 ## the original communities in the data
-plot_data <- visualise_effects_data(data = sim1,
+plot_data <- visualise_effects_data(data = sim1[sim1$block == 1, ],
                                     prop = c("p1", "p2", "p3", "p4"),
-                                    species_interest = "p1",
-                                    effect = "addition", model = mod)
+                                    var_interest = "p1",
+                                    effect = "increase", model = mod)
 
 ## Create plot
 visualise_effects_plot(data = plot_data,
                        prop = c("p1", "p2", "p3", "p4"))
 
-## Show specific curves and add prediction intervals
-subset <- plot_data[plot_data$.Group \%in\% c(1,7), ]
+## Show specific curves with prediction intervals
+subset <- quick_filter(plot_data, .Group \%in\% c(7, 15))
 visualise_effects_plot(data = subset, prop = 1:4, se = TRUE)
 
 ## Do not show average effect line
@@ -59,6 +80,21 @@ visualise_effects_plot(data = subset, prop = 1:4,
 
 ## Change colours of the pie-glyph slices
 visualise_effects_plot(data = subset, prop = 1:4,
+                       colours = c("darkolivegreen", "darkolivegreen1",
+                                   "steelblue4", "steelblue1"))
+
+#' ## Simultaneously create multiple plots for additional variables
+sim1$block <- as.numeric(sim1$block)
+new_mod <- update(mod, ~ . + block, data = sim1)
+plot_data <- visualise_effects_data(data = sim1[c(1, 5, 9, 13), 3:6],
+                                    prop = c("p1", "p2", "p3", "p4"),
+                                    var_interest = "p3",
+                                    model = new_mod, conf.level = 0.95,
+                                    add_var = list("block" = c(1, 2)))
+
+visualise_effects_plot(data = plot_data,
+                       prop = c("p1", "p2", "p3", "p4"),
+                       average = FALSE,
                        colours = c("darkolivegreen", "darkolivegreen1",
                                    "steelblue4", "steelblue1"))
 }

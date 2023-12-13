@@ -7,12 +7,16 @@
 add_ID_terms(data, model)
 }
 \arguments{
-\item{data}{A dataframe with species proportions that sum to 1 to create the identity effect groupings.}
+\item{data}{A data-frame with species proportions that sum to 1 to
+create the identity effect groupings.}
 
-\item{model}{A Diversity Interactions model object fit by using the \code{\link[DImodels:DI]{DI()}} function from the \code{\link[DImodels:DImodels-package]{DImodels}} package.}
+\item{model}{A Diversity Interactions model object fit by using the
+\code{\link[DImodels:DI]{DI()}} function from the
+\code{\link[DImodels:DImodels-package]{DImodels}} package.}
 }
 \value{
-A data-frame with additional columns describing the interactions terms present in the model object.
+A data-frame with additional columns appended to the end that contain
+the grouped species proportions.
 }
 \description{
 Utility function that accepts a fitted Diversity-Interactions (DI) model
@@ -40,5 +44,4 @@ print(head(newdata))
 add_ID_terms(data = newdata, model = mod1)
 add_ID_terms(data = newdata, model = mod2)
 add_ID_terms(data = newdata, model = mod3)
-
 }

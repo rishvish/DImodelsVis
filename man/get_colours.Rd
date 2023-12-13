@@ -20,7 +20,7 @@ A named vector containing the hex codes of colours
 \description{
 Utility function to return either a distinct colour-blind friendly colour
 for each variable or if a functional grouping is specified, then shades of
-the same colour for species within a functional group
+the same colour for variables within a functional group
 }
 \examples{
 ## Get n colours
@@ -29,6 +29,7 @@ get_colours(vars = 4)
 # Get a color-map for each value specified in vars
 get_colours(vars = c("p1", "p2", "p3", "p4"))
 
-# Group values in vars to have same shades of a colour
+# Group values of vars using FG. Variables in the same group
+# will have same shades of a colour
 get_colours(vars = 4, FG = c("G1", "G1", "G2", "G2"))
 }

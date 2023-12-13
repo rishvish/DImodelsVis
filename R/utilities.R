@@ -1,27 +1,82 @@
-#' @keywords internal
-#' Utility function for adding incorporating any additional experimental
-#' structures into the final data before making predictions
+#' @title Add additional variables to the data
 #'
-#' @usage NULL
-NULL
-add_exp_str <- function(data, exp_str){
-  # Add experimental structures to communities for predictions
-  exp_str_data <- expand.grid(exp_str)
-
-  # Add identifier for each unique combination of experimental structures
-  exp_str_data$.add_str_ID <- do.call(paste, c(Map(function(x, y) {paste(x, y, sep=": ")}, names(exp_str_data), exp_str_data), sep="\t"))
-
-  # If any clashes with common columns in data and exp_str
-  # Rename columns in data
-  common <- intersect(colnames(data), colnames(exp_str_data))
-  if(length(common)>0){
-    cli::cli_warn(c("Certain names specified in {.var exp_str} are already present in the data.",
-                       "i" = "The column{?s} {common} in the data will be given a {.val .data} suffix to avoid conflicts."))
-    idx <- which(colnames(data) == common)
-    colnames(data)[idx] <- paste0(colnames(data)[idx], ".data")
+#' @description
+#' Utility function for incorporating any additional variables
+#' into the data. Each row in the data will be replicated and
+#' new columns will be added for each variable specified in
+#' `add_var` with values corresponding to their cartesian product.
+#'
+#' @param data A data frame containing the data in which to add the
+#'             additional variables.
+#' @param add_var A named list specifying the names and corresponding
+#'                values of each new variable to add to the data. The
+#'                row in the data would be replicated for each unique
+#'                combination of values of variables (i.e., their
+#'                cartesian product)in `add_var`.
+#'
+#' @return A data-frame with any additional columns specified in `add_var`
+#'         and the following column.
+#'  \describe{
+#'    \item{.add_str_ID}{A unique identifier describing each element from the
+#'                       cartesian product of all variables specified in `add_var`.}
+#'    }
+#'
+#' @export
+#'
+#' @examples
+#' test_data <- data.frame(diag(1, 3))
+#' print(test_data)
+#'
+#' ## Adding a single variable
+#' add_add_var(data = test_data,
+#'             add_var = list("Var1" = c(10, 20)))
+#'
+#' ## Specifying multiple variables will add values for each unique combination
+#' add_add_var(data = test_data,
+#'             add_var = list("Var1" = c(10, 20),
+#'                            "Var2" = c(30, 40)))
+#'
+#' ## If the list specified in `add_var` is not named, then the additional
+#' ## variables will be automatically named Var1, Var2, Var3, etc.
+#' add_add_var(data = test_data,
+#'             add_var = list(c(1, 2), c(3, 4)))
+add_add_var <- function(data, add_var = NULL){
+  if(missing(data)){
+    cli::cli_abort(c("{.var data} cannot be empty.",
+                     "i" = "Specify a data-frame or tibble."))
   }
-  # Merge experimental structures with species communities
-  data <- left_join(data, exp_str_data, by = character())
+
+  sanity_checks(data = data)
+
+  if(!is.null(add_var)){
+    if(!is.list(add_var)){
+      cli::cli_abort(c("The value specified in {.var add_var} should be a list.",
+                       "i" = "Currently a value with class {.cls {class(add_var)}}
+                              has been specified."))
+    }
+
+    # Add experimental structures to communities for predictions
+    add_var_data <- expand.grid(add_var)
+
+    # Add identifier for each unique combination of experimental structures
+    add_var_data$.add_str_ID <- do.call(paste, c(Map(function(x, y) {paste(x, y, sep=": ")},
+                                                     names(add_var_data), add_var_data),
+                                                 sep="\t"))
+
+    # If any clashes with common columns in data and add_var
+    # Rename columns in data
+    common <- intersect(colnames(data), colnames(add_var_data))
+    if(length(common)>0){
+      cli::cli_warn(c("Certain names specified in {.var add_var} are already present
+                      in the data.",
+                      "i" = "The column{?s} {common} in the data will be given a
+                      {.val .data} suffix to avoid conflicts."))
+      idx <- which(colnames(data) == common)
+      colnames(data)[idx] <- paste0(colnames(data)[idx], ".data")
+    }
+    # Merge experimental structures with species communities
+    data <- left_join(data, add_var_data, by = character())
+  }
   return(data)
 }
 
@@ -31,7 +86,8 @@ add_exp_str <- function(data, exp_str){
 #' @usage NULL
 NULL
 colour_blind_friendly_cols <- function(n){
-  # A safe colour-blind palette created by combining Okabe-Ito colours and safe colour pallete from rcartocolor
+  # A safe colour-blind palette created by combining Okabe-Ito colours
+  # and safe colour pallete from rcartocolor
   safe_colorblind_palette <- c("#009E73", "#D55E00", "#AA4499",  "#0072B2", "#F0E442", "#661100",
                                "#332288", "#CC6677", "#E69F00", "#88CCEE", "#882255", "#DDCC77",
                                "#56B4E9", "#117733", "#CC79A7", "#44AA99", "#484848", "#999933",
@@ -39,7 +95,8 @@ colour_blind_friendly_cols <- function(n){
   if(n<=20){
     cols <- safe_colorblind_palette[1:n]
   } else {
-    message('There are too many colours and they might not all be colour-blind friendly and distiguishable from one another')
+    message('There are too many colours and they might not all be colour-blind
+            friendly and distiguishable from one another')
     cols <- grDevices::hcl.colors(palette = 'Spectral', n = n)
   }
 }
@@ -63,7 +120,8 @@ colour_blind_friendly_cols <- function(n){
 #' get_shades(c("red", "blue" ,"#A5F8E3", "#808080"), shades = 2)
 get_shades <- function(colours = c("#808080"), shades = 3){
   if(length(shades) != 1 & length(shades) != length(colours)){
-    stop(glue::glue("'shades' should be of a vector of length 1 or same as the number of colours ({length(colours)})"))
+    cli::cli_abort(c("{.var shades} should be of a vector of length 1 or same as
+                    the number of colours {.val {length(colours)}}"))
   }
 
   if(length(shades) == 1){
@@ -92,7 +150,8 @@ get_shades <- function(colours = c("#808080"), shades = 3){
   # Convert colours to HSL format
   hsl_cols <- t(plotwidgets::col2hsl(colours))
 
-  # Shades of each colour will be creating by adjusting the L parameter in the HSL respresentation of each colour
+  # Shades of each colour will be creating by adjusting the
+  # L parameter in the HSL respresentation of each colour
   new_cols <- lapply(1:length(colours), function(idx){
     col <- as.vector(hsl_cols[idx, ])
     light_level <- light_levels[[idx]]
@@ -130,7 +189,7 @@ get_shades <- function(colours = c("#808080"), shades = 3){
 #' @description
 #' Utility function to return either a distinct colour-blind friendly colour
 #' for each variable or if a functional grouping is specified, then shades of
-#' the same colour for species within a functional group
+#' the same colour for variables within a functional group
 #'
 #' @param vars Either a numeric value `n` to get n colours, or a character
 #'             vector of values where each value will be mapped to a colour.
@@ -149,13 +208,16 @@ get_shades <- function(colours = c("#808080"), shades = 3){
 #' # Get a color-map for each value specified in vars
 #' get_colours(vars = c("p1", "p2", "p3", "p4"))
 #'
-#' # Group values in vars to have same shades of a colour
+#' # Group values of vars using FG. Variables in the same group
+#' # will have same shades of a colour
 #' get_colours(vars = 4, FG = c("G1", "G1", "G2", "G2"))
 get_colours <- function(vars, FG = NULL){
   if(missing(vars)){
     cli::cli_abort("{.var vars} cannot be missing.",
-                   "i" = "Specify a character vector of variables names to map specific colours to each variable.",
-                   "i" = "Or if a specific mapping is not desired, specify a number {.val n} to {.var n} colours.")
+                   "i" = "Specify a character vector of variables names
+                   to map specific colours to each variable.",
+                   "i" = "Or if a specific mapping is not desired, specify
+                   a number {.val n} to {.var n} colours.")
   }
 
   if(is.numeric(vars) && length(vars) == 1){
@@ -164,7 +226,9 @@ get_colours <- function(vars, FG = NULL){
 
   nSpecies <- length(vars)
   if(!is.null(FG) & (!is.character(FG) | length(FG) != nSpecies)){
-    stop(glue::glue("'FG' should be a character vector having the same length as species vector ({nSpecies}) giving the functional group each species belongs to"))
+    stop(glue::glue("'FG' should be a character vector having the same length
+                    as species vector ({nSpecies}) giving the functional group
+                    each species belongs to."))
   }
 
   if(is.null(FG)){
@@ -190,11 +254,15 @@ get_colours <- function(vars, FG = NULL){
 #'
 #' @importFrom dplyr  %>% left_join
 #'
-#' @param nSpecies Number of species in the design
-#' @param species Names for the species. Will be used as column names for the final result. Default is "Sp" followed by column number.
-#' @param threshold The maximum number of communities to select for each level of richness for situations when there are too many equi-proportional communities.
+#' @param nvars Number of variables in the design
+#' @param variables Names for the variables. Will be used as column names for the
+#'                  final result. Default is "Var" followed by column number.
+#' @param threshold The maximum number of communities to select for each level
+#'                  of richness for situations when there are too many
+#'                  equi-proportional communities.
 #'
-#' @return A dataframe consisting all or a random selection of equi-proportional communities at each level of richness
+#' @return A dataframe consisting all or a random selection of equi-proportional
+#'         communities at each level of richness
 #' @export
 #'
 #' @examples
@@ -202,27 +270,27 @@ get_colours <- function(vars, FG = NULL){
 #' get_equi_comms(10)
 #'
 #' ## Change species names
-#' get_equi_comms(4, species = c("Lollium perenne", "Chicorum intybus",
-#'                               "Trifolium repens", "Trifolium pratense"))
-get_equi_comms <- function(nSpecies,
-                           species = paste0('Sp', 1:nSpecies),
-                           threshold = round(1000000/nSpecies)){
+#' get_equi_comms(4, variables = c("Lollium perenne", "Chicorum intybus",
+#'                                 "Trifolium repens", "Trifolium pratense"))
+get_equi_comms <- function(nvars,
+                           variables = paste0('Var', 1:nvars),
+                           threshold = round(1000000/nvars)){
 
   # Possible levels of richness
-  choices <- 1:nSpecies
+  choices <- 1:nvars
   # Communities to be used as seed for combinations
   seed_comms <- lapply(choices, function(rich_level){
-    c(rep(1, rich_level), rep(0, nSpecies - rich_level))
+    c(rep(1, rich_level), rep(0, nvars - rich_level))
   })
 
   chosen_comms <- lapply(seed_comms, function(comm){
     rich_level <- sum(comm)
-    nrows <- choose(nSpecies, rich_level)
+    nrows <- choose(nvars, rich_level)
     # If nCr is less than threshold parameter then get
     # all combinations
     if(nrows <= threshold){
-      combs <- matrix(0, nrow = nrows, ncol = nSpecies)
-      idx <- utils::combn(1:nSpecies, sum(comm)) %>% t()
+      combs <- matrix(0, nrow = nrows, ncol = nvars)
+      idx <- utils::combn(1:nvars, sum(comm)) %>% t()
       for (i in 1:nrows){
         combs[i, idx[i, ]] <- 1
       }
@@ -238,10 +306,10 @@ get_equi_comms <- function(nSpecies,
   comms <- do.call(rbind, chosen_comms) %>%
     as.data.frame()
   # Add column names and richness variable
-  colnames(comms) <- species
+  colnames(comms) <- variables
   comms$Richness <- rowSums(comms)
   # Convert to proportions
-  comms[, 1:nSpecies] <- comms[, 1:nSpecies]/comms$Richness
+  comms[, 1:nvars] <- comms[, 1:nvars]/comms$Richness
   return(comms)
 }
 
@@ -251,17 +319,18 @@ get_equi_comms <- function(nSpecies,
 #'
 #' @usage NULL
 NULL
-get_richness <- function(data, species){
-  # Special situation if funtion is called in dplyr pipeline as .data doesn't allow to select over multiple columns
+get_richness <- function(data, prop){
+  # Special situation if funtion is called in dplyr pipeline as .data doesn't
+  # allow to select over multiple columns
   if (inherits(data, "rlang_data_pronoun")) {
     # Add filler column to create data frame
-    my_data <- data.frame('filler', data[[species[1]]])
-    for (var in species){
+    my_data <- data.frame('filler', data[[prop[1]]])
+    for (var in prop){
       my_data[, var] <- data[[var]]
     }
     data <- my_data
   }
-  return(rowSums(data[, species] != 0))
+  return(rowSums(data[, prop] != 0))
 }
 
 #' @keywords internal
@@ -270,17 +339,18 @@ get_richness <- function(data, species){
 #'
 #' @usage NULL
 NULL
-get_evenness <- function(data, species){
-  # Special situation if funtion is called in dplyr pipeline as .data doesn't allow to select over multiple columns
+get_evenness <- function(data, prop){
+  # Special situation if funtion is called in dplyr pipeline as .data doesn't
+  # allow to select over multiple columns
   if (inherits(data, "rlang_data_pronoun")) {
     # Add filler column to create data frame
-    my_data <- data.frame('filler', data[[species[1]]])
-    for (var in species){
+    my_data <- data.frame('filler', data[[prop[1]]])
+    for (var in prop){
       my_data[, var] <- data[[var]]
     }
     data <- my_data
   }
-  return(DImodels::DI_data_E_AV(prop = species, data = data)$E)
+  return(DImodels::DI_data_E_AV(prop = prop, data = data)$E)
 }
 
 #' @keywords internal
@@ -289,17 +359,29 @@ get_evenness <- function(data, species){
 #'
 #' @usage NULL
 NULL
-get_comm_sum <- function(data, species){
-  # Special situation if funtion is called in dplyr pipeline as .data doesn't allow to select over multiple columns
+get_comm_sum <- function(data, prop){
+  # Special situation if funtion is called in dplyr pipeline as .data doesn't
+  # allow to select over multiple columns
   if (inherits(data, "rlang_data_pronoun")) {
     # Add filler column to create data frame
-    my_data <- data.frame('filler', data[[species[1]]])
-    for (var in species){
+    my_data <- data.frame('filler', data[[prop[1]]])
+    for (var in prop){
       my_data[, var] <- data[[var]]
     }
     data <- my_data
   }
-  return(rowSums(data[, species], na.rm = TRUE))
+  return(rowSums(data[, prop], na.rm = TRUE))
+}
+
+#' @keywords internal
+#' Utility function to check if community is equi-proportional
+#'
+#' @usage NULL
+NULL
+check_equi <- function(comm){
+  comm <- comm[which(comm != 0)]
+  ret_value <- (abs(max(comm) - min(comm)) < 0.00001)
+  return(ret_value)
 }
 
 #' @importFrom stats AIC BIC logLik
@@ -341,6 +423,9 @@ BICc_vec <- Vectorize(BICc)
 #' @usage NULL
 NULL
 logLik_vec <- Vectorize(logLik)
+#' @usage NULL
+NULL
+deviance_vec <- Vectorize(deviance)
 
 #' @usage NULL
 NULL
@@ -403,6 +488,24 @@ check_presence <- function(data, col, message = NULL){
   return(TRUE)
 }
 
+#' @keywords internal
+#' Wrapper function for adding a facet layer to a plot
+#' @importFrom stats as.formula
+#' @usage NULL
+NULL
+add_facet <- function(plot, data, facet_var, ...){
+  facet_var <- rlang::try_fetch(data %>% dplyr::select(facet_var),
+                                error = function(cnd)
+                                  rlang::abort(c("The value specified in `facet_var` is invalid."),
+                                               parent = cnd,
+                                               call = caller_env())) %>% colnames()
+
+  plot <- plot +
+    facet_wrap(as.formula(paste("~", facet_var)),
+               ...)
+  return(plot)
+}
+
 #' Default theme for DImodelsVis
 #'
 #' @importFrom ggplot2 theme_bw theme element_text element_rect %+replace%
@@ -411,7 +514,13 @@ check_presence <- function(data, col, message = NULL){
 #'
 #' @param font_size Base font size for text across the plot
 #' @param font_family Font family for text across the plot
-#' @param legend One of c("top", "bottom", "left", "right", "none") specifying the position of the legend. The legend position can also be specified as a numeric vector of form c(x, y) with x and y having values between 0 and 1. If specified as a numeric vector the legend within the plotting region where c(0,0) corresponds to the "bottom left" and c(1,1) corresponds to the "top right" position. The default position is "top".
+#' @param legend One of c("top", "bottom", "left", "right", "none") specifying
+#'               the position of the legend. The legend position can also be
+#'               specified as a numeric vector of form c(x, y) with x and y
+#'               having values between 0 and 1. If specified as a numeric vector
+#'               the legend within the plotting region where c(0,0) corresponds
+#'               to the "bottom left" and c(1,1) corresponds to the "top right"
+#'               position. The default position is "top".
 #'
 #' @return
 #' A ggplot theme object
@@ -437,7 +546,8 @@ theme_DI <- function (font_size = 14, font_family = "",
     legend <- match.arg(legend)
   } else if(all(is.numeric(legend))){
     if(!all(between(legend, 0, 1))){
-      cli_abort(c("If specified as a numeric vector the values for the legend should be between 0 and 1.",
+      cli_abort(c("If specified as a numeric vector the values for the legend
+                  should be between 0 and 1.",
                   "i" = "You specified the values as {.var x = {x}} and {.var {y}}"))
     }
   } else {
@@ -463,16 +573,20 @@ theme_DI <- function (font_size = 14, font_family = "",
 #' @importFrom DImodels DI_data
 #' @importFrom stats coef
 #'
-#' @param data A dataframe with species proportions that sum to 1 to create the appropriate interaction structures
-#' @param model A Diversity Interactions model object fit by using the \code{\link[DImodels:DI]{DI()}} function from the \code{\link[DImodels:DImodels-package]{DImodels}} package.
+#' @param data A data-frame with species proportions that sum to 1 to create
+#'             the appropriate interaction structures.
+#' @param model A Diversity Interactions model object fit by using the
+#'              \code{\link[DImodels:DI]{DI()}} function from the
+#'              \code{\link[DImodels:DImodels-package]{DImodels}} package.
 #'
 #' @description
 #' Utility function that accepts a fitted Diversity-Interactions (DI) model
-#' object and a data frame and adds the necessary interaction structures to
-#' the data for making predictions.
+#' object along with a data frame and adds the necessary interaction structures to
+#' the data for making predictions using the model object specified in `model`.
 #'
 #' @return
-#' A data-frame with additional columns describing the interactions terms present in the model object.
+#' The original data-frame with additional columns appended at the end
+#' describing the interactions terms present in the model object.
 #'
 #' @export
 #'
@@ -495,10 +609,22 @@ theme_DI <- function (font_size = 14, font_family = "",
 #' add_interaction_terms(data = newdata, model = mod2)
 #' add_interaction_terms(data = newdata, model = mod3)
 #' add_interaction_terms(data = newdata, model = mod4)
-#'
 add_interaction_terms <- function(data, model){
+  if(missing(data)){
+    cli::cli_abort(c("{.var data} cannot be empty.",
+                     "i" = "Specify a data-frame or tibble containing species
+                     proportions that sum to 1 to create the appropriate
+                     interaction structures."))
+  }
+
+  if(missing(model)){
+    cli::cli_abort(c("{.var model} cannot be empty.",
+                     "i" = "Specify a model object fit using the {.fn DI}
+                     function from the {.pkg DImodels} package."))
+  }
+
   # Ensure model is a DImodels object
-  sanity_checks(DImodel = model)
+  sanity_checks(DImodel = model, data = data)
 
   DImodel_tag <- model$DIcall$DImodel
   if (is.null(DImodel_tag)) {
@@ -516,6 +642,9 @@ add_interaction_terms <- function(data, model){
   else {
     prop <- prop_cols
   }
+
+  # Ensure proportions in data are appropriate and sum to 1
+  sanity_checks(data = data, prop = prop)
 
   only_one_row <- nrow(data) == 1
   if (only_one_row) {
@@ -561,8 +690,11 @@ add_interaction_terms <- function(data, model){
 
 #' @title Add identity effect groups used in a Diversity-Interactions (DI) model to new data
 #'
-#' @param data A dataframe with species proportions that sum to 1 to create the identity effect groupings.
-#' @param model A Diversity Interactions model object fit by using the \code{\link[DImodels:DI]{DI()}} function from the \code{\link[DImodels:DImodels-package]{DImodels}} package.
+#' @param data A data-frame with species proportions that sum to 1 to
+#'             create the identity effect groupings.
+#' @param model A Diversity Interactions model object fit by using the
+#'              \code{\link[DImodels:DI]{DI()}} function from the
+#'              \code{\link[DImodels:DImodels-package]{DImodels}} package.
 #'
 #' @description
 #' Utility function that accepts a fitted Diversity-Interactions (DI) model
@@ -570,7 +702,8 @@ add_interaction_terms <- function(data, model){
 #' effect groupings to the data for making predictions.
 #'
 #' @return
-#' A data-frame with additional columns describing the interactions terms present in the model object.
+#' A data-frame with additional columns appended to the end that contain
+#' the grouped species proportions.
 #'
 #' @export
 #'
@@ -595,10 +728,22 @@ add_interaction_terms <- function(data, model){
 #' add_ID_terms(data = newdata, model = mod1)
 #' add_ID_terms(data = newdata, model = mod2)
 #' add_ID_terms(data = newdata, model = mod3)
-#'
 add_ID_terms <- function(data, model){
+  if(missing(data)){
+    cli::cli_abort(c("{.var data} cannot be empty.",
+                     "i" = "Specify a data-frame or tibble containing species
+                     proportions that sum to 1 to create the appropriate
+                     interaction structures."))
+  }
+
+  if(missing(model)){
+    cli::cli_abort(c("{.var model} cannot be empty.",
+                     "i" = "Specify a model object fit using the {.fn DI}
+                     function from the {.pkg DImodels} package."))
+  }
+
   # Ensure model is a DImodels object
-  sanity_checks(DImodel = model)
+  sanity_checks(DImodel = model, data = data)
 
   # Get original species proportion columns
   prop_cols <- eval(model$DIcall$prop)
@@ -617,24 +762,45 @@ add_ID_terms <- function(data, model){
     ID <- paste0(prop, "_ID")
   }
 
-  IDs <-  group_IDs(data = data, prop = prop, ID = ID)
+  data <-  group_prop(data = data, prop = prop, FG = ID)
 
-  return(cbind(data, IDs))
+  return(data)
 }
 
 
-#' @title Add predictions and confidence interval to data using either statistical model or model coefficients
+#' @title Add predictions and confidence interval to data using either
+#' a model object or model coefficients
 #'
 #' @importFrom insight get_predicted
 #'
-#' @param data A data-frame containing appropriate values for all the terms in the model
-#' @param model A regression model object which will be used to make predictions for the observations in `data`.
-#'              Will override `coefficients` if specified.
-#' @param coefficients If a regression model is not available (or can't be fit in R), the regression coefficients from a model fit in some other language can be used to calculate predictions.
-#'                     However, the user would have to ensure there's an appropriate one-to-one positional mapping between the data columns and the coefficient values.
-#'                     Further, it would not be possible to calculate confidence/prediction intervals using this method.
-#' @param coeff_cols If `coefficients` are specified and there isn't a one-to-one positional mapping between
-#' @param conf.level The confidence level for calculating confidence/prediction intervals. Default is 0.95.
+#' @param data A data-frame containing appropriate values for all the terms
+#'             in the model.
+#' @param model A regression model object which will be used to make predictions
+#'              for the observations in `data`. Will override `coefficients`
+#'              if specified.
+#' @param coefficients If a regression model is not available (or can't be fit in R),
+#'                     the regression coefficients from a model fit in some other
+#'                     language can be used to calculate predictions. However, the
+#'                     user would have to ensure there's an appropriate one-to-one
+#'                     positional mapping between the data columns and the
+#'                     coefficient values. Further, the would also have to provide
+#'                     a variance-covariance matrix of the coefficients in the `vcov`
+#'                     parameter if they want the associated CI for the prediction or
+#'                     it would not be possible to calculate confidence/prediction
+#'                     intervals using this method.
+#' @param vcov If regression coefficients are specified, then the variance-covariance
+#'             matrix of the coefficients can be specified here to calculate the
+#'             associated confidence interval around each prediction. Failure to do
+#'             so would result in no confidence intervals being returned. Ensure
+#'             `coefficients` and `vcov` have the same positional mapping with the data.
+#' @param coeff_cols If `coefficients` are specified and a one-to-one positional
+#'                   mapping between the data-columns and coefficient vector is
+#'                   not present. A character string or numeric index can be specified
+#'                   here to reorder the data columns and match the corresponding
+#'                   coefficient value to the respective data column. See the
+#'                   "Use model coefficients for prediction" section in examples.
+#' @param conf.level The confidence level for calculating confidence/prediction
+#'                   intervals. Default is 0.95.
 #' @param interval Type of interval to calculate:
 #'  \describe{
 #'    \item{"none" (default)}{No interval to be calculated.}
@@ -646,8 +812,12 @@ add_ID_terms <- function(data, model){
 #' A data-frame with the following additional columns
 #'  \describe{
 #'    \item{.Pred}{The predicted response for each observation.}
-#'    \item{.Lower}{The lower limit of the confidence/prediction interval (if possible) for each observation.}
-#'    \item{.Upper}{The lower limit of the confidence/prediction interval (if possible) for each observation.}
+#'    \item{.Lower}{The lower limit of the confidence/prediction interval
+#'                  for each observation (will be same as ".Pred" if using
+#'                  `coefficients` and `vcov` is not specified).}
+#'    \item{.Upper}{The lower limit of the confidence/prediction interval
+#'                  for each observation (will be same as ".Pred" if using
+#'                  `coefficients` and `vcov` is not specified).}
 #'  }
 #'
 #' @export
@@ -656,55 +826,99 @@ add_ID_terms <- function(data, model){
 #' library(DImodels)
 #' data(sim1)
 #'
-#' # Fit DI models with different ID effect groupings
+#' # Fit a model
 #' mod <- lm(response ~ 0 + p1 + p2 + p3 + p4 + p1:p2 + p3:p4, data = sim1)
 #'
 #' # Create new data for adding predictions
 #' newdata <- head(sim1[sim1$block == 1,])
 #' print(newdata)
 #'
-#' # Adding predictions to data with confidence interval
+#' # Add predictions to data
 #' add_prediction(data = newdata, model = mod)
+#'
+#' # Adding predictions to data with confidence interval
+#' add_prediction(data = newdata, model = mod, interval = "confidence")
 #'
 #' # Calculate prediction intervals instead
 #' add_prediction(data = newdata, model = mod, interval = "prediction")
 #'
-#' # Change confidence level
+#' # Default is a 95% interval, change to 99%
 #' add_prediction(data = newdata, model = mod, interval = "prediction",
 #'                conf.level = 0.99)
 #'
-#' # Use model coefficients for prediction
+#' ####################################################################
+#' ##### Use model coefficients for prediction
 #' coeffs <- mod$coefficients
 #'
 #' # Would now have to add columns corresponding to each coefficient in the
-#' # data and ensure there is a desired mapping between data columns and
-#' # the coefficients. Also confidence intervals cannot be calculated.
+#' # data and ensure there is an appropriate mapping between data columns and
+#' # the coefficients.
 #' newdata$`p1:p2` = newdata$p1 * newdata$p2
 #' newdata$`p3:p4` = newdata$p3 * newdata$p4
 #'
 #' # If the coefficients are named then the function will try to
 #' # perform matching between data columns and the coefficients
+#' # Notice that confidence intervals
 #' add_prediction(data = newdata, coefficients = coeffs)
 #'
 #' # However, if the coefficients are not named
 #' coeffs <- unname(coeffs)
 #'
 #' # The user would have to manually specify the subset
-#' # of data columnsvarranged according to the coefficients
+#' # of data columns arranged according to the coefficients
 #' subset_data <- newdata[, c(3:6, 8,9)]
+#' subset_data # Notice now we have the exact columns in data as in coefficients
 #' add_prediction(data = subset_data, coefficients = coeffs)
 #'
 #' # Or specify a selection (either by name or index) in coeff_cols
 #' add_prediction(data = newdata, coefficients = coeffs,
 #'                coeff_cols = c("p1", "p2", "p3", "p4", "p1:p2", "p3:p4"))
 #'
+#' add_prediction(data = newdata, coefficients = coeffs,
+#'                coeff_cols = c(3, 4, 5, 6, 8, 9))
+#'
+#' # Adding confidence intervals when using model coefficients
+#' coeffs <- mod$coefficients
+#' # We need to provide a variance-covariance matrix to calculate the CI
+#' # when using `coefficients` argument. The following warning will be given
+#' add_prediction(data = newdata, coefficients = coeffs,
+#'                interval = "confidence")
+#'
+#' vcov_mat <- vcov(mod)
+#' add_prediction(data = newdata, coefficients = coeffs,
+#'                interval = "confidence", vcov = vcov_mat)
+#'
+#' # Currently both confidence and prediction intervals will be the same when
+#' # using this method
+#' add_prediction(data = newdata, coefficients = coeffs,
+#'                interval = "prediction", vcov = vcov_mat)
 add_prediction <- function(data, model = NULL,
-                           coefficients = NULL, coeff_cols = NULL,
+                           coefficients = NULL, coeff_cols = NULL, vcov = NULL,
                            interval = c("none","confidence", "prediction"),
                            conf.level = 0.95){
 
+  if(missing(data)){
+    cli::cli_abort(c("{.var data} cannot be empty.",
+                     "i" = "Specify a data-frame or tibble containing the
+                     respective columns necessary for making predictions."))
+  }
+
+
   # Ensure model or coefficients are specified correctly
   check_data_functions(model = model, coefficients = coefficients)
+
+  # If model is specified ensure it is appropriate
+  sanity_checks(model = model, data = data,
+                numerics = list("conf.level" = conf.level),
+                unit_lengths = list("conf.level" = conf.level))
+
+  # Ensure conf.level is between 0 and 1
+  if(!(conf.level < 1 && conf.level > 0)){
+    cli::cli_abort(c("{.var conf.level} should be a value between 0 and 1
+                     specifying the level at which to calculate the
+                     confidence/prediction interval.",
+                     "i" = "{.var conf.level} has a value of {conf.level}."))
+  }
 
   # Choose appropriate interval for prediction CI
   interval <- match.arg(interval)
@@ -713,31 +927,31 @@ add_prediction <- function(data, model = NULL,
   if(!is.null(model)){
     # Prediction with SE
     if(inherits(model, "DI")){
-      # TODO --------------------------------------------------------------------
-      # Remember to add functionality for getting both, confidence and prediction interval
       if(interval != "none"){
-        preds <- suppressWarnings(predict(model, newdata = data, se.fit = TRUE))
+        preds <- suppressWarnings(predict(model, newdata = data,
+                                          interval = interval, level = conf.level)) %>%
+          as.data.frame()
         data <- data %>%
           mutate(".Pred" := preds$fit,
-                 ".Lower" = preds$fit - round(qnorm((1 - conf.level)/2, lower.tail = F), 2) * preds$se.fit,
-                 ".Upper" = preds$fit - round(qnorm((1 + conf.level)/2, lower.tail = F), 2) * preds$se.fit)
+                 ".Lower" = preds$lwr,
+                 ".Upper" = preds$upr)
       } else{
         preds <- suppressWarnings(predict(model, newdata = data, se.fit = FALSE))
         data <- data %>%
           mutate(".Pred" := preds)
       }
     } else {
-      preds <- suppressMessages(insight::get_predicted(x = model, data = data))
+      preds <- suppressWarnings(suppressMessages(insight::get_predicted(x = model, data = data)))
 
       data <- data %>%
         mutate(".Pred" := as.numeric(preds))
 
       if(interval != "none"){
-        CIs <- suppressMessages(insight::get_predicted_ci(x = model,
-                                                          predictions = preds,
-                                                          data = data,
-                                                          ci = conf.level,
-                                                          ci_type = interval))
+        CIs <- suppressWarnings(suppressMessages(insight::get_predicted_ci(x = model,
+                                                                           predictions = preds,
+                                                                           data = data,
+                                                                           ci = conf.level,
+                                                                           ci_type = interval)))
 
         if(ncol(CIs) > 1){
           data <- data %>% mutate(".Lower" = CIs[, "CI_low"],
@@ -748,20 +962,32 @@ add_prediction <- function(data, model = NULL,
   }
   # Branch here if regression coefficients are specified
   else if(!is.null(coefficients)){
+    # Ensure coefficients are numeric
+    if(!is.numeric(coefficients)){
+      cli::cli_abort(c("{.var coefficients} should be a numeric vector.",
+                       "i" = "{.var coefficients} was specified as an object
+                       with class {.cls {class(coefficients)}}."))
+    }
     # If coefficients are named then order data columns accordingly
     if(!is.null(names(coefficients))){
       if(!all(names(coefficients) %in% colnames(data))){
         cli::cli_abort(c("All coefficient names should be present in the data as columns.",
-                         "i" = "{.var {names(coefficients)[!names(coefficients) %in% colnames(data)]}} {?was/were} not present in the data."))
+                         "i" = "{.var {names(coefficients)[!names(coefficients) %in% colnames(data)]}}
+                         {?was/were} not present in the data."))
       }
       # Create X matrix
       X_matrix <- as.matrix(sapply(data[, names(coefficients)], as.numeric))
     }
     # If a selection is specified from the data
     else if (!is.null(coeff_cols)){
-      if(length(coefficients)!=length(coeff_cols)){
-        cli::cli_abort(c("The number of columns specified for selection in {.var coeff_cols} should be same as the number of coefficients.",
-                         "i" = "The were {length(coefficients)} coefficients while {.var coeff_cols} specified {length(coeff_cols)} column{?s} to select."))
+      if(length(coefficients) != length(coeff_cols)){
+        cli::cli_abort(c("The number of values specified for selecting and reordering
+                         data columns in {.var coeff_cols} should be same as the
+                         number of coefficients specified in the {.var coefficients}
+                         vector.",
+                         "i" = "The were {length(coefficients)} coefficients
+                         while {.var coeff_cols} specified {length(coeff_cols)}
+                         column{?s} to select."))
       }
       # select the specified columns
       X_cols <- data %>% select(all_of(coeff_cols))
@@ -772,33 +998,435 @@ add_prediction <- function(data, model = NULL,
     # assume the user has specified everything correctly and calculate predictions
     else {
       if(ncol(data)!=length(coefficients)){
-        cli::cli_abort(c("The number of columns in data should be the same as the number of coefficients.",
-                         "i" = "The were {length(coefficients)} coefficients while data had {ncol(data)} columns.",
-                         "i" = "Consider giving names to the coefficient vector specified in {.var coefficients} corresponding to the respective data columns or providing a selection of columns in {.var coeff_cols} corresponding (in sequential order) to each coefficient."))
+        cli::cli_abort(c("The number of columns in {.var data} should be the same as
+                         the number of coefficients.",
+                         "i" = "The were {length(coefficients)} coefficients
+                         while data had {ncol(data)} columns.",
+                         "i" = "Consider giving names to the coefficient vector
+                         specified in {.var coefficients} corresponding to the
+                         respective data columns or providing a selection of
+                         columns in {.var coeff_cols} corresponding (in
+                         sequential order) to each coefficient."))
       }
       # Create X_matrix
       X_matrix <- as.matrix(sapply(data, as.numeric))
     }
     # Calculate predictions
-    preds <- X_matrix %*% coefficients
-    data <- data %>%
-      mutate(".Pred" := preds,
-             ".Upper" = preds,
-             ".Lower" = preds)
+    preds <- as.vector(X_matrix %*% coefficients)
+
+    # Calculate SE and uncertainty
+    if(!is.null(vcov) && interval != "none"){
+      if(!is.matrix(vcov) | !is.numeric(vcov)){
+        cli::cli_abort(c("{.var vcov} should be a numeric matrix.",
+                         "i" = "{.var vcov} was specified as an object
+                               with class {.cls {class(vcov)}}."))
+      }
+      if(nrow(vcov) != ncol(vcov)){
+        cli::cli_abort(c("{.var vcov} should be a symettric square matrix.",
+                         "i" = "Currently {.var vcov} has {nrow(vcov)} rows
+                         and {ncol(vcov} columns."))
+      }
+      if(ncol(X_matrix)!=ncol(vcov)){
+        cli::cli_abort(c("The number of columns in {.var data} should be the
+                         same as the number of columns in {.var vcov}",
+                         "i" = "The were {ncol(vcov)} columns in {.var vcov}
+                         while data had {ncol(data)} columns."))
+      }
+
+      # Calculate SE
+      se <-  as.numeric(sqrt(diag(X_matrix %*% vcov %*%
+                                    t(X_matrix))))
+      # Calculate wald ci
+      critval <- qnorm(conf.level + (1 - conf.level)/2)
+      lwr <- preds - critval * se
+      upr <- preds + critval * se
+    } else {
+      if(interval != "none"){
+        cli::cli_warn(c("{.var vcov} was not specified so confidence
+                        intervals cannot be calculated.",
+                        "i" = "The {.val .Upper} and {.val .Lower} columns
+                        will contain the same value as the {.val .Pred} column."))
+        upr = preds
+        lwr = preds
+      }
+    }
+
+    if(interval != "none"){
+      data <- data %>%
+        mutate(".Pred" = preds,
+               ".Lower" = lwr,
+               ".Upper" = upr)
+    } else {
+      data <- data %>%
+        mutate(".Pred" = preds)
+    }
+
+  }
+  return(data)
+}
+
+#' @title Quick filtering for compositional data
+#'
+#' @description
+#' A handy wrapper around the dplyr \code{\link[dplyr:filter]{filter()}} function
+#' enabling the user to quickly filter rows which satisfy specific conditions
+#' for compositional data like all equi-proportional communities, or communities
+#' with a given value of richness without having to make any changes to the data
+#' or adding any additional columns. All other functionalities are same as the
+#' dplyr \code{\link[dplyr:filter]{filter()}} function.
+#'
+#'
+#' @param data A data frame containing the compositional variables which should
+#'             be used to perform the filtering.
+#' @param prop A character/numeric vector indicating the columns containing the
+#'             compositional variables in `data`.
+#' @param special A character string specifying the filtering condition.
+#'                Four special keywords can be specified here for filtering
+#'                  1. richness: A positive integer value to filter communities with
+#'                               a specific number of species (variables with non-zero values).
+#'                  2. evenness: A numeric value between 0 and 1, to filter rows based on
+#'                               the relative abundances of the species where a higher
+#'                               value signifies a more even community with equal proportions
+#'                               of all species.
+#'                  3. equi: A boolean variable indicating whether to filter rows containing
+#'                           equi-proportional communities, i.e., communities where all species
+#'                           have the same non-zero proportion.
+#'                  4. monos: A boolean value indicating whether to filter communities
+#'                            containing a single species, i.e., richness == 1.
+#'                These keywords can be combined using any logical operators and can even
+#'                be combined with any other variables in the data. Please use the exact
+#'                keywords (case-sensitive) in the query to get appropriate results. See
+#'                examples for more details.
+#' @param ... Any additional arguments specified to the dplyr \code{\link[dplyr:filter]{filter()}} function.
+#'            Filtering conditions for any additional variables can also be specified here.
+#'
+#' @return A subset of the original data which matches the specified filtering conditions.
+#'
+#' @export
+#'
+#' @examples
+#' library(DImodels)
+#' library(dplyr)
+#'
+#' ## Load data
+#' data(sim3)
+#'
+#' # The special filter keywords should be specified as a string
+#' # Filter communities containing 3 species
+#' head(quick_filter(data = sim3, prop = 4:12,
+#'                   special = "richness == 3"))
+#'
+#' # Filter communities at richness 6 OR evenness 0
+#' head(quick_filter(data = sim3, prop = 4:12,
+#'                   special = "richness == 6 | evenness == 0"), 12)
+#'
+#' # Filter all monoculture AND treatment "A" (treatment is column present in data)
+#' head(quick_filter(data = sim3, prop = 4:12,
+#'                   special = "monos == TRUE & treatment == 'A'"), 10)
+#'
+#' # Filter all equi proportional communities but NOT monocultures
+#' head(quick_filter(data = sim3, prop = 4:12,
+#'                   special = "equi == TRUE & monos == FALSE"))
+#'
+#' # Function can also be used as normal filter function and in a dplyr pipeline
+#' sim3 %>% quick_filter(p1 == 1)
+#'
+#' # Both special filtering and normal filtering can be combined as well
+#' sim3 %>% quick_filter(prop = paste0("p", 1:9),
+#'                       special = "richness == 1",
+#'                       community %in% c(7, 9))
+quick_filter <- function(data, prop = NULL, special = NULL, ...){
+  # Sanity Checks
+  if(missing(data)){
+    cli::cli_abort(c("{.var data} cannot be empty.",
+                     "i" = "Specify a data frame or tibble in {.var data}."))
+  }
+
+  # If no special value specified then filter as normal
+  if(is.null(special)){
+    return_data <- data %>% filter(...)
+  } else {
+    # special should be a character
+    if(!is.character(special)){
+      cli::cli_abort(c("{.var special} should be a character specifying the filtering condition.",
+                       "i" = "Ensure {.var special} contains filtering conditions comprising
+                       the special keywords {.val {c(\"richness\", \"evenness\", \"monos\", \"equi\")}}
+                       or any other columns present in the data."))
+    }
+    # prop can't be null if special is specified
+    if(missing(prop)){
+      cli::cli_abort(c("{.var prop} cannot be empty if special filtering is used.",
+                       "i" = "Specify a character/numeric vector indicating
+                            the names/indicies corresponding to variable
+                            proportions in {.var data}."))
+    }
+    sanity_checks(data = data, prop = prop)
+    prop <- colnames(data[, prop])
+
+    data <- data %>% mutate(.richness = get_richness(.data, prop),
+                            .evenness = get_evenness(.data, prop),
+                            .monos = ifelse(.data$richness == 1, TRUE, FALSE),
+                            .equi = apply(data[, prop], 1, check_equi))
+
+    # Replace special term with "." variant
+    special <- gsub("richness", ".richness", special, fixed = TRUE)
+    special <- gsub("evenness", ".evenness", special, fixed = TRUE)
+    special <- gsub("monos", ".monos", special, fixed = TRUE)
+    special <- gsub("equi", ".equi", special, fixed = TRUE)
+    drop_cols <- c(".richness", ".evenness", ".monos", ".equi")
+
+    return_data <- data %>%
+      filter(eval(rlang::parse_expr(special)), ...) %>%
+      select(-all_of(drop_cols))
+  }
+
+  return(return_data)
+}
+
+
+#' @rdname Simplex_projection
+#' @title Project 3-d compositional data onto x-y plane
+#'
+#' @description
+#' Points in the 3-d simplex space with coordinates (x, y ,z) such that
+#' x + y + z = 1 are projected into the 2-d plane they reside in. This function
+#' can be used to convert the 3-d compositional data into 2-d and then be overlayed
+#' on the plots output by \code{\link{ternary_plot}},
+#' \code{\link{conditional_ternary_plot}} and \code{\link{grouped_ternary_plot}}.
+#'
+#' @param data A data-frame containing 3-d compositional data.
+#' @param prop A character vector specifying the columns names of columns
+#'             containing variable proportions. Default is "p1", "p2",
+#'             and "p3".
+#' @param x A character string specifying the name for the column containing
+#'          the x component of the x-y projection of the simplex. Default is ".x".
+#' @param y A character string specifying the name for the column containing
+#'          the y component of the x-y projection of the simplex. Default is ".y".
+#'
+#' @return A data-frame with the following two columns appended
+#' \describe{
+#'    \item{.x (or value specified in "x")}{The x component of the x-y projection of the simplex point.}
+#'    \item{.y (or value specified in "y")}{The y component of the x-y projection of the simplex point.}
+#'    }
+#'
+#' @export
+#'
+#' @examples
+#' library(DImodels)
+#' data(sim0)
+#'
+#' prop_to_tern_proj(data = sim0, prop = c("p1", "p2", "p3"))
+#'
+#' # Change names of the x and y projections
+#' prop_to_tern_proj(data = sim0, prop = c("p1", "p2", "p3"),
+#'                   x = "x-proj", y = "y-proj")
+prop_to_tern_proj <- function(data, prop,
+                              x = ".x", y = ".y"){
+  # Sanity Checks
+  if(missing(data)){
+    cli::cli_abort(c("{.var data} cannot be empty.",
+                     "i" = "Specify a data frame containing variable
+                            proportions."))
+  }
+
+  sanity_checks(data = data, prop = prop)
+
+  prop <- colnames(data[, prop])
+
+  data <- data %>%
+    mutate(!! y := !!sym(prop[1]) * sqrt(3)/2,
+           !! x := !!sym(prop[3]) + (!!sym(y))/sqrt(3)) %>%
+    select(all_of(prop), x, y, everything())
+  return(data)
+}
+
+#' @rdname Simplex_projection
+#' @title Project points from the x-y plane into the 3-d compositional data
+#'
+#' @param data A data-frame containing the x-y coordinates of the points.
+#' @param x A character string specifying the name for the column containing
+#'          the x component of the x-y projection of the simplex.
+#' @param y A character string specifying the name for the column containing
+#'          the y component of the x-y projection of the simplex.
+#' @param prop A character vector specifying the columns names of variable
+#'             containing the projected compositions. Default is "p1", "p2", and "p3".
+#'
+#' @return A data-frame with the following three columns appended
+#' \describe{
+#'    \item{p1 (or first value specified in "prop")}{The first component of the 3-d simplex point.}
+#'    \item{p2 (or second value specified in "prop")}{The second component of the 3-d simplex point.}
+#'    \item{p3 (or third value specified in "prop")}{The third component of the 3-d simplex point.}
+#'    }
+#' @export
+#'
+#' @examples
+#' library(DImodels)
+#' data(sim0)
+#'
+#' proj_data <- prop_to_tern_proj(data = sim0, prop = c("p1", "p2", "p3"))
+#'
+#' tern_to_prop_proj(data = proj_data, x = ".x", y = ".y")
+#'
+#' # Change prop names
+#' tern_to_prop_proj(data = proj_data, x = ".x", y = ".y",
+#'                   prop = c("prop1", "prop2", "prop3"))
+tern_to_prop_proj <- function(data, x, y,
+                              prop = c("p1", "p2", "p3")){
+  # Sanity Checks
+  if(missing(data)){
+    cli::cli_abort(c("{.var data} cannot be empty.",
+                     "i" = "Specify a data frame containing variable
+                            proportions."))
+  }
+
+  if(missing(x)){
+    cli::cli_abort(c("{.var x} cannot be empty.",
+                     "i" = "Specify the name/index of the column in {.var data}
+                            corresponding to the x-coordinate of ternary projection."))
+  }
+
+  if(missing(y)){
+    cli::cli_abort(c("{.var y} cannot be empty.",
+                     "i" = "Specify the name/index of the column in {.var data}
+                            corresponding to the y-coordinate of ternary projection."))
+  }
+
+  if(length(prop)!=3){
+    cli::cli_abort(c("{.var prop} should be a character vector of length three
+                     containing the names of the transformed compositional variables."))
+  }
+
+  if(!is.character(prop)){
+    cli::cli_abort(c("{.var prop} should be a character vector of length three
+                     containing the names of the transformed compositional variables.",
+                     "i" = "{.var prop} is specified as an object of {.cls {class(prop)}} type"))
+  }
+
+  if(!(x %in% colnames(data))){
+    cli::cli_abort(c("The value specified in {.var x} should be present in data.",
+                     "x" = "{.val x} was not present in data."))
+  }
+
+  if(!(x %in% colnames(data))){
+    cli::cli_abort(c("The value specified in {.var y} should be present in data.",
+                     "x" = "{.val y} was not present in data."))
+  }
+
+  sanity_checks(data = data)
+
+  data <- data %>%
+    mutate(!! prop[1] := !!sym(y) * 2/sqrt(3),
+           !! prop[3] := !!sym(x) - !!sym(y)/sqrt(3),
+           !! prop[2] := 1 - !!sym(y)*2/sqrt(3) -
+             (!!sym(x) - !!sym(y)/sqrt(3))) %>%
+    select(x, y, all_of(prop), everything())
+  return(data)
+}
+
+#' @title Combine variable proportions into groups
+#'
+#' @param data A data frame containing the compositional variables which need to
+#'             be grouped.
+#' @param prop A character/numeric vector indicating the columns containing the
+#'             compositional variables in `data`.
+#' @param FG A character vector of same length as `prop` specifying the group
+#'           each variable belongs to.
+#'
+#' @return A data-frame with additional columns appended to the end that contain
+#' the grouped variable proportions.
+#'
+#' @export
+#'
+#' @examples
+#' library(DImodels)
+#'
+#' data(sim1)
+#'
+#' head(group_prop(data = sim1, prop = 3:6,
+#'                 FG = c("Gr1", "Gr1", "Gr1", "Gr2")))
+#'
+#' head(group_prop(data = sim1, prop = 3:6,
+#'                 FG = c("Group1", "Group2", "Group1", "Group3")))
+#'
+#' # Data is returned as is, if no groups are specified in FG
+#' head(group_prop(data = sim1, prop = 3:6))
+group_prop <- function(data, prop, FG = NULL){
+
+  # Sanity Checks
+  if(missing(data)){
+    cli::cli_abort(c("{.var data} cannot be empty.",
+                     "i" = "Specify a data frame containing variable
+                            proportions."))
+  }
+
+  if(missing(prop)){
+    cli::cli_abort(c("{.var prop} cannot be empty.",
+                     "i" = "Specify a character/numeric vector indicating
+                            the names/indicies corresponding to variable
+                            proportions in {.var data}."))
+  }
+
+  sanity_checks(data = data, prop = prop)
+
+  if(!is.null(FG)){
+    if(!is.character(FG)){
+      cli::cli_abort(c("The {.var FG} argument should be specified as a character
+                       vector of same length as the {.var prop} argument, specifying
+                       the functional group to which each species in prop belongs.",
+                       "i" = "{.var FG} was specified as a {.cls {class(FG)}} object."))
+    }
+
+    if(length(prop) != length(FG)){
+      cli::cli_abort(c("The {.var FG} argument should be specified as a character
+                       vector of same length as the {.var prop} argument, specifying
+                       the functional group to which each species in prop belongs.",
+                       "i" = "{.var FG} has length {length(FG)} while {.var prop}
+                       has length {length(prop)}."))
+    }
+
+    prop <- colnames(data[, prop])
+    all_gr <- unique(FG)
+    for (gr in all_gr){
+      filter_prop <- prop[which(FG == gr)]
+      data[, gr] <- data %>%
+        select(filter_prop) %>%
+        rowSums()
+    }
   }
   return(data)
 }
 
 # Function to print generic message if model is not DI
+#' @keywords internal
+#' Utility function to check if model is a DImodel and print an appropriate
+#' help message accordingly
+#'
+#' @usage NULL
+NULL
 model_not_DI <- function(call_fn){
   data_fn <- paste0(call_fn, "_data")
   plot_fn <- paste0(call_fn, "_plot")
-  cli::cli_abort(c("{.var model} should be a regression model fit using the {.help [{.fun DI}](DImodels::DI)} function from
-                     the {.help [{.pkg DImodels}](DImodels::DImodels)} package or an object extending the {.cls DI} class.",
-                   "i" = "If your model cannot be fit using the {.help [{.fun DI}](DImodels::DI)} function,
-                     manually call the {.help [{.fn {data_fn}}]} function followed by the
+  cli::cli_abort(c("{.var model} should be a regression model fit using the
+                    {.help [{.fun DI}](DImodels::DI)} function from
+                    the {.help [{.pkg DImodels}](DImodels::DImodels)}
+                   package or an object extending the {.cls DI} class.",
+                   "i" = "If your model cannot be fit using the
+                   {.help [{.fun DI}](DImodels::DI)} function,
+                     manually call the {.help [{.fn {data_fn}}]}
+                     function to prepare the data followed by the
                      {.help [{.fn {plot_fn}}]} function to create the plot."))
 }
 
-# Import function from DImodels
-group_IDs <- getFromNamespace("group_IDs", "DImodels")
+#' @keywords internal
+#' Utility function to check if a particular column exists in the data
+#'
+#' @usage NULL
+NULL
+check_col_exists <- function(data, col){
+  col_names <- colnames(data)
+  if(all(col %in% col_names)){
+    return(TRUE)
+  } else {
+    return(FALSE)
+  }
+}

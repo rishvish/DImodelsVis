@@ -5,20 +5,24 @@
 \title{Get all equi-proportional communities at each level of richness}
 \usage{
 get_equi_comms(
-  nSpecies,
-  species = paste0("Sp", 1:nSpecies),
-  threshold = round(1e+06/nSpecies)
+  nvars,
+  variables = paste0("Var", 1:nvars),
+  threshold = round(1e+06/nvars)
 )
 }
 \arguments{
-\item{nSpecies}{Number of species in the design}
+\item{nvars}{Number of variables in the design}
 
-\item{species}{Names for the species. Will be used as column names for the final result. Default is "Sp" followed by column number.}
+\item{variables}{Names for the variables. Will be used as column names for the
+final result. Default is "Var" followed by column number.}
 
-\item{threshold}{The maximum number of communities to select for each level of richness for situations when there are too many equi-proportional communities.}
+\item{threshold}{The maximum number of communities to select for each level
+of richness for situations when there are too many
+equi-proportional communities.}
 }
 \value{
-A dataframe consisting all or a random selection of equi-proportional communities at each level of richness
+A dataframe consisting all or a random selection of equi-proportional
+        communities at each level of richness
 }
 \description{
 Get all equi-proportional communities at each level of richness
@@ -28,6 +32,6 @@ Get all equi-proportional communities at each level of richness
 get_equi_comms(10)
 
 ## Change species names
-get_equi_comms(4, species = c("Lollium perenne", "Chicorum intybus",
-                              "Trifolium repens", "Trifolium pratense"))
+get_equi_comms(4, variables = c("Lollium perenne", "Chicorum intybus",
+                                "Trifolium repens", "Trifolium pratense"))
 }

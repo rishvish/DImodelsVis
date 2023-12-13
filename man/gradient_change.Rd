@@ -6,11 +6,13 @@
 \usage{
 gradient_change(
   model,
+  data = NULL,
   gradient = c("richness", "evenness"),
-  communities = c("original", "equi"),
-  exp_str = list(),
-  threshold = NULL,
+  add_var = list(),
+  plot = TRUE,
+  pie_data = NULL,
   pie_colours = NULL,
+  facet_var = NULL,
   nrow = 0,
   ncol = 0
 )
@@ -20,41 +22,46 @@ gradient_change(
 \code{\link[DImodels:DI]{DI()}} function from the
 \code{\link[DImodels:DImodels-package]{DImodels}} package.}
 
+\item{data}{A dataframe specifying communities of interest for which user
+wants to visualise the gradient. If left blank, the value specified
+in `communities` will be used to create data for the user.}
+
 \item{gradient}{Diversity gradient to show on the X-axis, one of
 "richness" or "evenness". Defaults to "richness".}
 
-\item{communities}{Communities which are used to calculate the average
-response. Accepts one of "original" or "equi".
-"original" (the default) calculates the average using
-the original communities from the raw data used to fit
-the \code{\link[DImodels:DI]{DI}} model while "equi"
-uses all possible equi-proportional communities at each
-level of richness to calculate the average.}
-
-\item{exp_str}{A list specifying values for additional experimental
-structures in the model other than the proportions.
+\item{add_var}{A list specifying values for additional variables
+in the model independent of the compositional variables.
 This would be useful to compare the predictions across
 different values for a categorical variable. One plot will
 be generated for each unique combination of values specified
 here and they will be arranged in a grid according to the
 value specified in `nrow` and `ncol`.}
 
-\item{threshold}{For high levels of richness (>20) it might not be feasible
-to compute and store all equi-proportional communities.
-This parameter defines the number of communities randomly
-selected at each level of richness.}
+\item{plot}{A boolean variable indicating whether to create the plot or return
+the prepared data instead. The default `TRUE` creates the plot while
+`FALSE` would return the prepared data for plotting. Could be useful
+for if user wants to modify the data first and then call the plotting
+function manually.}
+
+\item{pie_data}{A subset of data-frame specified in `data`, to visualise
+the individual data-points as pie-glyphs showing the
+relative proportions of the variables in the data-point.}
 
 \item{pie_colours}{A character vector specifying the colours for the slices
 within the pie-chart glyphs.}
 
+\item{facet_var}{A character string or numeric index identifying the column
+in the data to be used for faceting the plot into multiple
+panels.}
+
 \item{nrow}{Number of rows in which to arrange the final plot
-(when `exp_str` is specified).}
+(when `add_var` is specified).}
 
 \item{ncol}{Number of columns in which to arrange the final plot
-(when `exp_str` is specified).}
+(when `add_var` is specified).}
 }
 \value{
-A ggmultiplot (ggplot if single plot is returned) class object
+A ggmultiplot (ggplot if single plot is returned) class object or data-frame (if `plot = FALSE`)
 }
 \description{
 Visualise average response at each level of richness
@@ -62,26 +69,59 @@ Visualise average response at each level of richness
 \examples{
 ## Load DImodels package to fit the model
 library(DImodels)
+library(dplyr)
 
 ## Load data
 data(sim4)
 
 ## Fit DI model
-mod <- DI(prop = 3:8, DImodel = 'AV', data = sim4, y = 'response')
+mod <- DI(prop = 3:8, DImodel = 'AV', data = sim4, y = 'response') \%>\%
+         suppressWarnings()
 
 ## Create visualisation
 
-## By default, 'richness' is the gradient and commmunities from the
-## raw data are used to calcualte average response
+## By default, 'richness' is the gradient and communities from the
+## raw data are used to calculate average response
 gradient_change(model = mod)
 
-## Can also calculate average response using all possible
-## equi-proportional communities at each level of richness
-gradient_change(model = mod, communities = 'equi')
+## Specify custom data
+gradient_change(model = mod, data = sim4 \%>\% filter(richness <= 4))
 
-## Can also plot across evenness
-data(sim5)
-mod1 <- DI(prop = paste0('p', 1:9), DImodel = 'AV',
-          data = sim5, y = 'response', estimate_theta = TRUE)
-gradient_change(model = mod1, gradient = 'evenness')
+## Create plot for all equi-proportional communities at a
+## given level of richness
+plot_data <- get_equi_comms(6, variables = paste0("p", 1:6))
+gradient_change(model = mod, data = plot_data)
+
+## Can also plot average response across evenness
+gradient_change(model = mod, gradient = 'evenness')
+
+## Change colours of the pie-slices using `pie_colours`
+gradient_change(model = mod,
+                pie_colours = c("darkolivegreen1", "darkolivegreen4",
+                                "orange1", "orange4",
+                                "steelblue1", "steelblue4"))
+
+## Manually specify only specific communities to be shown as pie-chart
+## glyphs using `pie_data`.
+gradient_change(model = mod,
+                pie_data = sim4 \%>\% filter(richness \%in\% c(1, 6)))
+
+## Use `facet_var` to facet the plot on an additional variable
+gradient_change(model = mod,
+                pie_data = sim4 \%>\% filter(richness \%in\% c(1, 6)),
+                facet_var = "treatment")
+
+## Use `add_var` to add additional variables independent of the compositions
+## Multiple plots will be produced and can be arranged using nrow and ncol
+## Create plot arranged in 2 rows
+gradient_change(model = mod,
+                data = sim4[, -2],
+                add_var = list("treatment" = c(50, 250)),
+                pie_data = sim4[, -2] \%>\% filter(richness \%in\% c(1, 6)),
+                nrow = 2)
+
+## Specify `plot = FALSE` to not create the plot but return the prepared data
+gradient_change(model = mod, plot = FALSE,
+                pie_data = sim4 \%>\% filter(richness \%in\% c(1, 6)),
+                facet_var = "treatment")
 }

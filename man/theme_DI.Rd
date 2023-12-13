@@ -15,7 +15,13 @@ theme_DI(
 
 \item{font_family}{Font family for text across the plot}
 
-\item{legend}{One of c("top", "bottom", "left", "right", "none") specifying the position of the legend. The legend position can also be specified as a numeric vector of form c(x, y) with x and y having values between 0 and 1. If specified as a numeric vector the legend within the plotting region where c(0,0) corresponds to the "bottom left" and c(1,1) corresponds to the "top right" position. The default position is "top".}
+\item{legend}{One of c("top", "bottom", "left", "right", "none") specifying
+the position of the legend. The legend position can also be
+specified as a numeric vector of form c(x, y) with x and y
+having values between 0 and 1. If specified as a numeric vector
+the legend within the plotting region where c(0,0) corresponds
+to the "bottom left" and c(1,1) corresponds to the "top right"
+position. The default position is "top".}
 }
 \value{
 A ggplot theme object

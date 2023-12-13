@@ -2,9 +2,17 @@
 % Please edit documentation in R/GradientChange.R
 \name{gradient_change_plot}
 \alias{gradient_change_plot}
-\title{Visualising average change in response over a diversity gradient.}
+\title{Average response over diversity gradient}
 \usage{
-gradient_change_plot(data, prop = NULL, pie_data = NULL, pie_colours = NULL)
+gradient_change_plot(
+  data,
+  prop = NULL,
+  pie_data = NULL,
+  pie_colours = NULL,
+  facet_var = NULL,
+  nrow = 0,
+  ncol = 0
+)
 }
 \arguments{
 \item{data}{A data-frame which is the output of the
@@ -12,7 +20,7 @@ gradient_change_plot(data, prop = NULL, pie_data = NULL, pie_colours = NULL)
 predicted response averaged over a particular diversity gradient.}
 
 \item{prop}{A vector identifying the column-names or indices of the
-columns containing the proportions in `data`.}
+columns containing the variable proportions in `data`.}
 
 \item{pie_data}{A subset of data-frame specified in `data`, to visualise
 the individual data-points as pie-glyphs showing the
@@ -20,11 +28,27 @@ relative proportions of the variables in the data-point.}
 
 \item{pie_colours}{A character vector specifying the colours for the slices
 within the pie-chart glyphs.}
+
+\item{facet_var}{A character string or numeric index identifying the column
+in the data to be used for faceting the plot into multiple
+panels.}
+
+\item{nrow}{Number of rows in which to arrange the final plot
+(when `add_var` is specified).}
+
+\item{ncol}{Number of columns in which to arrange the final plot
+(when `add_var` is specified).}
 }
 \value{
 A ggplot object
 }
 \description{
+Helper function for plotting the average response at each level of the
+diversity gradient. The output of the \code{\link{gradient_change_data}}
+function should be passed here to visualise the average response. The
+proportions of the compositional variables present in the data would be
+shown on the plot using `\code{\link[PieGlyph:PieGlyph-package]{pie-glyphs}}`.
+
 Helper for plotting average response at each level of species richness
 }
 \examples{
@@ -51,13 +75,14 @@ gradient_change_plot(data = plot_data)
 
 ## Average response with respect to evenness
 plot_data <- gradient_change_data(data = sim4,
-                          prop = c("p1", "p2", "p3", "p4", "p5", "p6"),
-                          model = mod,
-                          gradient = "evenness")
+                                  prop = c("p1", "p2", "p3",
+                                           "p4", "p5", "p6"),
+                                  model = mod,
+                                  gradient = "evenness")
 gradient_change_plot(data = plot_data,
                      prop = c("p1", "p2", "p3", "p4", "p5", "p6"))
 
-## Change colours of the pie-slices
+## Change colours of the pie-slices using `pie_colours`
 gradient_change_plot(data = plot_data,
                      prop = c("p1", "p2", "p3", "p4", "p5", "p6"),
                      pie_colours = c("darkolivegreen1", "darkolivegreen4",
@@ -74,4 +99,24 @@ gradient_change_plot(data = plot_data,
 ## `pie_data` to have the .Pred and .Gradient columns.
 ## So the best use case for this parameter is to accept
 ## a subset of the data specified in `data`.
+
+## Use `facet_var` to facet the plot on an additional variable
+gradient_change_plot(data = plot_data,
+                     prop = c("p1", "p2", "p3", "p4", "p5", "p6"),
+                     pie_data = plot_data \%>\% filter(.Richness \%in\% c(1, 6)),
+                     facet_var = "treatment")
+
+## If `add_var` was used during the data preparation step then
+## multiple plots will be produced and can be arranged using nrow and ncol
+new_mod <- update(mod, ~. + treatment, data = sim4)
+plot_data <- gradient_change_data(data = sim4[c(seq(1, 18, 3), 19:47), -2],
+                                  prop = c("p1", "p2", "p3",
+                                           "p4", "p5", "p6"),
+                                  model = new_mod,
+                                  add_var = list("treatment" = c(50, 250)))
+## Create plot arranged in 2 rows
+gradient_change_plot(data = plot_data,
+                     prop = c("p1", "p2", "p3", "p4", "p5", "p6"),
+                     pie_data = plot_data \%>\% filter(.Richness \%in\% c(1, 6)),
+                     nrow = 2)
 }

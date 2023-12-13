@@ -2,17 +2,31 @@
 % Please edit documentation in R/GradientChange.R
 \name{gradient_change_data}
 \alias{gradient_change_data}
-\title{Visualising average change in response over a diversity gradient.}
+\title{Average response over diversity gradient}
 \usage{
-gradient_change_data(data, prop, gradient = c("richness", "evenness"), ...)
+gradient_change_data(
+  data,
+  prop,
+  add_var = list(),
+  gradient = c("richness", "evenness"),
+  ...
+)
 }
 \arguments{
-\item{data}{A data-frame consisting of species proportions and
+\item{data}{A data-frame consisting of variable proportions and
 any other necessary variables to make predictions from
 `model` or `coefficients`.}
 
 \item{prop}{A vector identifying the column-names or indices of the
-columns containing the proportions in `data`.}
+columns containing the variable proportions in `data`.}
+
+\item{add_var}{A list specifying values for additional variables
+in the model independent of the compositional variables.
+This would be useful to compare the predictions across
+different values for a categorical variable. One plot will
+be generated for each unique combination of values specified
+here and they will be arranged in a grid according to the
+value specified in `nrow` and `ncol`.}
 
 \item{gradient}{Diversity gradient to show on the X-axis, one of
 "richness" or "evenness". Defaults to "richness".}
@@ -20,13 +34,32 @@ columns containing the proportions in `data`.}
 \item{...}{
   Arguments passed on to \code{\link[=add_prediction]{add_prediction}}
   \describe{
-    \item{\code{model}}{A regression model object which will be used to make predictions for the observations in `data`.
-Will override `coefficients` if specified.}
-    \item{\code{coefficients}}{If a regression model is not available (or can't be fit in R), the regression coefficients from a model fit in some other language can be used to calculate predictions.
-However, the user would have to ensure there's an appropriate one-to-one positional mapping between the data columns and the coefficient values.
-Further, it would not be possible to calculate confidence/prediction intervals using this method.}
-    \item{\code{coeff_cols}}{If `coefficients` are specified and there isn't a one-to-one positional mapping between}
-    \item{\code{conf.level}}{The confidence level for calculating confidence/prediction intervals. Default is 0.95.}
+    \item{\code{model}}{A regression model object which will be used to make predictions
+for the observations in `data`. Will override `coefficients`
+if specified.}
+    \item{\code{coefficients}}{If a regression model is not available (or can't be fit in R),
+the regression coefficients from a model fit in some other
+language can be used to calculate predictions. However, the
+user would have to ensure there's an appropriate one-to-one
+positional mapping between the data columns and the
+coefficient values. Further, the would also have to provide
+a variance-covariance matrix of the coefficients in the `vcov`
+parameter if they want the associated CI for the prediction or
+it would not be possible to calculate confidence/prediction
+intervals using this method.}
+    \item{\code{vcov}}{If regression coefficients are specified, then the variance-covariance
+matrix of the coefficients can be specified here to calculate the
+associated confidence interval around each prediction. Failure to do
+so would result in no confidence intervals being returned. Ensure
+`coefficients` and `vcov` have the same positional mapping with the data.}
+    \item{\code{coeff_cols}}{If `coefficients` are specified and a one-to-one positional
+mapping between the data-columns and coefficient vector is
+not present. A character string or numeric index can be specified
+here to reorder the data columns and match the corresponding
+coefficient value to the respective data column. See the
+"Use model coefficients for prediction" section in examples.}
+    \item{\code{conf.level}}{The confidence level for calculating confidence/prediction
+intervals. Default is 0.95.}
     \item{\code{interval}}{Type of interval to calculate:
 \describe{
   \item{"none" (default)}{No interval to be calculated.}
@@ -36,16 +69,17 @@ Further, it would not be possible to calculate confidence/prediction intervals u
   }}
 }
 \value{
-A data-frame with the following columns appended at the end
+The data-frame with the following columns appended at the end
  \describe{
-   \item{.Pred}{The predicted response for each community.}
+   \item{.Pred}{The predicted response for each obvervation.}
    \item{.Lower}{The lower limit of the prediction/confidence interval
                  for each observation.}
    \item{.Upper}{The upper limit of the prediction/confidence interval
                  for each observation.}
-   \item{.Richness}{The richness (number of species) within each community.}
+   \item{.Richness}{The richness (number of non-zero compositional variables)
+                    within each observation.}
    \item{.Evenness}{The evenness (metric quantifying the relative abundance
-                    of each species) of each community.}
+                    of each compositional variable) within each observation.}
    \item{.Gradient}{An character string defining the diversity gradient used
                     for averaging the response.}
    \item{.Avg}{The averaged value of the response for each unique value of
@@ -53,10 +87,17 @@ A data-frame with the following columns appended at the end
  }
 }
 \description{
-Helper function for creating the data for the average richness plot.
+Helper function for creating the data to visualise the average
+response over a diversity gradient. The average can be calculated
+either over the "richness" or "evenness" gradients. The average is
+calculated from all communities present at a given level of the
+chosen diversity gradient in `data`. The output of this
+function can be passed to the \code{\link{gradient_change_plot}} function
+to visualise the results.
 }
 \examples{
 library(DImodels)
+library(dplyr)
 
 ## Load data
 data(sim2)
@@ -75,4 +116,46 @@ head(gradient_change_data(data = sim2,
                           prop = c("p1", "p2", "p3", "p4"),
                           model = mod,
                           gradient = "evenness"))
+
+## Additional variables can also be added to the data by either specifying
+## them directly in the `data` or by using the `add_var` argument
+## Refit model
+sim2$block <- as.numeric(sim2$block)
+new_mod <- update(mod, ~. + block, data = sim2)
+## This model has block so we can either specify block in the data
+subset_data <- sim2[c(1,5,9,11), 2:6]
+subset_data
+head(gradient_change_data(data = subset_data,
+                          prop = c("p1", "p2", "p3", "p4"),
+                          model = mod,
+                          gradient = "evenness"))
+## Or we could add the variable using `add_var`
+subset_data <- sim2[c(1,5,9,11), 3:6]
+subset_data
+head(gradient_change_data(data = subset_data,
+                          prop = c("p1", "p2", "p3", "p4"),
+                          model = new_mod,
+                          gradient = "evenness",
+                          add_var = list(block = c(1, 2))))
+## The benefit of specifying the variable this way is we have an ID
+## columns now called `.add_str_ID` which could be used to create a
+## separate plot for each value of the additional variable
+
+
+## Model coefficients can also be used, but then user would have
+## to specify the data with all columns corresponding to each coefficient
+coef_data <- sim2 \%>\%
+               mutate(`p1:p2` = p1*p2, `p1:p3` = p1*p2, `p1:p4` = p1*p4,
+                      `p2:p3` = p2*p3, `p2:p4` = p2*p4, `p3:p4` = p3*p4) \%>\%
+               select(p1, p2, p3, p4,
+                      `p1:p2`, `p1:p3`, `p1:p4`,
+                      `p2:p3`, `p2:p4`, `p3:p4`) \%>\%
+               slice(1,5,9,11)
+print(coef_data)
+print(mod$coefficients)
+gradient_change_data(data = coef_data,
+                     prop = c("p1", "p2", "p3", "p4"),
+                     gradient = "evenness",
+                     coefficients = mod$coefficients,
+                     interval = "none")
 }

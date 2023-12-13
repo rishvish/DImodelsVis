@@ -9,12 +9,13 @@ model_diagnostics(
   which = c(1, 2, 3, 5),
   prop = NULL,
   npoints = 3,
-  cook.levels = c(0.5, 1),
-  pie_radius = 0.25,
+  cook_levels = c(0.5, 1),
+  pie_radius = 0.2,
   pie_colours = NULL,
   only_extremes = FALSE,
   label_size = 4,
   points_size = 3,
+  plot = TRUE,
   nrow = 0,
   ncol = 0
 )
@@ -43,7 +44,7 @@ package.}
 \item{npoints}{Number of points to be labelled in each plot, starting
 with the most extreme.}
 
-\item{cook.levels}{A numeric vector specifying levels of Cook's distance
+\item{cook_levels}{A numeric vector specifying levels of Cook's distance
 at which to draw contours.}
 
 \item{pie_radius}{A numeric value specifying the radius (in cm) for the
@@ -61,12 +62,17 @@ identifying extreme observations.}
 \item{points_size}{A numeric value specifying the size of points (when
 pie-glyphs not shown) shown in the plots.}
 
+\item{plot}{A boolean variable indicating whether to create the plot or return
+the prepared data instead. The default `TRUE` creates the plot while
+`FALSE` would return the prepared data for plotting. Could be useful
+for if user wants to modify the data first and then call the plotting}
+
 \item{nrow}{Number of rows in which to arrange the final plot}
 
 \item{ncol}{Number of columns in which to arrange the final plot}
 }
 \value{
-A ggmultiplot (ggplot if single plot is returned) class object
+A ggmultiplot (ggplot if single plot is returned) class object or data-frame (if `plot = FALSE`)
 }
 \description{
 This function returns regression diagnostics plots for a model with points
@@ -82,7 +88,6 @@ data(sim1)
 ## Fit model
 mod1 <- lm(response ~ 0 + (p1 + p2 + p3 + p4)^2, data = sim1)
 
-\dontrun{
 ## Get diagnostics plot
 ## Recommend to store plot in a variable, to access individual plots later
 diagnostics <- model_diagnostics(mod1, prop = c("p1", "p2", "p3", "p4"))
@@ -104,5 +109,7 @@ model_diagnostics(mod1, prop = c("p1", "p2", "p3", "p4"),
 DI_mod <- DI(y = "response", prop = c("p1", "p2", "p3", "p4"),
              DImodel = "FULL", data = sim1)
 model_diagnostics(DI_mod, which = 1)
-}
+
+## Specify `plot = FALSE` to not create the plot but return the prepared data
+model_diagnostics(DI_mod, which = 1, plot  = FALSE)
 }

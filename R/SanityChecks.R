@@ -86,7 +86,15 @@ sanity_checks <- function(data = NULL, prop = NULL, responses = NULL,
     # Ensure all prop columns are numeric
     if(!all(sapply(data[, prop], is.numeric))){
       cli::cli_abort(c("All columns specified in {.var prop} should be numeric:",
-                       "x" = "The columns {.var {prop[!sapply(data[, prop], is.numeric)]}} {?is/are} are not numeric."),
+                       "x" = "The column{?s} {.var {prop[!sapply(data[, prop], is.numeric)]}} {?is/are} are not numeric."),
+                     call = call)
+    }
+
+    # Ensure prop is between 0 and 1
+    if(!all(sapply(data[, prop], function(x) all(between(x, 0, 1))))){
+      cli::cli_abort(c("All columns specified in {.var prop} should have values between 0 and 1:",
+                       "x" = "The column{?s} {.var {prop[!sapply(data[, prop], function(x) all(between(x, 0, 1)))]}}
+                       {?do/does} not have values between 0 and 1."),
                      call = call)
     }
 
@@ -94,11 +102,11 @@ sanity_checks <- function(data = NULL, prop = NULL, responses = NULL,
     comm_sum <- get_comm_sum(data, prop)
     if(!all(dplyr::near(comm_sum, 1, tol = .Machine$double.eps^0.25))){
       if(any(comm_sum < 1)){
-        cli::cli_abort(c("!" = "The columns containing the prop proportions should sum to 1 for each community:",
-                         "i" = "Certain communities sum less than 1 currently. Do you want to specify any additional prop from the design?"),
+        cli::cli_abort(c("!" = "The columns containing the variable proportions should sum to 1 for each community:",
+                         "i" = "Certain communities sum less than 1 currently. Do you want to specify any additional columns from the design?"),
                        call = call)
       } else {
-        cli::cli_abort(c("!" = "The columns containing the prop proportions should sum to 1 for each community:",
+        cli::cli_abort(c("!" = "The columns containing the variables proportions should sum to 1 for each community:",
                          "i" = "Certain communities sum more than 1 currently. Have you specified any additional columns not from the design?"),
                        call = call)
       }
@@ -296,39 +304,65 @@ check_data_functions <- function(model, coefficients, prop = NULL,
 #'
 #' @usage NULL
 NULL
-check_exp_str <- function(model = NULL, exp_str = NULL, call = caller_env()){
-  if(!is.null(exp_str) && !is.list(exp_str)){
-    cli::cli_abort(c("{.var exp_str} should be a list containing the names and values for experimental structures in the DI model.",
-                     "i" = "An example list could be as follows list(\"exp_str1\" = c(\"value1\", \"value2\"),
-                                                                     \"exp_str2\" = c(\"value1\"))"),
+check_add_var <- function(model = NULL, add_var = NULL, call = caller_env()){
+  if(!is.null(add_var) && !is.list(add_var)){
+    cli::cli_abort(c("{.var add_var} should be a list containing the names and values for experimental structures in the DI model.",
+                     "i" = "An example list could be as follows list(\"add_var1\" = c(\"value1\", \"value2\"),
+                                                                     \"add_var2\" = c(\"value1\"))"),
                    call = call)
   }
 
   # If no experimental structures were specified then do not perform any checks
-  if(length(exp_str) == 0){
-    return(exp_str)
+  if(length(add_var) == 0){
+    return(add_var)
   }
 
   if(!is.null(model) && insight::is_regression_model(model)){
     model_data <- if (inherits(model, "DI")) model$original_data else insight::get_data(model)
     data_col_names <- colnames(model_data)
-    exp_names <- names(exp_str)
+    exp_names <- names(add_var)
 
     if(!all(exp_names %in% colnames(model_data))){
-      cli::cli_warn(c("The names for the experimental structures specified in {.var exp_str} should be same as the names used when fitting the model.",
+      cli::cli_warn(c("The names for the experimental structures specified in {.var add_var} should be same as the names used when fitting the model.",
                       "x" = "{.var {exp_names[!(exp_names %in% data_col_names)]}} {?is/are} not present in the data and will be ignored."),
                     call = call)
-      exp_str <- exp_str[exp_names != exp_names[!(exp_names %in% data_col_names)]]
+      add_var <- add_var[exp_names != exp_names[!(exp_names %in% data_col_names)]]
     }
 
-    exp_str <- sapply(names(exp_str), function(x){
+    add_var <- sapply(names(add_var), function(x){
       model_var <- model_data[, x]
-      value <- exp_str[[x]]
-      # If variable in data was of type character or factor ensure exp_str is too
+      value <- add_var[[x]]
+
+      # If variable in model was of type factor ensure levels are specified
+      levels_not_match <- if(length(levels(model_var)) != length(levels(as.factor(value)))) TRUE else FALSE
+      if(inherits(model_var, "factor") && levels_not_match){
+        lvl_str <- paste0(dQuote(unique(value)), collapse = ', ')
+        mod_lvl <- paste0(dQuote(levels(model_var)), collapse = ', ')
+        cli::cli_abort(c("{.var {x}} was of type {.cls {class(model_var)}} in the
+                            data used to fit the model and the levels of the variable
+                            specified in `add_var` do not match the levels of the
+                            variable used when fitting the model.",
+                         "i" = "Specify {.var {x}}  in {.var add_var} as a
+                          {.cls factor} with the same levels as in the orignal data or
+                          the predictions could fail.",
+                         "i" = "Here, {.val {x}} had levels {.val {levels(model_var)}}
+                         in the data used to fit the model, but predictions are needed
+                         only for levels {.val {unique(value)}}. However we'd still have
+                         to specify all levels for {.val {x}} when specifying {.val {x}}
+                          in {.var add_var}. Thus `add_var` would be specified as \n
+                          {.code add_var({x} = factor(c({lvl_str}),
+                                                      levels = c({mod_lvl})))}
+                          "),
+                       call = call)
+      }
+      # If variable in data was of type character or factor ensure add_var is too
       if(!all(class(model_var) == class(value))){
-        cli::cli_warn(c("{.var {x}} was of type {.cls {class(model_var)}} in the data used to fit the model but was specified as {.cls {class(exp_str[[x]])}} in {.var exp_str}.",
-                        "i" = "Converting {.var {x}}  in {.var exp_str} to {.cls {class(model_var)}}."),
+        cli::cli_warn(c("{.var {x}} was of type {.cls {class(model_var)}} in the
+                      data used to fit the model but was specified as
+                      {.cls {class(add_var[[x]])}} in {.var add_var}.",
+                        "i" = "Converting {.var {x}}  in {.var add_var} to {.cls {class(model_var)}}."),
                       call = call)
+
         if(is.character(model_var) || is.factor(model_var)){
           value <- as.character(value)
         } else if(is.numeric(model_var)){
@@ -336,8 +370,10 @@ check_exp_str <- function(model = NULL, exp_str = NULL, call = caller_env()){
 
           # Fallback if numeric conversion failed
           if(any(is.na(value))){
-            cli::cli_abort(c("{.var {x}} was of type {.cls {class(model_var)}} in the data, but the values specified in {.var exp_str} for {.var {x}} can't be converted to {.cls numeric}.",
-                             "i" = "Specify a numeric vector for {.var {x}} in {.var exp_str}."),
+            cli::cli_abort(c("{.var {x}} was of type {.cls {class(model_var)}} in the data,
+                             but the values specified in {.var add_var} for {.var {x}}
+                             can't be converted to {.cls numeric}.",
+                             "i" = "Specify a numeric vector for {.var {x}} in {.var add_var}."),
                            call = call)
           }
         }
@@ -345,9 +381,9 @@ check_exp_str <- function(model = NULL, exp_str = NULL, call = caller_env()){
       value
     }, simplify = FALSE)
 
-    check_values <- sapply(names(exp_str), function(x){
+    check_values <- sapply(names(add_var), function(x){
       model_var <- model_data[, x]
-      values <- exp_str[[x]]
+      values <- add_var[[x]]
       # Throwing error for a factor variable if value specified was not in the orignal data
       if(!is.numeric(model_var) && !all(values %in% unique(model_var))){
         return_value <- values[!values %in% unique(model_var)]
@@ -357,18 +393,18 @@ check_exp_str <- function(model = NULL, exp_str = NULL, call = caller_env()){
     }, simplify = FALSE)
 
     if(!all(sapply(check_values, is.logical))){
-      cli::cli_warn(c("The values for categorical experimental structures specified in {.var exp_str} cannot accept values not present in the original data.",
+      cli::cli_warn(c("The values for categorical experimental structures specified in {.var add_var} cannot accept values not present in the original data.",
                       "x" = "The values specified for {.var {names(check_values)[!sapply(check_values, is.logical)]}} are not present in the data and will be ignored."),
                     call = call)
-      glue::glue("The following values are dropped from `exp_str`,
+      glue::glue("The following values are dropped from `add_var`,
                {paste(names(check_values), check_values, sep = \": \", collapse = \"\\n\")}")
 
-      exp_str <- sapply(names(exp_str), function(x){
-        exp_str[[x]][!exp_str[[x]] %in% check_values[[x]]]
+      add_var <- sapply(names(add_var), function(x){
+        add_var[[x]][!add_var[[x]] %in% check_values[[x]]]
       }, simplify = FALSE)
     }
   }
-  return(exp_str)
+  return(add_var)
 }
 
 #' @keywords internal
