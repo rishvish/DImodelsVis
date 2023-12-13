@@ -1406,15 +1406,17 @@ NULL
 model_not_DI <- function(call_fn){
   data_fn <- paste0(call_fn, "_data")
   plot_fn <- paste0(call_fn, "_plot")
+  data_fn_link <- paste0("DImodelsVis::", data_fn)
+  plot_fn_link <- paste0("DImodelsVis::", plot_fn)
   cli::cli_abort(c("{.var model} should be a regression model fit using the
                     {.help [{.fun DI}](DImodels::DI)} function from
                     the {.help [{.pkg DImodels}](DImodels::DImodels)}
                    package or an object extending the {.cls DI} class.",
                    "i" = "If your model cannot be fit using the
                    {.help [{.fun DI}](DImodels::DI)} function,
-                     manually call the {.help [{.fn {data_fn}}]}
+                     manually call the {.help [{.fn {data_fn}}]({data_fn_link})}
                      function to prepare the data followed by the
-                     {.help [{.fn {plot_fn}}]} function to create the plot."))
+                     {.help [{.fn {plot_fn}}]({plot_fn_link})} function to create the plot."))
 }
 
 #' @keywords internal
