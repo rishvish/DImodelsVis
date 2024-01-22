@@ -4,16 +4,16 @@
 #' The helper function to create the underlying data for visualising the effect
 #' of increasing or decreasing (or both) the proportion of a variable from a
 #' set of compositional variables. This is a special case of the
-#' \code{\link{suggest_name}} function where the end points are either the
+#' \code{\link{simplex_path}} function where the end points are either the
 #' monoculture (i.e. variable of interest = 1, while all others equal 0) of the
 #' variable of interest (when increasing the proportion) or a community without
 #' the variable of interest (when decreasing the proportion). The observations
 #' specified in `data` are connected to the respective communities with a straight
 #' line across the simplex, this has the effect of changing the proportion of
 #' the variable of interest whilst adjusting the proportion of the other variables
-#' but keeping their proportions unchanged, thereby preserving the compositional
-#' nature of the data. This enables us to visualise the effect of changing the
-#' proportion of a variable of interest. See examples for more information.
+#' but keeping the ratio of their relative proportions unchanged, thereby preserving
+#' the compositional nature of the data. This enables us to visualise the effect of
+#' changing the proportion of a variable of interest. See examples for more information.
 #' The output of this function can be passed to the
 #' \code{\link{visualise_effects_plot}} function to visualise the results.
 #'
@@ -54,22 +54,30 @@
 #'
 #' @return A data frame with the following columns appended at the end
 #'  \describe{
-#'    \item{.Sp}{An identifier column to discern the variable of interest being modified in each curve.}
+#'    \item{.Sp}{An identifier column to discern the variable of interest being
+#'               modified in each curve.}
 #'    \item{.Proportion}{The value of the variable of interest within the community.}
 #'    \item{.Group}{An identifier column to discern between the different curves.}
 #'    \item{.add_str_ID}{An identifier column for grouping the cartesian product
 #'                       of all additional columns specified in `add_var`
 #'                       parameter (if `add_var` is specified).}
 #'    \item{.Pred}{The predicted response for each observation.}
-#'    \item{.Lower}{The lower limit of the prediction/confidence interval for each observation.}
-#'    \item{.Upper}{The upper limit of the prediction/confidence interval for each observation.}
-#'    \item{.Marginal}{The marginal change in the response (first derivative) with respect to the
-#'                     gradual change in the proportion of the species of interest.}
-#'    \item{.Threshold}{A numeric value indicating the maximum proportion of the species of interest
-#'                      within a particular community which results in a positive marginal effect on the response.}
-#'    \item{.MarEffect}{A character string entailing whether the increase/decrease of the species of interest from the
-#'                      particular community would result in a positive or negative marginal effect on the response.}
-#'    \item{.Effect}{An identifier column signifying whether considering the effect of species addition or species decrease.}
+#'    \item{.Lower}{The lower limit of the prediction/confidence interval for
+#'                  each observation.}
+#'    \item{.Upper}{The upper limit of the prediction/confidence interval for
+#'                  each observation.}
+#'    \item{.Marginal}{The marginal change in the response (first derivative)
+#'                     with respect to the gradual change in the proportion of
+#'                     the species of interest.}
+#'    \item{.Threshold}{A numeric value indicating the maximum proportion of
+#'                      the species of interest within a particular community
+#'                      which results in a positive marginal effect on the response.}
+#'    \item{.MarEffect}{A character string entailing whether the increase/decrease
+#'                      of the species of interest from the particular community
+#'                      would result in a positive or negative marginal effect
+#'                      on the response.}
+#'    \item{.Effect}{An identifier column signifying whether considering the
+#'                   effect of species addition or species decrease.}
 #'  }
 #'
 #' @export
@@ -352,15 +360,17 @@ visualise_effects_data <- function(data, prop, var_interest = NULL,
 #' curve for each observation (whenever possible) in the data.
 #' `\code{\link[PieGlyph:PieGlyph-package]{Pie-glyphs}}` are
 #' used to highlight the compositions of the specified communities and the ending
-#' community after the variable interest either completes dominates the community
+#' community after the variable of interest either completes dominates the community
 #' (when looking at the effect of increase) or completely vanishes from the community
 #' (when looking at the effect of decrease) or both.
 #'
 #' @param data A data frame created using the \code{\link{visualise_effects_data}} function.
 #' @param prop A vector of column names or indices identifying the columns containing the
 #'             species proportions in the data.
-#' @param colours A character vector indicating the colours for the slices in the pie-glyphs.
-#'                If left NULL, the colour blind friendly colours will be for the pie-glyph slices.
+#' @param pie_colours A character vector indicating the colours for the slices
+#'                    in the pie-glyphs. \cr
+#'                    If left NULL, the colour blind friendly colours will be
+#'                    for the pie-glyph slices.
 #' @param se A boolean variable indicating whether to plot confidence intervals associated with
 #'           the effect of species increase or decrease
 #' @param average A boolean variable indicating whether to add a line describing the "average"
@@ -392,7 +402,7 @@ visualise_effects_data <- function(data, prop, var_interest = NULL,
 #'                        prop = c("p1", "p2", "p3", "p4"))
 #'
 #' ## Show specific curves with prediction intervals
-#' subset <- quick_filter(plot_data, .Group %in% c(7, 15))
+#' subset <- custom_filter(plot_data, .Group %in% c(7, 15))
 #' visualise_effects_plot(data = subset, prop = 1:4, se = TRUE)
 #'
 #' ## Do not show average effect line
@@ -401,7 +411,7 @@ visualise_effects_data <- function(data, prop, var_interest = NULL,
 #'
 #' ## Change colours of the pie-glyph slices
 #' visualise_effects_plot(data = subset, prop = 1:4,
-#'                        colours = c("darkolivegreen", "darkolivegreen1",
+#'                        pie_colours = c("darkolivegreen", "darkolivegreen1",
 #'                                    "steelblue4", "steelblue1"))
 #'
 #' #' ## Simultaneously create multiple plots for additional variables
@@ -416,9 +426,9 @@ visualise_effects_data <- function(data, prop, var_interest = NULL,
 #' visualise_effects_plot(data = plot_data,
 #'                        prop = c("p1", "p2", "p3", "p4"),
 #'                        average = FALSE,
-#'                        colours = c("darkolivegreen", "darkolivegreen1",
+#'                        pie_colours = c("darkolivegreen", "darkolivegreen1",
 #'                                    "steelblue4", "steelblue1"))
-visualise_effects_plot <- function(data, prop, colours = NULL,
+visualise_effects_plot <- function(data, prop, pie_colours = NULL,
                                    se = FALSE, average = TRUE,
                                    nrow = 0, ncol = 0){
   if(missing(data)){
@@ -437,7 +447,7 @@ visualise_effects_plot <- function(data, prop, colours = NULL,
   }
 
   sanity_checks(data = data, prop = prop,
-                colours = colours,
+                colours = pie_colours,
                 booleans = list("se" = se, "average" = average),
                 numerics = list("nrow" = nrow, "ncol" = ncol),
                 unit_lengths = list("nrow" = nrow, "ncol" = ncol))
@@ -452,9 +462,10 @@ visualise_effects_plot <- function(data, prop, colours = NULL,
                     function(i){
                       data_iter <- data %>% filter(.data$.add_str_ID == ids[i])
                       visualise_effects_plot_internal(data = data_iter, prop = prop,
-                                                      colours = colours, se = se,
+                                                      pie_colours = pie_colours, se = se,
                                                       average = average)+
-                        labs(subtitle = ids[i])
+                        labs(subtitle = ids[i]) +
+                        ylim(min(data$.Pred), max(data$.Pred))
                     })
     if(length(plots) > 1){
       plot <- new("ggmultiplot", plots = plots, nrow = nrow, ncol = ncol)
@@ -464,7 +475,7 @@ visualise_effects_plot <- function(data, prop, colours = NULL,
     cli::cli_alert_success("Created all plots.")
   } else {
     plot <- visualise_effects_plot_internal(data = data, prop = prop,
-                                            colours = colours, se = se,
+                                            pie_colours = pie_colours, se = se,
                                             average = average)
     cli::cli_alert_success("Created plot.")
   }
@@ -473,11 +484,11 @@ visualise_effects_plot <- function(data, prop, colours = NULL,
 
 #' @title Effects plot for compositional data
 #' @description
-#' This function will prepare the underlying data and plot the results for visualising the
-#' the effect of increasing or decreasing the proportion of a variable from a
-#' set of compositional variables in a single function call. The generated plot will
+#' This function will prepare the underlying data and plot the results for visualising
+#' the effect of increasing or decreasing the proportion of a predictor variable
+#' (from a set of compositional variables). The generated plot will
 #' show a curve for each observation (whenever possible) in the data.
-#' `\code{\link[PieGlyph:PieGlyph-package]{Pie-glyphs}}` are
+#' \code{\link[PieGlyph:PieGlyph-package]{Pie-glyphs}} are
 #' used to highlight the compositions of the specified communities and the ending
 #' community after the variable interest either completes dominates the community
 #' (when looking at the effect of increase) or completely vanishes from the community
@@ -487,10 +498,10 @@ visualise_effects_plot <- function(data, prop, colours = NULL,
 #' \code{\link[DImodels:DImodels-package]{DImodels}} R package and would implicitly
 #' call \code{\link{visualise_effects_data}} followed by
 #' \code{\link{visualise_effects_plot}}. If your model object isn't fit using
-#' DImodels, consider calling these functions manually.
+#' DImodels, users can call the data and plot functions manually, one by one.
 #'
 #' @importFrom ggplot2 geom_line labs scale_colour_manual geom_ribbon labeller
-#'                     stat_summary scale_x_reverse facet_wrap stat_summary
+#'                     stat_summary scale_x_reverse facet_wrap geom_smooth
 #' @importFrom dplyr %>% select filter all_of everything slice mutate bind_rows summarise
 #' @importFrom PieGlyph geom_pie_glyph
 #' @importFrom rlang :=
@@ -560,10 +571,10 @@ visualise_effects_plot <- function(data, prop, colours = NULL,
 #'                   var_interest = c("p1", "p3"))
 #'
 #' ## Show effects of both increase and decrease using `effect = "both"`
-#' ## and change colours of pie-glyphs using colours
+#' ## and change colours of pie-glyphs using `pie_colours`
 #' visualise_effects(model = mod, effect = "both",
 #'                   average = FALSE,
-#'                   colours = c("steelblue1", "steelblue4", "orange1", "orange4"),
+#'                   pie_colours = c("steelblue1", "steelblue4", "orange1", "orange4"),
 #'                   data = data.frame("p1" = c(0.7, 0.1),
 #'                                     "p2" = c(0.3, 0.5),
 #'                                     "p3" = c(0,   0.4),
@@ -573,7 +584,7 @@ visualise_effects_plot <- function(data, prop, colours = NULL,
 #' ## Specify `plot = FALSE` to not create the plot but return the prepared data
 #' visualise_effects(model = mod, effect = "both",
 #'                   average = FALSE, plot = FALSE,
-#'                   colours = c("steelblue1", "steelblue4", "orange1", "orange4"),
+#'                   pie_colours = c("steelblue1", "steelblue4", "orange1", "orange4"),
 #'                   data = data.frame("p1" = c(0.7, 0.1),
 #'                                     "p2" = c(0.3, 0.5),
 #'                                     "p3" = c(0,   0.4),
@@ -583,7 +594,7 @@ visualise_effects_plot <- function(data, prop, colours = NULL,
 #' # Add additional variables and create a separate plot for each
 #' visualise_effects(model = mod, effect = "both",
 #'                   average = FALSE,
-#'                   colours = c("steelblue1", "steelblue4", "orange1", "orange4"),
+#'                   pie_colours = c("steelblue1", "steelblue4", "orange1", "orange4"),
 #'                   data = data.frame("p1" = c(0.7, 0.1),
 #'                                     "p2" = c(0.3, 0.5),
 #'                                     "p3" = c(0,   0.4),
@@ -597,13 +608,13 @@ visualise_effects <- function(model, data = NULL, var_interest = NULL,
                               interval = c("confidence", "prediction", "none"),
                               conf.level = 0.95,
                               se = FALSE, average = TRUE,
-                              colours = NULL, FG = NULL, plot = TRUE,
+                              pie_colours = NULL, FG = NULL, plot = TRUE,
                               nrow = 0, ncol = 0){
 
   # Sanity checks
   # Ensure model is a DImodels object
   # Ensure specified model is fit using the DI function
-  if(missing(model) || !inherits(model, "DI")){
+  if(missing(model) || (!inherits(model, "DI") && !inherits(model, "DImulti"))){
     model_not_DI(call_fn = "visualise_effects")
   }
 
@@ -611,17 +622,23 @@ visualise_effects <- function(model, data = NULL, var_interest = NULL,
   original_data <- model$original_data
 
   # Get all species in the model
-  model_species <- eval(model$DIcall$prop)
+  if(inherits(model, "DI")){
+    model_species <- eval(model$DIcall$prop)
+  } else if(inherits(model, "DImulti")){
+    model_species <- attr(model, "prop")
+  }
   # If species were specified as column indices extract names
   if(is.numeric(model_species)){
     model_species <- colnames(original_data)[model_species]
   }
 
-  # If the user has not specified neither of communities, equi or model_data. Then default to plotting the design communities
+  # If the user has not specified neither of communities, equi or model_data.
+  # Then default to plotting the design communities
   if(is.null(data)){
     design_points <- nrow(unique(original_data[, model_species]))
-    # By default the model will plot all data in the original data. However this might not be feasible when there are a lot
-    # of data in the design. If that's the case then plot only the equi-proportional mixtures
+    # By default the model will plot all data in the original data.
+    # However this might not be feasible when there are a lot of data points in the
+    # design. If that's the case then plot only the first 100 rows
     if(design_points <= 100){
       data <- unique(original_data[, model_species])
     } else {
@@ -636,7 +653,8 @@ visualise_effects <- function(model, data = NULL, var_interest = NULL,
   if(!is.null(data)){
     # Ensure data are specified as a data-frame and in proper format
     if(!inherits(data, "data.frame")){
-      stop("Specify data to show effects for in the plot as a data frame with proportions of the different species")
+      stop("Specify data to show effects for in the plot as a data frame
+           with proportions of the different species")
     } else {
 
       sp_abs <- !model_species %in% colnames(data)
@@ -648,7 +666,8 @@ visualise_effects <- function(model, data = NULL, var_interest = NULL,
                          "i" = "Update the column names in {.var data} to ensure they match
                                {.val {model_species}}"))
       }
-      # If any species present in the model is not specified in the data, then notify user and assume its proportion to be 0
+      # If any species present in the model is not specified in the data, then
+      # notify user and assume its proportion to be 0
       if(any(sp_abs)){
         cli::cli_bullets(c("*" = "The variable{?s} {.val {model_species[sp_abs]}} {?was/were} not
                        present in the data specified, assuming their proportions to be 0."))
@@ -663,6 +682,10 @@ visualise_effects <- function(model, data = NULL, var_interest = NULL,
   effect <- match.arg(effect)
   interval <- match.arg(interval)
 
+  # If model object is of type DImulti add info about EFs and timepoints
+  if(inherits(model, "DImulti")) {
+    add_var <- link_DImodelsMulti(model = model, add_var = add_var)
+  }
 
   plot_data <- visualise_effects_data(model = model, data = plot_data,
                                       prop = model_species, effect = effect,
@@ -673,18 +696,22 @@ visualise_effects <- function(model, data = NULL, var_interest = NULL,
 
   # Get functional groups
   if(is.null(FG)){
-    FG <- eval(model$DIcall$FG)
+    if(inherits(model, "DI")){
+      FG <- eval(model$DIcall$FG)
+    } else {
+      FG <- attr(model, "FG")
+    }
   }
 
   # Colours for species
-  if(is.null(colours)){
-    colours <- get_colours(vars = model_species, FG = FG)
+  if(is.null(pie_colours)){
+    pie_colours <- get_colours(vars = model_species, FG = FG)
   }
 
   if(isTRUE(plot)){
     plot <- visualise_effects_plot(data = plot_data,
                                    prop = model_species,
-                                   colours = colours,
+                                   pie_colours = pie_colours,
                                    se = se,
                                    average = average)
     return(plot)
@@ -698,8 +725,14 @@ visualise_effects <- function(model, data = NULL, var_interest = NULL,
 #'
 #' @usage NULL
 NULL
-visualise_effects_plot_internal <- function(data, prop, colours = NULL,
+visualise_effects_plot_internal <- function(data, prop, pie_colours = NULL,
                                             se = FALSE, average = TRUE){
+
+  # Check all columns necessary for plotting are present
+  check_plot_data(data = data,
+                  cols_to_check = c(".Sp", ".Effect", ".Group",
+                                    ".Pred", ".Proportion"),
+                  calling_fun = "visualise_effects")
 
   # Get names of columns containing species proportions
   species_names <- data %>% select(all_of(prop)) %>% colnames()
@@ -722,8 +755,8 @@ visualise_effects_plot_internal <- function(data, prop, colours = NULL,
 
 
   # Colours for the pie-glyph slices
-  if(is.null(colours)){
-    colours <- get_colours(species_names)
+  if(is.null(pie_colours)){
+    pie_colours <- get_colours(species_names)
   }
 
   # Create canvas for plot
@@ -732,6 +765,10 @@ visualise_effects_plot_internal <- function(data, prop, colours = NULL,
 
   # Add ribbons for uncertainty of prediction
   if(se){
+    # Check all columns necessary for plotting are present
+    check_plot_data(data = data,
+                    cols_to_check = c(".Lower", ".Upper"),
+                    calling_fun = "visualise_effects")
     plot <- plot +
       geom_ribbon(aes(ymin = .data$.Lower, ymax = .data$.Upper,
                       group = .data$.Group),
@@ -746,29 +783,27 @@ visualise_effects_plot_internal <- function(data, prop, colours = NULL,
   if(average){
     # Round species proportion to 2 decimal places and calculate average effect.
     # Rounding done because for species decrease because some proportions have recurring decimals
-    avg_data <- data %>%
-      mutate(".Proportion" = round(.data$.Proportion, 2)) %>%
-      group_by(.data$.Sp, .data$.Group, .data$.Proportion) %>%
-      distinct(.data$.Proportion, .keep_all = TRUE) %>%
-      ungroup() %>%
-      group_by(.data$.Sp, .data$.Proportion) %>%
-      summarise(.Avg = round(mean(.data$.Pred), 2)) %>%
-      ungroup()
+    # avg_data <- data %>%
+    #   mutate(".Proportion" = round(.data$.Proportion, 2)) %>%
+    #   group_by(.data$.Sp, .data$.Group, .data$.Proportion) %>%
+    #   distinct(.data$.Proportion, .keep_all = TRUE) %>%
+    #   ungroup() %>%
+    #   group_by(.data$.Sp, .data$.Proportion) %>%
+    #   summarise(.Avg = round(mean(.data$.Pred), 2)) %>%
+    #   ungroup()
 
     # Add line showing average effect
     plot <- plot +
-      geom_line(aes(x = .data$.Proportion, y = .data$.Avg),
-                colour = "black", linewidth = 1.25, data = avg_data) +
-      # stat_summary(group = '.Sp', fun = mean, geom = "line", colour="black",
-      #              linewidth = 1.25, data = avg_data)+
-      labs(caption = "The black line shows the average effect of all curves shown in a panel. ")
-  }
+      geom_smooth(colour = "black", linewidth = 1.25,
+                  aes(group = 1), method = "loess",
+                  formula = y ~ x, se = FALSE)
+    }
 
   # Add the pie-chart glyphs for identifying the data
   plot <- plot +
     geom_pie_glyph(aes(group = .data$.Sp), data = pie_data, radius = 0.3,
                    slices = prop, colour = 'black')+
-    scale_fill_manual(values = colours,
+    scale_fill_manual(values = pie_colours,
                       labels = prop)
 
   # If looking at species decrease then reverse the x-axis

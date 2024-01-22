@@ -21,37 +21,43 @@ model_diagnostics(
 )
 }
 \arguments{
-\item{model}{A statistical regression model object.}
+\item{model}{A statistical regression model object fit using \code{lm},
+\code{glm}, \code{nlme} functions, etc.}
 
 \item{which}{A subset of the numbers 1 to 6, by default 1, 2, 3, and 5,
-referring to
-    1. - "Residuals vs Fitted", aka ‘Tukey-Anscombe’ plot
-    2. - "Normal Q-Q" plot, an enhanced qqnorm(resid(.))
-    3. - "Scale-Location"
-    4. - "Cook's distance"
-    5. - "Residuals vs Leverage"
-    6. - "Cook's dist vs Lev./(1-Lev.)"}
+referring to \cr
+1 - "Residuals vs Fitted", aka "Tukey-Anscombe" plot \cr
+2 - "Normal Q-Q" plot, an enhanced qqnorm(resid(.)) \cr
+3 - "Scale-Location" \cr
+4 - "Cook's distance" \cr
+5 - "Residuals vs Leverage" \cr
+6 - "Cook's dist vs Lev./(1-Lev.)" \cr
+\emph{Note: If the specified model object does not inherit the \code{lm}
+class, it might not be possible to create all diagnostics plots.
+In these cases, the user will be notified about any plots which
+can't be created.}}
 
 \item{prop}{A character vector giving names of columns containing
-proportions to show in the pie-chart glyphs. If not specified,
+proportions to show in the pie-glyphs. If not specified,
 black points (geom_point) will be shown for each observation in
-the model. Note: `\code{prop}` can be left blank and will be
+the model. Note: \verb{\code{prop}} can be left blank and will be
 interpreted if model is a \code{Diversity-Interactions (DI)}
-model object fit using the\code{\link[DImodels:DI]{DI()}}
+model object fit using the \code{\link[DImodels:DI]{DI()}}
 function from the \code{\link[DImodels:DImodels-package]{DImodels}}
 package.}
 
 \item{npoints}{Number of points to be labelled in each plot, starting
-with the most extreme.}
+with the most extreme (those points with the highest
+absolute residuals or hat values).}
 
 \item{cook_levels}{A numeric vector specifying levels of Cook's distance
 at which to draw contours.}
 
 \item{pie_radius}{A numeric value specifying the radius (in cm) for the
-pie-chart glyphs.}
+pie-glyphs.}
 
 \item{pie_colours}{A character vector specifying the colours for the slices
-within the pie-chart glyphs.}
+within the pie-glyphs.}
 
 \item{only_extremes}{A logical value indicating whether to show pie-glyphs
 only for extreme observations.}
@@ -63,21 +69,22 @@ identifying extreme observations.}
 pie-glyphs not shown) shown in the plots.}
 
 \item{plot}{A boolean variable indicating whether to create the plot or return
-the prepared data instead. The default `TRUE` creates the plot while
-`FALSE` would return the prepared data for plotting. Could be useful
-for if user wants to modify the data first and then call the plotting}
+the prepared data instead. The default \code{TRUE} creates the plot while
+\code{FALSE} would return the prepared data for plotting. Could be useful
+for if user wants to modify the data first and then call the plotting.}
 
-\item{nrow}{Number of rows in which to arrange the final plot}
+\item{nrow}{Number of rows in which to arrange the final plot.}
 
-\item{ncol}{Number of columns in which to arrange the final plot}
+\item{ncol}{Number of columns in which to arrange the final plot.}
 }
 \value{
-A ggmultiplot (ggplot if single plot is returned) class object or data-frame (if `plot = FALSE`)
+A ggmultiplot (ggplot if single plot is returned) class object or data-frame (if \code{plot = FALSE}).
 }
 \description{
 This function returns regression diagnostics plots for a model with points
-replaced by pie-chart glyphs making it easier to track various data points
-in the plots.
+replaced by pie-glyphs making it easier to track various data points
+in the plots. This could be useful in models with compositional predictors
+to quickly identify any observations with unusual residuals, hat values, etc.
 }
 \examples{
 library(DImodels)
@@ -112,4 +119,12 @@ model_diagnostics(DI_mod, which = 1)
 
 ## Specify `plot = FALSE` to not create the plot but return the prepared data
 model_diagnostics(DI_mod, which = 1, plot  = FALSE)
+
+## If the specified model object does not inherit the lm class, then
+## only residual vs fitted and normal qqplot will be produced
+library(DImodelsMulti)
+data(simMV)
+#                    unit_IDs = 1, prop = paste0("p", 1:6),
+#                    data = simMV, DImodel = "ID", method = "ML")
+#model_diagnostics(model = MVmodel)
 }

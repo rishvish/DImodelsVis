@@ -1,8 +1,9 @@
 #' @title Regression diagnostics plots with pie-glyphs
 #' @description
 #' This function returns regression diagnostics plots for a model with points
-#' replaced by pie-chart glyphs making it easier to track various data points
-#' in the plots.
+#' replaced by pie-glyphs making it easier to track various data points
+#' in the plots. This could be useful in models with compositional predictors
+#' to quickly identify any observations with unusual residuals, hat values, etc.
 #'
 #' @importFrom PieGlyph geom_pie_glyph pieGrob
 #' @importFrom dplyr bind_rows desc filter arrange slice
@@ -17,33 +18,40 @@
 #' @importFrom cli cli_progress_bar cli_progress_update cli_process_done cli_bullets
 #' @importClassesFrom ggfortify ggmultiplot
 #'
-#' @param model A statistical regression model object.
+#' @md
+#' @param model A statistical regression model object fit using \code{lm},
+#'              \code{glm}, \code{nlme} functions, etc.
 #' @param which A subset of the numbers 1 to 6, by default 1, 2, 3, and 5,
-#'              referring to
-#'                  1. - "Residuals vs Fitted", aka ‘Tukey-Anscombe’ plot
-#'                  2. - "Normal Q-Q" plot, an enhanced qqnorm(resid(.))
-#'                  3. - "Scale-Location"
-#'                  4. - "Cook's distance"
-#'                  5. - "Residuals vs Leverage"
-#'                  6. - "Cook's dist vs Lev./(1-Lev.)"
+#'              referring to \cr
+#'                  1 - "Residuals vs Fitted", aka "Tukey-Anscombe" plot \cr
+#'                  2 - "Normal Q-Q" plot, an enhanced qqnorm(resid(.)) \cr
+#'                  3 - "Scale-Location" \cr
+#'                  4 - "Cook's distance" \cr
+#'                  5 - "Residuals vs Leverage" \cr
+#'                  6 - "Cook's dist vs Lev./(1-Lev.)" \cr
+#'              \emph{Note: If the specified model object does not inherit the \code{lm}
+#'              class, it might not be possible to create all diagnostics plots.
+#'              In these cases, the user will be notified about any plots which
+#'              can't be created.}
 #' @param npoints Number of points to be labelled in each plot, starting
-#'                with the most extreme.
+#'                with the most extreme (those points with the highest
+#'                absolute residuals or hat values).
 #' @param cook_levels A numeric vector specifying levels of Cook's distance
 #'                    at which to draw contours.
-#' @param nrow Number of rows in which to arrange the final plot
-#' @param ncol Number of columns in which to arrange the final plot
+#' @param nrow Number of rows in which to arrange the final plot.
+#' @param ncol Number of columns in which to arrange the final plot.
 #' @param prop A character vector giving names of columns containing
-#'             proportions to show in the pie-chart glyphs. If not specified,
+#'             proportions to show in the pie-glyphs. If not specified,
 #'             black points (geom_point) will be shown for each observation in
 #'             the model. Note: `\code{prop}` can be left blank and will be
 #'             interpreted if model is a \code{Diversity-Interactions (DI)}
-#'             model object fit using the\code{\link[DImodels:DI]{DI()}}
+#'             model object fit using the \code{\link[DImodels:DI]{DI()}}
 #'             function from the \code{\link[DImodels:DImodels-package]{DImodels}}
 #'             package.
 #' @param pie_radius A numeric value specifying the radius (in cm) for the
-#'                   pie-chart glyphs.
+#'                   pie-glyphs.
 #' @param pie_colours A character vector specifying the colours for the slices
-#'                    within the pie-chart glyphs.
+#'                    within the pie-glyphs.
 #' @param label_size A numeric value specifying the size of the labels
 #'                   identifying extreme observations.
 #' @param points_size A numeric value specifying the size of points (when
@@ -53,9 +61,9 @@
 #' @param plot A boolean variable indicating whether to create the plot or return
 #'             the prepared data instead. The default `TRUE` creates the plot while
 #'             `FALSE` would return the prepared data for plotting. Could be useful
-#'             for if user wants to modify the data first and then call the plotting
+#'             for if user wants to modify the data first and then call the plotting.
 #'
-#' @return A ggmultiplot (ggplot if single plot is returned) class object or data-frame (if `plot = FALSE`)
+#' @return A ggmultiplot (ggplot if single plot is returned) class object or data-frame (if `plot = FALSE`).
 #' @export
 #'
 #' @examples
@@ -91,6 +99,15 @@
 #'
 #' ## Specify `plot = FALSE` to not create the plot but return the prepared data
 #' model_diagnostics(DI_mod, which = 1, plot  = FALSE)
+#'
+#' ## If the specified model object does not inherit the lm class, then
+#' ## only residual vs fitted and normal qqplot will be produced
+#' library(DImodelsMulti)
+#' data(simMV)
+# # MVmodel <- DImulti(y = paste0("Y", 1:4), eco_func = c("NA", "UN"),
+#'#                    unit_IDs = 1, prop = paste0("p", 1:6),
+#'#                    data = simMV, DImodel = "ID", method = "ML")
+#' #model_diagnostics(model = MVmodel)
 model_diagnostics <- function(model, which = c(1,2,3,5), prop = NULL,
                               npoints = 3, cook_levels = c(0.5, 1),
                               pie_radius = 0.2, pie_colours = NULL,
@@ -116,19 +133,55 @@ model_diagnostics <- function(model, which = c(1,2,3,5), prop = NULL,
                                     "plot" = plot,
                                     "only_extremes" = only_extremes))
 
-  # Data will all diagnostic metrics added
-  plot_data <- fortify(model = model)
+  # Sanity checks from plot.lm function
+  if (!is.numeric(which) || any(which < 1) || any(which > 6)){
+    cli::cli_abort(c("{.var which} must be a numeric vector with values
+                     between 1 and 6.",
+                     "i" = "The value{?s} specified {?was/were}
+                           {as.character(which)}."))
+  }
+
+  # Data with all diagnostic metrics added
+  if(inherits(model, "lm")){
+    plot_data <- fortify(model = model)
+  } else {
+    if(inherits(model, "DImulti")){
+      plot_data <- as.data.frame(attr(model, "data"))
+    } else {
+      plot_data <- as.data.frame(insight::get_modelmatrix(model))
+    }
+    plot_data <- plot_data %>%
+      mutate(.fitted = fitted(model),
+             .resid = residuals(model),
+             .stdresid = residuals(model, type = "pearson"))
+    if(any(which > 2)){
+      which <- which[which %in% c(1, 2)]
+      message <- c("!" = "The model object species in {.var model} does not inherit
+                   the {.cls lm} class.",
+                   "i" = "Only {.val Residual vs Fitted} ({.var which} = 1) and
+                         {.val Normal QQ plot} ({.var which} = 2)
+                          will be created for this object.")
+      if(length(which) > 0){
+        cli::cli_warn(message)
+      } else {
+        cli::cli_abort(message)
+      }
+    }
+  }
 
   if(is.null(prop)){
-    if(inherits(model, "DI")){
+    if(inherits(model, "DI") || inherits(model, "DImulti")){
       # Get original data used to fit the model
       original_data <- model$original_data
 
       # Get all species in the model
-      #IDs <- eval(model$DIcall$ID)
-      prop <- eval(model$DIcall$prop)
-      plot_data <- cbind(plot_data, original_data[, prop])
-
+      # IDs <- eval(model$DIcall$ID)
+      if(inherits(model, "DI")){
+        prop <- eval(model$DIcall$prop)
+        plot_data <- cbind(plot_data, original_data[, prop])
+      } else {
+        prop <- attr(model, "prop")
+      }
       model_species <- original_data[, prop] %>% colnames()
       pies <- TRUE
     }  else {
@@ -151,21 +204,11 @@ model_diagnostics <- function(model, which = c(1,2,3,5), prop = NULL,
       only_extremes <- FALSE
     }
   }
-
-  # Sanity checks from plot.lm function
-  if (!is.numeric(which) || any(which < 1) || any(which > 6)){
-    cli::cli_abort(c("{.var which} must be a numeric vector with values
-                     between 1 and 6.",
-                     "i" = "The value{?s} specified {?was/were}
-                           {as.character(which)}."))
-  }
-
   #binomialLike <- family(model)$family == "binomial"
 
   # Decide which plots to show
   show <- rep(FALSE, 6)
   show[which] <- TRUE
-
 
   # Prepare the data for plotting
   plot_data$Obs <- seq_along(plot_data$.fitted)
@@ -253,9 +296,9 @@ model_diagnostics <- function(model, which = c(1,2,3,5), prop = NULL,
                   colour = "red", linetype = 1) +
         geom_hline(yintercept=0, col="black", linetype="dashed")
 
-      # If possible then replace points with pie-chart glyphs showing proportions
+      # If possible then replace points with pie-glyphs showing proportions
       if(pies){
-        # Show extreme observations with pie-chart glyphs
+        # Show extreme observations with pie-glyphs
         if(only_extremes){
           pl <- add_pies(pl = pl, colours = colours,
                          data = show.r, slices = model_species,
@@ -273,7 +316,7 @@ model_diagnostics <- function(model, which = c(1,2,3,5), prop = NULL,
                       grob_obj = pie_grob,
                       label_size = label_size) +
         labs(x = "Fitted Values", y = "Residuals",
-             title = "Residual vs Fitted")+
+             title = "Residual vs Fitted", fill = "Variables")+
         scale_y_continuous(expand = expansion(mult = 0.1))
 
       plots[["ResivsFit"]] <- pl
@@ -287,7 +330,7 @@ model_diagnostics <- function(model, which = c(1,2,3,5), prop = NULL,
         geom_abline(slope = qq_slope, intercept = qq_intercept)
 
       if(pies){
-        # Show extreme observations with pie-chart glyphs
+        # Show extreme observations with pie-glyphs
         if(only_extremes){
           pl <- add_pies(pl = pl, colours = colours,
                          data = show.r, slices = model_species,
@@ -324,7 +367,7 @@ model_diagnostics <- function(model, which = c(1,2,3,5), prop = NULL,
                   colour = "red", linetype = 1)
 
       if(pies){
-        # Show extreme observations with pie-chart glyphs
+        # Show extreme observations with pie-glyphs
         if(only_extremes){
           pl <- add_pies(pl = pl, colours = colours,
                          data = show.r, slices = model_species,
@@ -357,7 +400,7 @@ model_diagnostics <- function(model, which = c(1,2,3,5), prop = NULL,
                        linewidth = 1)
 
       if(pies){
-        # Show extreme observations with pie-chart glyphs
+        # Show extreme observations with pie-glyphs
         if(only_extremes){
           pl <- add_pies(pl = pl, colours = colours,
                          data = show.cook, slices = model_species,
@@ -429,7 +472,7 @@ model_diagnostics <- function(model, which = c(1,2,3,5), prop = NULL,
       }
 
       if(pies){
-        # Show extreme observations with pie-chart glyphs
+        # Show extreme observations with pie-glyphs
         if(only_extremes){
           panel_plot <- add_pies(pl = panel_plot, colours = colours,
                                  data = show.cook, slices = model_species,
@@ -513,7 +556,7 @@ model_diagnostics <- function(model, which = c(1,2,3,5), prop = NULL,
                       y = .data$yend + (0.025 * .data$yend),
                       label = .data$label))
       if(pies){
-        # Show extreme observations with pie-chart glyphs
+        # Show extreme observations with pie-glyphs
         if(only_extremes){
           panel_plot <- add_pies(pl = panel_plot, colours = colours,
                                  data = show.cook, slices = model_species,
@@ -563,7 +606,7 @@ add_pies <- function(pl, colours, legend_position = "top", ...){
   pl +
     geom_pie_glyph(...)+
     theme(legend.position = legend_position)+
-    scale_fill_manual(values = colours)
+    scale_fill_manual(values = colours, name = "Variables")
 }
 
 # Helper function to labels at fixed positions

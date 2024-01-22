@@ -14,7 +14,7 @@ visualise_effects(
   conf.level = 0.95,
   se = FALSE,
   average = TRUE,
-  colours = NULL,
+  pie_colours = NULL,
   FG = NULL,
   plot = TRUE,
   nrow = 0,
@@ -63,8 +63,10 @@ the effect of species increase or decrease}
 \item{average}{A boolean variable indicating whether to add a line describing the "average"
 effect of species increase or decrease}
 
-\item{colours}{A character vector indicating the colours for the slices in the pie-glyphs.
-If left NULL, the colour blind friendly colours will be for the pie-glyph slices.}
+\item{pie_colours}{A character vector indicating the colours for the slices
+in the pie-glyphs. \cr
+If left NULL, the colour blind friendly colours will be
+for the pie-glyph slices.}
 
 \item{FG}{A higher level grouping for the compositional variables in the
 data. Variables belonging to the same group will be assigned with
@@ -89,11 +91,11 @@ function manually.}
 A ggmultiplot (ggplot if single plot is returned) class object or data-frame (if `plot = FALSE`)
 }
 \description{
-This function will prepare the underlying data and plot the results for visualising the
-the effect of increasing or decreasing the proportion of a variable from a
-set of compositional variables in a single function call. The generated plot will
+This function will prepare the underlying data and plot the results for visualising
+the effect of increasing or decreasing the proportion of a predictor variable
+(from a set of compositional variables). The generated plot will
 show a curve for each observation (whenever possible) in the data.
-`\code{\link[PieGlyph:PieGlyph-package]{Pie-glyphs}}` are
+\code{\link[PieGlyph:PieGlyph-package]{Pie-glyphs}} are
 used to highlight the compositions of the specified communities and the ending
 community after the variable interest either completes dominates the community
 (when looking at the effect of increase) or completely vanishes from the community
@@ -103,7 +105,7 @@ This is a wrapper function specifically for statistical models fit using the
 \code{\link[DImodels:DImodels-package]{DImodels}} R package and would implicitly
 call \code{\link{visualise_effects_data}} followed by
 \code{\link{visualise_effects_plot}}. If your model object isn't fit using
-DImodels, consider calling these functions manually.
+DImodels, users can call the data and plot functions manually, one by one.
 }
 \examples{
 library(DImodels)
@@ -147,10 +149,10 @@ visualise_effects(model = mod, effect = "decrease",
                   var_interest = c("p1", "p3"))
 
 ## Show effects of both increase and decrease using `effect = "both"`
-## and change colours of pie-glyphs using colours
+## and change colours of pie-glyphs using `pie_colours`
 visualise_effects(model = mod, effect = "both",
                   average = FALSE,
-                  colours = c("steelblue1", "steelblue4", "orange1", "orange4"),
+                  pie_colours = c("steelblue1", "steelblue4", "orange1", "orange4"),
                   data = data.frame("p1" = c(0.7, 0.1),
                                     "p2" = c(0.3, 0.5),
                                     "p3" = c(0,   0.4),
@@ -160,7 +162,7 @@ visualise_effects(model = mod, effect = "both",
 ## Specify `plot = FALSE` to not create the plot but return the prepared data
 visualise_effects(model = mod, effect = "both",
                   average = FALSE, plot = FALSE,
-                  colours = c("steelblue1", "steelblue4", "orange1", "orange4"),
+                  pie_colours = c("steelblue1", "steelblue4", "orange1", "orange4"),
                   data = data.frame("p1" = c(0.7, 0.1),
                                     "p2" = c(0.3, 0.5),
                                     "p3" = c(0,   0.4),
@@ -170,7 +172,7 @@ visualise_effects(model = mod, effect = "both",
 # Add additional variables and create a separate plot for each
 visualise_effects(model = mod, effect = "both",
                   average = FALSE,
-                  colours = c("steelblue1", "steelblue4", "orange1", "orange4"),
+                  pie_colours = c("steelblue1", "steelblue4", "orange1", "orange4"),
                   data = data.frame("p1" = c(0.7, 0.1),
                                     "p2" = c(0.3, 0.5),
                                     "p3" = c(0,   0.4),

@@ -2,13 +2,14 @@
 % Please edit documentation in R/GradientChange.R
 \name{gradient_change_data}
 \alias{gradient_change_data}
-\title{Average response over diversity gradient}
+\title{Visualise change in (predicted) response over diversity gradient}
 \usage{
 gradient_change_data(
   data,
   prop,
   add_var = list(),
   gradient = c("richness", "evenness"),
+  prediction = TRUE,
   ...
 )
 }
@@ -20,8 +21,8 @@ any other necessary variables to make predictions from
 \item{prop}{A vector identifying the column-names or indices of the
 columns containing the variable proportions in `data`.}
 
-\item{add_var}{A list specifying values for additional variables
-in the model independent of the compositional variables.
+\item{add_var}{A list specifying values for additional predictor variables
+in the model independent of the compositional predictor  variables.
 This would be useful to compare the predictions across
 different values for a categorical variable. One plot will
 be generated for each unique combination of values specified
@@ -29,7 +30,16 @@ here and they will be arranged in a grid according to the
 value specified in `nrow` and `ncol`.}
 
 \item{gradient}{Diversity gradient to show on the X-axis, one of
-"richness" or "evenness". Defaults to "richness".}
+"richness" or "evenness". Defaults to "richness". See
+`Details` for more information.}
+
+\item{prediction}{A logical value indicating whether to pass the final
+data to the `add_prediction` function and append the
+predictions to the data. Default value is TRUE, but
+often it would be desirable to make additional changes
+to the data before making any predictions, so the user
+can set this to FALSE and manually call the `add_prediction`
+function.}
 
 \item{...}{
   Arguments passed on to \code{\link[=add_prediction]{add_prediction}}
@@ -71,29 +81,65 @@ intervals. Default is 0.95.}
 \value{
 The data-frame with the following columns appended at the end
  \describe{
-   \item{.Pred}{The predicted response for each obvervation.}
-   \item{.Lower}{The lower limit of the prediction/confidence interval
-                 for each observation.}
-   \item{.Upper}{The upper limit of the prediction/confidence interval
-                 for each observation.}
    \item{.Richness}{The richness (number of non-zero compositional variables)
                     within each observation.}
    \item{.Evenness}{The evenness (metric quantifying the relative abundance
                     of each compositional variable) within each observation.}
    \item{.Gradient}{An character string defining the diversity gradient used
                     for averaging the response.}
-   \item{.Avg}{The averaged value of the response for each unique value of
-               the selected diversity gradient.}
+   \item{.Pred}{The predicted response for each obvervation.}
+   \item{.Lower}{The lower limit of the prediction/confidence interval
+                 for each observation.}
+   \item{.Upper}{The upper limit of the prediction/confidence interval
+                 for each observation.}
+   \item{.Avg}{The averaged value of the predicted response for each unique
+               value of the selected diversity gradient.}
  }
 }
 \description{
-Helper function for creating the data to visualise the average
-response over a diversity gradient. The average can be calculated
-either over the "richness" or "evenness" gradients. The average is
-calculated from all communities present at a given level of the
+Helper function for creating the data to visualise a scatter-plot of the
+response over a diversity gradient. The "richness" and "evenness"
+diversity gradients are currently supported. The average (predicted) response
+is calculated from all communities present at a given level of the
 chosen diversity gradient in `data`. The output of this
 function can be passed to the \code{\link{gradient_change_plot}} function
 to visualise the results.
+}
+\details{
+Currently two diversity gradients are supported
+\itemize{
+  \item{\strong{Richness}: A metric describing the number of non-zero compositional
+  variables in an observation.}
+  \item{\strong{Evenness}: A metric quantifying the relative abundances of all
+  compositional variables in an observation. Defined as
+  \deqn{(2s/(s-1)) \sum_{i, j = 1; i < j}^{s}{p_i * p_j}} where \eqn{s} is the
+  total number of compositional variables and \eqn{p_i} and \eqn{p_j} are the
+  proportions of the variables \eqn{i} and \eqn{j}.
+  See \href{https://doi.org/10.1111/j.1365-2745.2007.01225.x}{Kirwan et al., 2007} and
+  \href{https://doi.org/10.1890/08-1684.1}{Kirwan et al., 2009} for more
+  information.}
+}
+
+Here's an small example of how these metrics are calculated for a few
+observations. Suppose we have four compositional variables (i.e. \eqn{s = 4})
+and have the following three observations
+\itemize{
+ \item{A = (0.5, 0.5, 0, 0)}
+ \item{B = (0.25, 0.25, 0.25, 0.25)}
+ \item{C = (1, 0, 0, 0)}
+}
+The richness values for these three observations would be as follows
+\itemize{
+ \item{A = 2 (Since two of the four compositional variables were non-zero)}
+ \item{B = 4 (Since all four compositional variables were non-zero)}
+ \item{C = 1 (Since one of the four compositional variables were non-zero)}
+}
+The evenness values would be calculated as follows
+\itemize{
+ \item{A = \eqn{2*4/(4-1)*(0.5*0.5+0.5*0+0.5*0+0.5*0+0.5*0+0*0) = 0.67}}
+ \item{B = \eqn{2*4/(4-1)*(0.25*0.25+0.25*0.25+0..25*0.25+0.25*0.25+0.25*0.25+0.25*0) = 1}}
+ \item{C = \eqn{2*4/(4-1)*(1*0+1*0+1*0+0*0+0*0+0*0) = 0}}
+}
 }
 \examples{
 library(DImodels)

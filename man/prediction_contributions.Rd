@@ -27,14 +27,14 @@ prediction_contributions(
 \code{\link[DImodels:DI]{DI()}} function from the
 \code{\link[DImodels:DImodels-package]{DImodels}} package.}
 
-\item{data}{A data-frame containing compositional variables specifying
-observations of interest for which user wants to compare the
-predicted response. If left blank, a selection of observations
-(2 from each level of richness) from the original data used
-to fit the model would be selected.}
+\item{data}{A user-defined data-frame containing compositional variables
+specifying values for predictor variables (fitted within the
+model object) that the user wished to predict for. If left blank,
+a selection of observations (2 from each level of richness) from
+the original data used to fit the model would be selected.}
 
-\item{add_var}{A list specifying values for additional variables
-in the model independent of the compositional variables.
+\item{add_var}{A list specifying values for additional predictor variables
+in the model independent of the compositional predictor  variables.
 This would be useful to compare the predictions across
 different values for a categorical variable. One plot will
 be generated for each unique combination of values specified
@@ -110,16 +110,16 @@ A ggmultiplot (ggplot if single plot is returned) class object or data-frame (if
 }
 \description{
 A stacked bar_chart is shown where the individual contributions
-(\eqn{\beta} * predictor value) for each term in a statistical model are stacked
+(parameter estimate * predictor value) for each term in a statistical model are stacked
 on top of another. The total height of the stacked bar gives the value of the
 predicted response. The uncertainty around the predicted response can also be shown
 on the plot.
 This is a wrapper function specifically for statistical models fit using the
 \code{\link[DImodels:DI]{DI()}} function from the
-\code{\link[DImodels:DImodels-package]{DImodels}} R package and would implicitly
-call \code{\link{prediction_contributions_data}} followed by
+\code{\link[DImodels:DImodels-package]{DImodels}} R package and it implicitly
+calls \code{\link{prediction_contributions_data}} followed by
 \code{\link{prediction_contributions_plot}}. If your model object isn't fit using
-DImodels, consider calling these functions manually.
+DImodels, the associated data and plot functions can instead be called manually.
 }
 \examples{
 #' ## Load DImodels package to fit the model

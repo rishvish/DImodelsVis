@@ -318,7 +318,13 @@ check_add_var <- function(model = NULL, add_var = NULL, call = caller_env()){
   }
 
   if(!is.null(model) && insight::is_regression_model(model)){
-    model_data <- if (inherits(model, "DI")) model$original_data else insight::get_data(model)
+    if (inherits(model, "DI")) {
+      model_data <- model$original_data
+    } else if (inherits(model, "DImulti")) {
+      model_data <- attr(model, "data")
+    } else {
+      model_data <- insight::get_data(model)
+    }
     data_col_names <- colnames(model_data)
     exp_names <- names(add_var)
 

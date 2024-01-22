@@ -22,23 +22,21 @@ be compositional in nature (i.e., proportions should sum to 1).}
 \item{tern_vars}{A character vector giving the names of the three variables
 to be shown in the ternary diagram.}
 
-\item{conditional}{A data-frame or list describing the names of the variables
+\item{conditional}{A data-frame describing the names of the variables
 and their respective values at which to slice the
-simplex space. The format should be as follows for
-  1- data-frame: data.frame("p1" = c(0, 0.5),
-                            "p2" = c(0.2, 0.1))
-  2- list: list("p1" = c(0, 0.5),
-                "p2" = c(0.2, 0.1))
-Once slice would be created for row in `conditional` with
+simplex space. The format should be, for example, as follows: \cr
+\code{data.frame("p1" = c(0, 0.5), "p2" = c(0.2, 0.1))} \cr
+Once figure would be created for row in `conditional` with
 the respective values of all specified variables. Any
-variables not specified in `conditional` will be assumed
-to be 0.}
+compositional variables not specified in `conditional` will
+be assumed to be 0.}
 
 \item{add_var}{A list specifying values for additional variables
-in the model other than the proportions (i.e. not part of the simplex design).
-This would be useful to compare the predictions across
-different values for a categorical variable.
-One plot will be generated for each unique combination
+in the model other than the proportions (i.e. not part of the
+simplex design).
+This could be useful for comparing the predictions across
+different values for a non-compositional variable.
+One ternary plot will be generated for each unique combination
 of values specified here.}
 
 \item{resolution}{A number between 1 and 5 describing the resolution of the
@@ -145,22 +143,11 @@ mod <- glm(response ~ 0 + (p1 + p2 + p3 + p4 + p5 + p6)^2, data = sim4)
 ## to be 0, for example p5 and p6 here.
 head(conditional_ternary_data(prop = c("p1", "p2", "p3", "p4", "p5", "p6"),
                               tern_vars = c("p1", "p2", "p3"),
-                              conditional = list("p4" = c(0, 0.2, 0.5)),
+                              conditional = data.frame("p4" = c(0, 0.2, 0.5)),
                               model = mod,
                               resolution = 1))
 
 ## Can also condition on multiple species
-## `conditional` can either be specified as a list or a data-frame
-## if `conditional` is specified as a list the slices will be prepared
-## following a positional mapping between the elements of the list.
-head(conditional_ternary_data(prop = c("p1", "p2", "p3", "p4", "p5", "p6"),
-                              tern_vars = c("p1", "p2", "p3"),
-                              conditional = list("p4" = c(0,   0.2),
-                                                 "p5" = c(0.5, 0.1),
-                                                 "p6" = c(0,   0.3)),
-                              model = mod,
-                              resolution = 1))
-## `conditional` as a data-frame
 cond <- data.frame(p4 = c(0, 0.2), p5 = c(0.5, 0.1), p6 = c(0, 0.3))
 cond
 head(conditional_ternary_data(prop = c("p1", "p2", "p3", "p4", "p5", "p6"),
@@ -177,7 +164,7 @@ mod <- glm(response ~ 0 + (p1 + p2 + p3 + p4 + p5 + p6)^2 + treatment,
 ## Notice the additional `.add_str_ID` column
 head(conditional_ternary_data(prop = c("p1", "p2", "p3", "p4", "p5", "p6"),
                               tern_vars = c("p1", "p2", "p3"),
-                              conditional = list("p4" = c(0, 0.2, 0.5)),
+                              conditional = data.frame("p4" = c(0, 0.2, 0.5)),
                               add_var = list("treatment" = c(50, 150)),
                               model = mod,
                               resolution = 1))
@@ -187,7 +174,7 @@ head(conditional_ternary_data(prop = c("p1", "p2", "p3", "p4", "p5", "p6"),
 ## Use `prediction = FALSE` to get data without any predictions
 cond_data <- conditional_ternary_data(prop = c("p1", "p2", "p3", "p4", "p5", "p6"),
                                       tern_vars = c("p1", "p2", "p3"),
-                                      conditional = list("p4" = c(0, 0.2, 0.5)),
+                                      conditional = data.frame("p4" = c(0, 0.2, 0.5)),
                                       prediction = FALSE,
                                       resolution = 1)
 ## The data can then be modified and the `add_prediction` function can be

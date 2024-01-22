@@ -2,13 +2,15 @@
 % Please edit documentation in R/GradientChange.R
 \name{gradient_change_plot}
 \alias{gradient_change_plot}
-\title{Average response over diversity gradient}
+\title{Visualise change in (predicted) response over diversity gradient}
 \usage{
 gradient_change_plot(
   data,
   prop = NULL,
   pie_data = NULL,
   pie_colours = NULL,
+  average = TRUE,
+  y_var = ".Pred",
   facet_var = NULL,
   nrow = 0,
   ncol = 0
@@ -27,7 +29,16 @@ the individual data-points as pie-glyphs showing the
 relative proportions of the variables in the data-point.}
 
 \item{pie_colours}{A character vector specifying the colours for the slices
-within the pie-chart glyphs.}
+within the pie-glyphs.}
+
+\item{average}{A boolean value indicating whether to plot a line indicating
+the average change in the predicted response with respect to
+the variable shown on the X-axis.}
+
+\item{y_var}{A character string indicating the column name of the variable
+to be shown on the Y-axis. This could be useful for plotting
+raw data on the Y-axis. By default has a value of ".Pred"
+refering to the column containing model predictions.}
 
 \item{facet_var}{A character string or numeric index identifying the column
 in the data to be used for faceting the plot into multiple
@@ -43,13 +54,13 @@ panels.}
 A ggplot object
 }
 \description{
-Helper function for plotting the average response at each level of the
-diversity gradient. The output of the \code{\link{gradient_change_data}}
-function should be passed here to visualise the average response. The
-proportions of the compositional variables present in the data would be
-shown on the plot using `\code{\link[PieGlyph:PieGlyph-package]{pie-glyphs}}`.
-
-Helper for plotting average response at each level of species richness
+Helper function for plotting the average (predicted) response at each level
+of the diversity gradient. The output of the \code{\link{gradient_change_data}}
+function should be passed here to visualise a scatter-plot of the predicted
+response (or raw response) over a diversity gradient. The points can be overlaid with
+`\code{\link[PieGlyph:PieGlyph-package]{pie-glyphs}}` to show the relative
+proportions of the compositional variables. The average change in the
+(predicted) response over the chosen diversity gradient can also be shown.
 }
 \examples{
 library(DImodels)
@@ -82,13 +93,17 @@ plot_data <- gradient_change_data(data = sim4,
 gradient_change_plot(data = plot_data,
                      prop = c("p1", "p2", "p3", "p4", "p5", "p6"))
 
+## Don't show line indicating the average change by using `average = FALSE`
+gradient_change_plot(data = plot_data,
+                     prop = c("p1", "p2", "p3", "p4", "p5", "p6"),
+                     average = FALSE)
+
 ## Change colours of the pie-slices using `pie_colours`
 gradient_change_plot(data = plot_data,
                      prop = c("p1", "p2", "p3", "p4", "p5", "p6"),
                      pie_colours = c("darkolivegreen1", "darkolivegreen4",
                                      "orange1", "orange4",
                                      "steelblue1", "steelblue4"))
-
 
 ## Manually specify only specific communities to be shown as pie-chart
 ## glyphs using `pie_data`.
@@ -119,4 +134,18 @@ gradient_change_plot(data = plot_data,
                      prop = c("p1", "p2", "p3", "p4", "p5", "p6"),
                      pie_data = plot_data \%>\% filter(.Richness \%in\% c(1, 6)),
                      nrow = 2)
+
+## Create plot for raw data instead of predictions
+## Create the data for plotting by specifying `prediction = FALSE`
+plot_data <- gradient_change_data(data = sim4[sim4$treatment == 50, ],
+                                  prop = c("p1", "p2", "p3",
+                                           "p4", "p5", "p6"),
+                                  prediction = FALSE)
+## This data will not have any predictions
+head(plot_data)
+## Call the plotting function by specifying the variable you we wish to
+## plot on the Y-axis by using the argument `y_var`
+gradient_change_plot(data = plot_data, y_var = "response",
+                     prop = c("p1", "p2", "p3",
+                              "p4", "p5", "p6"))
 }

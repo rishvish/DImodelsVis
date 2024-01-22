@@ -2,12 +2,10 @@
 % Please edit documentation in R/Ternary.R
 \name{ternary_data}
 \alias{ternary_data}
-\title{Ternary diagram with contours}
+\title{Prepare data for showing contours in ternary diagrams.}
 \usage{
 ternary_data(
   prop = c(".P1", ".P2", ".P3"),
-  x = ".x",
-  y = ".y",
   add_var = list(),
   resolution = 3,
   prediction = TRUE,
@@ -15,21 +13,16 @@ ternary_data(
 )
 }
 \arguments{
-\item{prop}{A character vector specifying the columns names of entities
-whose proportions to manipulate. Default is ".P1", ".P2",
+\item{prop}{A character vector specifying the columns names of compositional
+variables whose proportions to manipulate. Default is ".P1", ".P2",
 and ".P3".}
 
-\item{x}{A character string specifying the name for the column containing
-the x component of the x-y projection of the simplex. Default is ".x".}
-
-\item{y}{A character string specifying the name for the column containing
-the y component of the x-y projection of the simplex. Default is ".y".}
-
 \item{add_var}{A list specifying values for additional variables
-in the model other than the proportions (i.e. not part of the simplex design).
-This would be useful to compare the predictions across
-different values for a categorical variable.
-One plot will be generated for each unique combination
+in the model other than the proportions (i.e. not part of the
+simplex design).
+This could be useful for comparing the predictions across
+different values for a non-compositional variable.
+One ternary plot will be generated for each unique combination
 of values specified here.}
 
 \item{resolution}{A number between 1 and 5 describing the resolution of the
@@ -88,9 +81,9 @@ A data-frame with the following columns and any additional columns
  \describe{
    \item{.x}{The x component of the x-y projection of the simplex point.}
    \item{.y}{The y component of the x-y projection of the simplex point.}
-   \item{.P1}{The first entity whose proportion is varied across the simplex.}
-   \item{.P2}{The second entity whose proportion is varied across the simplex.}
-   \item{.P3}{The third entity whose proportion is varied across the simplex.}
+   \item{.P1}{The first variable whose proportion is varied across the simplex.}
+   \item{.P2}{The second variable whose proportion is varied across the simplex.}
+   \item{.P3}{The third variable whose proportion is varied across the simplex.}
    \item{.add_str_ID}{An identifier column for grouping the cartesian product
                       of all additional columns specified in `add_var`
                       parameter (if `add_var` is specified).}
@@ -103,14 +96,16 @@ A data-frame with the following columns and any additional columns
  }
 }
 \description{
-The data preparation function to create a gradient of proportions of three
-entities where their proportions sum to 1, thereby representing a 2 dimensional
-simplex which can be shown on a ternary surface. The projections of the three
-entities on the x-y plane is also calculated. The final output can then used with a
-relevant statistical model to make predictions for the response and visualise it
-as the proportions of the three entities change over the simplex (response surface
-analysis). The output of this function can be passed to the
-\code{\link{ternary_plot}} function to plot the results.
+The data preparation function for creating an equally spaced grid of three
+compositional variables (i.e., the three variables sum to 1 at each point
+along the grid). The projection of each point in the grid on the x-y plane is
+also calculated. This data can be used with a relevant statistical model
+to predict the response across the ternary surface. The output of this
+function can then be passed to the \code{\link{ternary_plot}} function to
+visualise the change in the response as a contour plot. \cr
+\emph{Note:} This function works only for models with three compositional
+predictors. For models with more than three compositional predictors see
+\code{\link{conditional_ternary}}.
 }
 \examples{
 library(DImodels)
@@ -122,18 +117,24 @@ data(sim0)
 ## Fit model
 mod <- lm(response ~ 0 + (p1 + p2 + p3)^2, data = sim0)
 
-## Create a contour map of predicted response over the ternary surface
+## Preapre data for creating a contour map of predicted response over
+## the ternary surface
 ## Remember to specify prop with the same character values as the names
 ## of the variables in the model containing the prop.
-head(ternary_data(resolution = 1, model = mod,
-                  prop = c("p1", "p2", "p3")))
+plot_data <- ternary_data(resolution = 1, model = mod,
+                          prop = c("p1", "p2", "p3"))
+## Show plot
+ternary_plot(data = plot_data)
 
-## Can also add any additional variables independent of the simplex
+## Can also add any additional variables independent of the simplex using
+## the `add_var` argument
 sim0$treatment <-  rep(c("A", "B", "C", "D"), each = 16)
 new_mod <- update(mod, ~. + treatment, data = sim0)
-head(ternary_data(prop = c("p1", "p2", "p3"),
-                  add_var = list("treatment" = c("A", "B")),
-                  resolution = 1, model = new_mod))
+plot_data <- ternary_data(prop = c("p1", "p2", "p3"),
+                          add_var = list("treatment" = c("A", "B")),
+                          resolution = 1, model = new_mod)
+## Plot to compare between additional variables
+ternary_plot(plot_data)
 
 ## It could be desirable to take the output of this function and add
 ## additional variables to the data before making predictions
@@ -168,4 +169,7 @@ contour_data <- add_prediction(data = contour_data,
                                vcov = vcov(mod),
                                interval = "confidence")
 head(contour_data)
+## Show plot
+ternary_plot(contour_data)
+## See `?ternary_plot` for options to customise the ternary_plot
 }

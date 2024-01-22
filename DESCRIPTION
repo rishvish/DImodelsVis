@@ -30,3 +30,5 @@ Imports:
     tidyr,
     utils
 RoxygenNote: 7.2.3
+Suggests: 
+    DImodelsMulti (>= 0.1.9)

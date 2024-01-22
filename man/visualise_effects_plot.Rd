@@ -7,7 +7,7 @@
 visualise_effects_plot(
   data,
   prop,
-  colours = NULL,
+  pie_colours = NULL,
   se = FALSE,
   average = TRUE,
   nrow = 0,
@@ -20,8 +20,10 @@ visualise_effects_plot(
 \item{prop}{A vector of column names or indices identifying the columns containing the
 species proportions in the data.}
 
-\item{colours}{A character vector indicating the colours for the slices in the pie-glyphs.
-If left NULL, the colour blind friendly colours will be for the pie-glyph slices.}
+\item{pie_colours}{A character vector indicating the colours for the slices
+in the pie-glyphs. \cr
+If left NULL, the colour blind friendly colours will be
+for the pie-glyph slices.}
 
 \item{se}{A boolean variable indicating whether to plot confidence intervals associated with
 the effect of species increase or decrease}
@@ -46,7 +48,7 @@ desired modifications) should be passed here. The generated plot will show a
 curve for each observation (whenever possible) in the data.
 `\code{\link[PieGlyph:PieGlyph-package]{Pie-glyphs}}` are
 used to highlight the compositions of the specified communities and the ending
-community after the variable interest either completes dominates the community
+community after the variable of interest either completes dominates the community
 (when looking at the effect of increase) or completely vanishes from the community
 (when looking at the effect of decrease) or both.
 }
@@ -71,7 +73,7 @@ visualise_effects_plot(data = plot_data,
                        prop = c("p1", "p2", "p3", "p4"))
 
 ## Show specific curves with prediction intervals
-subset <- quick_filter(plot_data, .Group \%in\% c(7, 15))
+subset <- custom_filter(plot_data, .Group \%in\% c(7, 15))
 visualise_effects_plot(data = subset, prop = 1:4, se = TRUE)
 
 ## Do not show average effect line
@@ -80,7 +82,7 @@ visualise_effects_plot(data = subset, prop = 1:4,
 
 ## Change colours of the pie-glyph slices
 visualise_effects_plot(data = subset, prop = 1:4,
-                       colours = c("darkolivegreen", "darkolivegreen1",
+                       pie_colours = c("darkolivegreen", "darkolivegreen1",
                                    "steelblue4", "steelblue1"))
 
 #' ## Simultaneously create multiple plots for additional variables
@@ -95,6 +97,6 @@ plot_data <- visualise_effects_data(data = sim1[c(1, 5, 9, 13), 3:6],
 visualise_effects_plot(data = plot_data,
                        prop = c("p1", "p2", "p3", "p4"),
                        average = FALSE,
-                       colours = c("darkolivegreen", "darkolivegreen1",
+                       pie_colours = c("darkolivegreen", "darkolivegreen1",
                                    "steelblue4", "steelblue1"))
 }

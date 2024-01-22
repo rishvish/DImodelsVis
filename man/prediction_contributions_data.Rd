@@ -18,11 +18,11 @@ prediction_contributions_data(
 )
 }
 \arguments{
-\item{data}{A data-frame containing compositional variables specifying
-observations of interest for which user wants to compare the
-predicted response. If left blank, a selection of observations
-(2 from each level of richness) from the original data used
-to fit the model would be selected.}
+\item{data}{A user-defined data-frame containing compositional variables
+specifying values for predictor variables (fitted within the
+model object) that the user wished to predict for. If left blank,
+a selection of observations (2 from each level of richness) from
+the original data used to fit the model would be selected.}
 
 \item{model}{A Diversity Interactions model object fit by using the
 \code{\link[DImodels:DI]{DI()}} function from the
@@ -52,8 +52,8 @@ associated confidence interval around each prediction. Failure to do
 so would result in no confidence intervals being returned. Ensure
 `coefficients` and `vcov` have the same positional mapping with the data.}
 
-\item{add_var}{A list specifying values for additional variables
-in the model independent of the compositional variables.
+\item{add_var}{A list specifying values for additional predictor variables
+in the model independent of the compositional predictor  variables.
 This would be useful to compare the predictions across
 different values for a categorical variable. One plot will
 be generated for each unique combination of values specified
@@ -88,7 +88,7 @@ If none of the three options are available, the function would
 assign a unique ID for each bar.}
 }
 \value{
-A data-frame with the following columns. Any aditional columns which
+A data-frame with the following columns. Any additional columns which
 weren't used to fit the model would also be present.
  \describe{
    \item{.Community}{An identifier column to discern each

@@ -7,7 +7,6 @@
 grouped_ternary_plot(
   data,
   nlevels = 7,
-  show = c("contours", "points"),
   colours = NULL,
   lower_lim = NULL,
   upper_lim = NULL,
@@ -15,7 +14,6 @@ grouped_ternary_plot(
   contour_text = TRUE,
   show_axis_labels = TRUE,
   show_axis_guides = FALSE,
-  points_size = 2,
   axis_label_size = 4,
   vertex_label_size = 5
 )
@@ -26,13 +24,13 @@ grouped_ternary_plot(
 
 \item{nlevels}{The number of levels to show on the contour map.}
 
-\item{show}{A character string indicating whether to show raw points or contours
-on the ternary. The default is to show "contours".}
-
 \item{colours}{A character vector or function specifying the colours for the
-contour map. The number of colours should be same as `nlevels`.
+contour map or points. The number of colours should be same as
+`nlevels` if (`show = "contours"`). \cr
 The default colours scheme is the
-\code{\link[grDevices:terrain.colors]{terrain.colors()}}.}
+\code{\link[grDevices:terrain.colors]{terrain.colors()}} for
+continuous variables and an extended version of the Okabe-Ito
+colour scale for categoricl variables.}
 
 \item{lower_lim}{A number to set a custom lower limit for the contour
 (if `show = "contours"`). The default is minimum of the prediction.}
@@ -58,9 +56,6 @@ is \code{TRUE}.}
 \item{show_axis_guides}{A boolean value indicating whether to show axis
 guides within the interior of the ternary. The
 default is \code{FALSE}.}
-
-\item{points_size}{If showing points, then a numeric value specifying the size
-of the points.}
 
 \item{axis_label_size}{A numeric value to adjust the size of the axis labels
 in the ternary plot. The default size is 4.}

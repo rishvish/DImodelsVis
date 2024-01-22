@@ -282,6 +282,14 @@ grouped_ternary_data <- function(prop, FG,
   cond_data <- cond_data %>%
     select(all_of(c(tern_vars, ".x", ".y", prop, all_FGs[!all_FGs %in% tern_vars], names(add_var))), everything())
 
+  # Add attributes for fetching data
+  attr(cond_data, "prop") <- prop
+  attr(cond_data, "FG") <- all_FGs
+  attr(cond_data, "tern_vars") <- tern_vars
+  attr(cond_data, "x_proj") <- ".x"
+  attr(cond_data, "y_proj") <- ".y"
+  attr(cond_data, "add_var") <- names(add_var)
+
   cli::cli_alert_success("Finished data preparation.")
   return(cond_data)
   #return(list(data = cond_data, cond_FG = cond_FG, cond_values = cond_values))
@@ -364,7 +372,6 @@ grouped_ternary_data <- function(prop, FG,
 #' grouped_ternary_plot(data = plot_data)
 grouped_ternary_plot <- function(data,
                                  nlevels = 7,
-                                 show = c("contours", "points"),
                                  colours = NULL,
                                  lower_lim = NULL,
                                  upper_lim = NULL,
@@ -372,7 +379,6 @@ grouped_ternary_plot <- function(data,
                                  contour_text = TRUE,
                                  show_axis_labels = TRUE,
                                  show_axis_guides = FALSE,
-                                 points_size = 2,
                                  axis_label_size = 4,
                                  vertex_label_size = 5){
   if(missing(data)){
@@ -381,8 +387,6 @@ grouped_ternary_plot <- function(data,
   }
 
   pl <- conditional_ternary_plot(data = data,
-                                 show = show,
-                                 points_size = points_size,
                                  nlevels = nlevels,
                                  colours = colours,
                                  tern_labels = tern_labels,
@@ -473,13 +477,13 @@ grouped_ternary_plot <- function(data,
 #' grouped_ternary(m1, FG = c("G1","G1","G2","G2","G2","L","L","H","H"),
 #'                 resolution = 1,
 #'                 tern_vars = c("G1", "L", "H"),
-#'                 conditional = list("G2" = c(0, 0.25, 0.5)))
+#'                 conditional = data.frame("G2" = c(0, 0.25, 0.5)))
 #'
 #' ## Specify `plot = FALSE` to not create the plot but return the prepared data
 #' grouped_ternary(m1, FG = c("G1","G1","G2","G2","G2","L","L","H","H"),
 #'                 resolution = 1, plot = FALSE,
 #'                 tern_vars = c("G1", "L", "H"),
-#'                 conditional = list("G2" = c(0, 0.25, 0.5)))
+#'                 conditional = data.frame("G2" = c(0, 0.25, 0.5)))
 #'
 #' ## All other functionality from \code{\link{condtional_ternary_plot}} is
 #' ## available in this function too.
@@ -491,7 +495,6 @@ grouped_ternary <- function(model,
                             add_var = list(),
                             resolution = 3,
                             plot = TRUE,
-                            show = c("contours", "points"),
                             nlevels = 7,
                             colours = NULL,
                             lower_lim = NULL,
@@ -501,11 +504,10 @@ grouped_ternary <- function(model,
                             show_axis_guides = FALSE,
                             axis_label_size = 4,
                             vertex_label_size = 5,
-                            points_size = 2,
                             nrow = 0, ncol = 0){
 
   # Ensure specified model is fit using the DI function
-  if(missing(model) || !inherits(model, "DI")){
+  if(missing(model) || (!inherits(model, "DI") && !inherits(model, "DImulti"))){
     model_not_DI(call_fn = "grouped_ternary")
   }
 
@@ -513,7 +515,11 @@ grouped_ternary <- function(model,
   og_data <- model$original_data
 
   # Get all species in the model
-  species <- eval(model$DIcall$prop)
+  if(inherits(model, "DI")){
+    species <- eval(model$DIcall$prop)
+  } else if(inherits(model, "DImulti")){
+    species <- attr(model, "prop")
+  }
   if(is.numeric(species)){
     species <- colnames(og_data)[species]
   }
@@ -522,10 +528,17 @@ grouped_ternary <- function(model,
   if(missing(FG)){
     if(!is.null(eval(model$DIcall$FG))){
       FG <- eval(model$DIcall$FG)
+    } else if (!is.null(attr(model, "FG"))){
+      FG <- attr(model, "FG")
     } else {
       cli::cli_abort(c("The {.var FG} argument cannot be empty.",
                        "i" = "The {.var FG} argument should be specified as a character vector of same length as the {.var prop} argument, specifying the functional group to which each species in prop belongs."))
     }
+  }
+
+  # If model object is of type DImulti add info about EFs and timepoints
+  if(inherits(model, "DImulti")) {
+    add_var <- link_DImodelsMulti(model = model, add_var = add_var)
   }
 
   # Create data in appropriate format for plotting
@@ -542,8 +555,6 @@ grouped_ternary <- function(model,
 
   if(isTRUE(plot)){
     plot <- grouped_ternary_plot(data = plot_data,
-                                 show = show,
-                                 points_size = points_size,
                                  nlevels = nlevels,
                                  colours = colours,
                                  tern_labels = tern_labels,

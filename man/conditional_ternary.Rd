@@ -11,7 +11,6 @@ conditional_ternary(
   add_var = list(),
   resolution = 3,
   plot = TRUE,
-  show = c("contours", "points"),
   nlevels = 7,
   colours = NULL,
   lower_lim = NULL,
@@ -21,7 +20,6 @@ conditional_ternary(
   show_axis_guides = FALSE,
   axis_label_size = 4,
   vertex_label_size = 5,
-  points_size = 2,
   nrow = 0,
   ncol = 0
 )
@@ -34,23 +32,21 @@ conditional_ternary(
 \item{tern_vars}{A character vector giving the names of the three variables
 to be shown in the ternary diagram.}
 
-\item{conditional}{A data-frame or list describing the names of the variables
+\item{conditional}{A data-frame describing the names of the variables
 and their respective values at which to slice the
-simplex space. The format should be as follows for
-  1- data-frame: data.frame("p1" = c(0, 0.5),
-                            "p2" = c(0.2, 0.1))
-  2- list: list("p1" = c(0, 0.5),
-                "p2" = c(0.2, 0.1))
-Once slice would be created for row in `conditional` with
+simplex space. The format should be, for example, as follows: \cr
+\code{data.frame("p1" = c(0, 0.5), "p2" = c(0.2, 0.1))} \cr
+Once figure would be created for row in `conditional` with
 the respective values of all specified variables. Any
-variables not specified in `conditional` will be assumed
-to be 0.}
+compositional variables not specified in `conditional` will
+be assumed to be 0.}
 
 \item{add_var}{A list specifying values for additional variables
-in the model other than the proportions (i.e. not part of the simplex design).
-This would be useful to compare the predictions across
-different values for a categorical variable.
-One plot will be generated for each unique combination
+in the model other than the proportions (i.e. not part of the
+simplex design).
+This could be useful for comparing the predictions across
+different values for a non-compositional variable.
+One ternary plot will be generated for each unique combination
 of values specified here.}
 
 \item{resolution}{A number between 1 and 5 describing the resolution of the
@@ -59,19 +55,19 @@ A high value would result in a higher definition figure
 but at the cost of being computationally expensive.}
 
 \item{plot}{A boolean variable indicating whether to create the plot or return
-the prepared data instead. The default `TRUE` creates the plot while
-`FALSE` would return the prepared data for plotting. Could be useful
-for if user wants to modify the data first and then call the plotting}
-
-\item{show}{A character string indicating whether to show raw points or contours
-on the ternary. The default is to show "contours".}
+the prepared data instead. The default \code{TRUE} creates the plot while
+\code{FALSE} would return the prepared data for plotting. Could be useful
+for if user wants to modify the data first and then call the plotting.}
 
 \item{nlevels}{The number of levels to show on the contour map.}
 
 \item{colours}{A character vector or function specifying the colours for the
-contour map. The number of colours should be same as `nlevels`.
+contour map or points. The number of colours should be same as
+`nlevels` if (`show = "contours"`). \cr
 The default colours scheme is the
-\code{\link[grDevices:terrain.colors]{terrain.colors()}}.}
+\code{\link[grDevices:terrain.colors]{terrain.colors()}} for
+continuous variables and an extended version of the Okabe-Ito
+colour scale for categoricl variables.}
 
 \item{lower_lim}{A number to set a custom lower limit for the contour
 (if `show = "contours"`). The default is minimum of the prediction.}
@@ -96,9 +92,6 @@ in the ternary plot. The default size is 4.}
 
 \item{vertex_label_size}{A numeric value to adjust the size of the vertex
 labels in the ternary plot. The default size is 5.}
-
-\item{points_size}{If showing points, then a numeric value specifying the size
-of the points.}
 
 \item{nrow}{Number of rows in which to arrange the final plot
 (when `add_var` is specified).}
@@ -136,7 +129,7 @@ m1 <- DI(y = "response", data = sim2, prop = 3:6, DImodel = "FULL")
 #' ## Create data for slicing
 ## We only condition on the variable "p3"
 conditional_ternary(model = m1, tern_vars = c("p1", "p2", "p4"),
-                    conditional = list("p3" = c(0, 0.2, 0.5)),
+                    conditional = data.frame("p3" = c(0, 0.2, 0.5)),
                     resolution = 1)
 
 ## Slices for experiments for over 4 variables

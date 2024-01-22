@@ -91,38 +91,46 @@ intervals. Default is 0.95.}
 \value{
 A data frame with the following columns appended at the end
  \describe{
-   \item{.Sp}{An identifier column to discern the variable of interest being modified in each curve.}
+   \item{.Sp}{An identifier column to discern the variable of interest being
+              modified in each curve.}
    \item{.Proportion}{The value of the variable of interest within the community.}
    \item{.Group}{An identifier column to discern between the different curves.}
    \item{.add_str_ID}{An identifier column for grouping the cartesian product
                       of all additional columns specified in `add_var`
                       parameter (if `add_var` is specified).}
    \item{.Pred}{The predicted response for each observation.}
-   \item{.Lower}{The lower limit of the prediction/confidence interval for each observation.}
-   \item{.Upper}{The upper limit of the prediction/confidence interval for each observation.}
-   \item{.Marginal}{The marginal change in the response (first derivative) with respect to the
-                    gradual change in the proportion of the species of interest.}
-   \item{.Threshold}{A numeric value indicating the maximum proportion of the species of interest
-                     within a particular community which results in a positive marginal effect on the response.}
-   \item{.MarEffect}{A character string entailing whether the increase/decrease of the species of interest from the
-                     particular community would result in a positive or negative marginal effect on the response.}
-   \item{.Effect}{An identifier column signifying whether considering the effect of species addition or species decrease.}
+   \item{.Lower}{The lower limit of the prediction/confidence interval for
+                 each observation.}
+   \item{.Upper}{The upper limit of the prediction/confidence interval for
+                 each observation.}
+   \item{.Marginal}{The marginal change in the response (first derivative)
+                    with respect to the gradual change in the proportion of
+                    the species of interest.}
+   \item{.Threshold}{A numeric value indicating the maximum proportion of
+                     the species of interest within a particular community
+                     which results in a positive marginal effect on the response.}
+   \item{.MarEffect}{A character string entailing whether the increase/decrease
+                     of the species of interest from the particular community
+                     would result in a positive or negative marginal effect
+                     on the response.}
+   \item{.Effect}{An identifier column signifying whether considering the
+                  effect of species addition or species decrease.}
  }
 }
 \description{
 The helper function to create the underlying data for visualising the effect
 of increasing or decreasing (or both) the proportion of a variable from a
 set of compositional variables. This is a special case of the
-\code{\link{suggest_name}} function where the end points are either the
+\code{\link{simplex_path}} function where the end points are either the
 monoculture (i.e. variable of interest = 1, while all others equal 0) of the
 variable of interest (when increasing the proportion) or a community without
 the variable of interest (when decreasing the proportion). The observations
 specified in `data` are connected to the respective communities with a straight
 line across the simplex, this has the effect of changing the proportion of
 the variable of interest whilst adjusting the proportion of the other variables
-but keeping their proportions unchanged, thereby preserving the compositional
-nature of the data. This enables us to visualise the effect of changing the
-proportion of a variable of interest. See examples for more information.
+but keeping the ratio of their relative proportions unchanged, thereby preserving
+the compositional nature of the data. This enables us to visualise the effect of
+changing the proportion of a variable of interest. See examples for more information.
 The output of this function can be passed to the
 \code{\link{visualise_effects_plot}} function to visualise the results.
 }

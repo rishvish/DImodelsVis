@@ -17,17 +17,14 @@
 #'             be compositional in nature (i.e., proportions should sum to 1).
 #' @param tern_vars A character vector giving the names of the three variables
 #'                  to be shown in the ternary diagram.
-#' @param conditional A data-frame or list describing the names of the variables
+#' @param conditional A data-frame describing the names of the variables
 #'                    and their respective values at which to slice the
-#'                    simplex space. The format should be as follows for
-#'                      1- data-frame: data.frame("p1" = c(0, 0.5),
-#'                                                "p2" = c(0.2, 0.1))
-#'                      2- list: list("p1" = c(0, 0.5),
-#'                                    "p2" = c(0.2, 0.1))
-#'                    Once slice would be created for row in `conditional` with
+#'                    simplex space. The format should be, for example, as follows: \cr
+#'                    \code{data.frame("p1" = c(0, 0.5), "p2" = c(0.2, 0.1))} \cr
+#'                    Once figure would be created for row in `conditional` with
 #'                    the respective values of all specified variables. Any
-#'                    variables not specified in `conditional` will be assumed
-#'                    to be 0.
+#'                    compositional variables not specified in `conditional` will
+#'                    be assumed to be 0.
 #' @inheritParams ternary_data
 #' @inheritDotParams add_prediction -data
 #'
@@ -74,22 +71,11 @@
 #' ## to be 0, for example p5 and p6 here.
 #' head(conditional_ternary_data(prop = c("p1", "p2", "p3", "p4", "p5", "p6"),
 #'                               tern_vars = c("p1", "p2", "p3"),
-#'                               conditional = list("p4" = c(0, 0.2, 0.5)),
+#'                               conditional = data.frame("p4" = c(0, 0.2, 0.5)),
 #'                               model = mod,
 #'                               resolution = 1))
 #'
 #' ## Can also condition on multiple species
-#' ## `conditional` can either be specified as a list or a data-frame
-#' ## if `conditional` is specified as a list the slices will be prepared
-#' ## following a positional mapping between the elements of the list.
-#' head(conditional_ternary_data(prop = c("p1", "p2", "p3", "p4", "p5", "p6"),
-#'                               tern_vars = c("p1", "p2", "p3"),
-#'                               conditional = list("p4" = c(0,   0.2),
-#'                                                  "p5" = c(0.5, 0.1),
-#'                                                  "p6" = c(0,   0.3)),
-#'                               model = mod,
-#'                               resolution = 1))
-#' ## `conditional` as a data-frame
 #' cond <- data.frame(p4 = c(0, 0.2), p5 = c(0.5, 0.1), p6 = c(0, 0.3))
 #' cond
 #' head(conditional_ternary_data(prop = c("p1", "p2", "p3", "p4", "p5", "p6"),
@@ -106,7 +92,7 @@
 #' ## Notice the additional `.add_str_ID` column
 #' head(conditional_ternary_data(prop = c("p1", "p2", "p3", "p4", "p5", "p6"),
 #'                               tern_vars = c("p1", "p2", "p3"),
-#'                               conditional = list("p4" = c(0, 0.2, 0.5)),
+#'                               conditional = data.frame("p4" = c(0, 0.2, 0.5)),
 #'                               add_var = list("treatment" = c(50, 150)),
 #'                               model = mod,
 #'                               resolution = 1))
@@ -116,7 +102,7 @@
 #' ## Use `prediction = FALSE` to get data without any predictions
 #' cond_data <- conditional_ternary_data(prop = c("p1", "p2", "p3", "p4", "p5", "p6"),
 #'                                       tern_vars = c("p1", "p2", "p3"),
-#'                                       conditional = list("p4" = c(0, 0.2, 0.5)),
+#'                                       conditional = data.frame("p4" = c(0, 0.2, 0.5)),
 #'                                       prediction = FALSE,
 #'                                       resolution = 1)
 #' ## The data can then be modified and the `add_prediction` function can be
@@ -246,7 +232,8 @@ conditional_ternary_data <- function(prop, tern_vars,
         mutate(.Sp = paste0(cond_names, collapse = ", "),
                .Value = paste0(cond_vals, collapse = ", "),
                .Facet = paste0(cond_names, " = ", cond_vals,
-                               collapse = "; \t"))
+                               collapse = "; \t")) %>%
+        mutate(.Facet = fct_inorder(.data$.Facet))
 
       # To avoid any rounding issues & ensure all species proportions sum to 1
       # No need to fix if rowsum is one
@@ -289,6 +276,14 @@ conditional_ternary_data <- function(prop, tern_vars,
   selection <- if(is.null(conditional)) NULL else c(colnames(conditional))
   cond_data <- cond_data %>%
     select(all_of(c(tern_vars, ".x", ".y", selection, names(add_var))), everything())
+
+  # Add attributes for fetching data
+  attr(cond_data, "prop") <- prop
+  attr(cond_data, "tern_vars") <- tern_vars
+  attr(cond_data, "x_proj") <- ".x"
+  attr(cond_data, "y_proj") <- ".y"
+  attr(cond_data, "add_var") <- names(add_var)
+
   cli::cli_alert_success("Finished data preparation.")
   return(cond_data)
 }
@@ -325,7 +320,7 @@ conditional_ternary_data <- function(prop, tern_vars,
 #' ## We only condition on the variable "p3"
 #' plot_data <- conditional_ternary_data(prop = c("p1", "p2", "p3", "p4", "p5", "p6"),
 #'                                       tern_vars = c("p1", "p2", "p4"),
-#'                                       conditional = list("p3" = c(0, 0.2, 0.5)),
+#'                                       conditional = data.frame("p3" = c(0, 0.2, 0.5)),
 #'                                       model = mod,
 #'                                       resolution = 1)
 #'
@@ -351,7 +346,7 @@ conditional_ternary_data <- function(prop, tern_vars,
 #' ## Notice the additional `.add_str_ID` column
 #' plot_data <- conditional_ternary_data(prop = c("p1", "p2", "p3", "p4", "p5", "p6"),
 #'                                       tern_vars = c("p1", "p2", "p3"),
-#'                                       conditional = list("p4" = c(0, 0.2, 0.5)),
+#'                                       conditional = data.frame("p4" = c(0, 0.2, 0.5)),
 #'                                       add_var = list("treatment" = c(50, 150)),
 #'                                       model = mod,
 #'                                       resolution = 1)
@@ -359,7 +354,6 @@ conditional_ternary_data <- function(prop, tern_vars,
 #' ## Use nrow to align plots
 #' conditional_ternary_plot(data = plot_data, nrow = 2)
 conditional_ternary_plot <- function(data,
-                                     show = c("contours", "points"),
                                      nlevels = 7,
                                      colours = NULL,
                                      lower_lim = NULL,
@@ -377,9 +371,23 @@ conditional_ternary_plot <- function(data,
                     "i" = "Specify the output of
                           {.fn conditional_ternary_data} function."))
   }
+  # Check data for important columns
+  check_plot_data(data = data,
+                  cols_to_check = c(".Pred", ".x", ".y"),
+                  calling_fun = "conditional_ternary")
 
   if(check_col_exists(data, ".add_str_ID")){
     ids <- unique(data$.add_str_ID)
+    # If user didn't specify lower limit assume it to be min of predicted response
+    if(is.null(lower_lim)){
+      lower_lim <- round(min(data[, ".Pred"]), 2)
+    }
+
+    # If user didn't specify upper limit assume it to be max of predicted response
+    if(is.null(upper_lim)){
+      upper_lim <- round(max(data[, ".Pred"]), 2)
+    }
+
     plots <- lapply(cli_progress_along(1:length(ids), name = "Creating plot",
                                        format = paste0(
                                          "{pb_spin} Creating plot ",
@@ -388,7 +396,6 @@ conditional_ternary_plot <- function(data,
                     function(i){
                       data_iter <- data %>% filter(.data$.add_str_ID == ids[i])
                       plot <- conditional_ternary_plot_internal(data = data_iter,
-                                                                show = show,
                                                                 nlevels = nlevels,
                                                                 colours = colours,
                                                                 tern_labels = tern_labels,
@@ -397,7 +404,6 @@ conditional_ternary_plot <- function(data,
                                                                 contour_text = contour_text,
                                                                 show_axis_labels = show_axis_labels,
                                                                 show_axis_guides = show_axis_guides,
-                                                                points_size = points_size,
                                                                 axis_label_size = axis_label_size,
                                                                 vertex_label_size = vertex_label_size) +
                         labs(subtitle = ids[i])
@@ -410,7 +416,6 @@ conditional_ternary_plot <- function(data,
     cli::cli_alert_success("Created all plots.")
   } else {
     plot <- conditional_ternary_plot_internal(data = data,
-                                              show = show,
                                               nlevels = nlevels,
                                               colours = colours,
                                               tern_labels = tern_labels,
@@ -419,7 +424,6 @@ conditional_ternary_plot <- function(data,
                                               contour_text = contour_text,
                                               show_axis_labels = show_axis_labels,
                                               show_axis_guides = show_axis_guides,
-                                              points_size = points_size,
                                               axis_label_size = axis_label_size,
                                               vertex_label_size = vertex_label_size)
     cli::cli_alert_success("Created plot.")
@@ -475,7 +479,7 @@ conditional_ternary_plot <- function(data,
 #' #' ## Create data for slicing
 #' ## We only condition on the variable "p3"
 #' conditional_ternary(model = m1, tern_vars = c("p1", "p2", "p4"),
-#'                     conditional = list("p3" = c(0, 0.2, 0.5)),
+#'                     conditional = data.frame("p3" = c(0, 0.2, 0.5)),
 #'                     resolution = 1)
 #'
 #' ## Slices for experiments for over 4 variables
@@ -510,7 +514,6 @@ conditional_ternary <- function(model,
                                 add_var = list(),
                                 resolution = 3,
                                 plot = TRUE,
-                                show = c("contours", "points"),
                                 nlevels = 7,
                                 colours = NULL,
                                 lower_lim = NULL,
@@ -520,11 +523,10 @@ conditional_ternary <- function(model,
                                 show_axis_guides = FALSE,
                                 axis_label_size = 4,
                                 vertex_label_size = 5,
-                                points_size = 2,
                                 nrow = 0, ncol = 0){
 
   # Ensure specified model is fit using the DI function
-  if(missing(model) || !inherits(model, "DI")){
+  if(missing(model) || (!inherits(model, "DI") && !inherits(model, "DImulti"))){
     model_not_DI(call_fn = "conditional_ternary")
   }
 
@@ -532,15 +534,23 @@ conditional_ternary <- function(model,
   og_data <- model$original_data
 
   # Get all species in the model
-  species <- eval(model$DIcall$prop)
-
-  if(is.numeric(species)){
+  if(inherits(model, "DI")){
+    species <- eval(model$DIcall$prop)
+  } else if(inherits(model, "DImulti")){
+    species <- attr(model, "prop")
+  }
+    if(is.numeric(species)){
     species <- colnames(og_data)[species]
   }
 
   # Species to show in the ternary
   if(missing(tern_vars)){
     tern_vars <- species[1:3]
+  }
+
+  # If model object is of type DImulti add info about EFs and timepoints
+  if(inherits(model, "DImulti")) {
+    add_var <- link_DImodelsMulti(model = model, add_var = add_var)
   }
 
   # Create data in appropriate format for plotting
@@ -556,7 +566,6 @@ conditional_ternary <- function(model,
 
   if(isTRUE(plot)){
     plot <- conditional_ternary_plot(data = plot_data,
-                                     show = show,
                                      nlevels = nlevels,
                                      colours = colours,
                                      tern_labels = tern_labels,
@@ -565,7 +574,6 @@ conditional_ternary <- function(model,
                                      contour_text = contour_text,
                                      show_axis_labels = show_axis_labels,
                                      show_axis_guides = show_axis_guides,
-                                     points_size = points_size,
                                      axis_label_size = axis_label_size,
                                      vertex_label_size = vertex_label_size,
                                      nrow = nrow, ncol = ncol)
@@ -582,7 +590,6 @@ conditional_ternary <- function(model,
 #' @usage NULL
 NULL
 conditional_ternary_plot_internal <- function(data,
-                                              show = c("contours", "points"),
                                               nlevels = 7,
                                               colours = NULL,
                                               lower_lim = NULL,
@@ -591,7 +598,6 @@ conditional_ternary_plot_internal <- function(data,
                                               contour_text = TRUE,
                                               show_axis_labels = TRUE,
                                               show_axis_guides = FALSE,
-                                              points_size = 2,
                                               axis_label_size = 4,
                                               vertex_label_size = 5){
   # Create the simple ternary plot
@@ -601,8 +607,6 @@ conditional_ternary_plot_internal <- function(data,
                               tern_labels = tern_labels,
                               lower_lim = lower_lim,
                               upper_lim = upper_lim,
-                              show = show,
-                              points_size = points_size,
                               contour_text = contour_text,
                               show_axis_labels = FALSE,
                               show_axis_guides = show_axis_guides,
@@ -662,8 +666,8 @@ conditional_ternary_plot_internal <- function(data,
 
 
 check_conditional_parameter <- function(conditional, prop, tern_vars){
-  if(! is.null(conditional) && !(inherits(conditional, "data.frame") || is.list(conditional))){
-    cli::cli_abort("{.var conditional} should be a list or data-frame containing
+  if(! is.null(conditional) && !(inherits(conditional, "data.frame"))){
+    cli::cli_abort("{.var conditional} should be a data-frame containing
                    the names and conditioning values for the variables at which
                    the simplex space should be sliced.",
                    "i" = "{.var conditional} was specified as a
@@ -675,19 +679,19 @@ check_conditional_parameter <- function(conditional, prop, tern_vars){
   # If the elements in the conditional list don't all have the same length
   # then the elements with shorter lengths will be padded with zeroes to
   # ensure all elements have the same length
-  if(is.list(conditional)){
-    lengths <- sapply(conditional, length)
-    max_len <- max(lengths)
-    fixed_cond <- lapply(1:length(conditional), function(idx){
-      vec <- conditional[[idx]]
-      if(length(vec) != max_len){
-        vec <- c(vec, rep(0, max_len - length(vec)))
-      }
-      vec
-    })
-    names(fixed_cond) <- names(conditional)
-    conditional <- as_tibble(fixed_cond)
-  }
+  # if(is.list(conditional)){
+  #   lengths <- sapply(conditional, length)
+  #   max_len <- max(lengths)
+  #   fixed_cond <- lapply(1:length(conditional), function(idx){
+  #     vec <- conditional[[idx]]
+  #     if(length(vec) != max_len){
+  #       vec <- c(vec, rep(0, max_len - length(vec)))
+  #     }
+  #     vec
+  #   })
+  #   names(fixed_cond) <- names(conditional)
+  #   conditional <- as_tibble(fixed_cond)
+  # }
 
   # From now on conditional will be a data.frame
   cond_names <- colnames(conditional)

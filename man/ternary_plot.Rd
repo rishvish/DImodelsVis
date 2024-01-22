@@ -6,9 +6,8 @@
 \usage{
 ternary_plot(
   data,
-  x = ".x",
-  y = ".y",
-  pred = ".Pred",
+  prop = NULL,
+  col_var = ".Pred",
   show = c("contours", "points"),
   tern_labels = c("P1", "P2", "P3"),
   show_axis_labels = TRUE,
@@ -32,16 +31,14 @@ ternary_plot(
 response at each point along the simplex to show the variation
 in response as a contour map.}
 
-\item{x}{The column name or index containing the x-component of the x-y
-projection of the 2-d simplex.}
+\item{prop}{A character vector specifying the columns names of compositional
+variables. By default, the function will try to automatically
+interpret these values from the data.}
 
-\item{y}{The column name or index containing the y-component of the x-y
-projection of the 2-d simplex.}
+\item{col_var}{The column name containing the variable to be used for
+colouring the contours or points. The default is ".Pred".}
 
-\item{pred}{The column name or index containing the predicted response
-(for showing contours).}
-
-\item{show}{A character string indicating whether to show raw points or contours
+\item{show}{A character string indicating whether to show data-points or contours
 on the ternary. The default is to show "contours".}
 
 \item{tern_labels}{A character vector containing the labels of the vertices
@@ -71,9 +68,12 @@ of the points.}
 \item{nlevels}{The number of levels to show on the contour map.}
 
 \item{colours}{A character vector or function specifying the colours for the
-contour map. The number of colours should be same as `nlevels`.
+contour map or points. The number of colours should be same as
+`nlevels` if (`show = "contours"`). \cr
 The default colours scheme is the
-\code{\link[grDevices:terrain.colors]{terrain.colors()}}.}
+\code{\link[grDevices:terrain.colors]{terrain.colors()}} for
+continuous variables and an extended version of the Okabe-Ito
+colour scale for categoricl variables.}
 
 \item{lower_lim}{A number to set a custom lower limit for the contour
 (if `show = "contours"`). The default is minimum of the prediction.}
@@ -95,14 +95,10 @@ the contour lines showing their values
 A ggmultiplot (ggplot if single plot is returned) class object or data-frame (if `plot = FALSE`)
 }
 \description{
-The plotting function to visualise response change over a 2-d simplex
-surface (ternary diagram). Create the ternary surface using the
-`\link{ternary_data}` function and add predictions of the
-response using the `\link{add_prediction}`. This function can then be used to visualise response change over the
-ternary surface as a contour map. One could also visualise raw data-points
-across the simplex by projecting them onto the ternary surface by using
-`\link{prop_to_tern_proj}` function and using the `show = "points"`
-parameter. See examples for more details.
+Create a ternary diagram showing the a scatter-plot of points across the surface
+or a contour map showing the change in a continuous variable across the
+ternary surface. The ternary surface can be created using the `\link{ternary_data}`
+function.
 }
 \examples{
 library(DImodels)
@@ -112,23 +108,31 @@ library(ggplot2)
 ## Load data
 data(sim0)
 
-### Show raw data in ternary
-## Project the 3-d simplex data into x-y plane
-raw_data <-  prop_to_tern_proj(data = sim0, prop = c("p1", "p2" , "p3"))
-
-## ternary_plot shows contours by default, use `show = "points"` to show
+### Show raw data as points in ternary
+## `ternary_plot` shows contours by default, use `show = "points"` to show
 ## points across the ternary
-ternary_plot(data = raw_data, show = "points")
+ternary_plot(data = sim0, prop = c("p1", "p2", "p3"), show = "points")
+
+## The points can also be coloured using an additional variable by
+## specifying it in `col_var`
+ternary_plot(data = sim0, prop = c("p1", "p2", "p3"),
+             col_var = "response", show = "points")
+
+## Categorical variables can also be shown
+sim0$richness <- as.factor(sim0$richness)
+ternary_plot(data = sim0, prop = c("p1", "p2", "p3"),
+             col_var = "richness", show = "points")
+
+## Change colours by using `colours` argument
+ternary_plot(data = sim0, prop = c("p1", "p2", "p3"),
+             col_var = "richness", show = "points",
+             colours = c("tomato", "steelblue", "orange"))
 
 ## Show axis guides and increase points size
-ternary_plot(data = raw_data, show = "points",
+ternary_plot(data = sim0, prop = c("p1", "p2", "p3"),
+             show = "points", col_var = "richness",
              show_axis_guides = TRUE, points_size = 4)
 
-## Overlay the output of the plot with geom_point to customise the points
-## further
-ternary_plot(data = raw_data, show = "points",
-             show_axis_guides = TRUE) +
-             geom_point(aes(colour = response))
 
 ### Show contours of response
 ## Fit model

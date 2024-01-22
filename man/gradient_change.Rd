@@ -2,7 +2,7 @@
 % Please edit documentation in R/GradientChange.R
 \name{gradient_change}
 \alias{gradient_change}
-\title{Visualise average response at each level of richness}
+\title{Visualise change in (predicted) response over diversity gradient}
 \usage{
 gradient_change(
   model,
@@ -10,6 +10,8 @@ gradient_change(
   gradient = c("richness", "evenness"),
   add_var = list(),
   plot = TRUE,
+  average = TRUE,
+  y_var = ".Pred",
   pie_data = NULL,
   pie_colours = NULL,
   facet_var = NULL,
@@ -27,10 +29,11 @@ wants to visualise the gradient. If left blank, the value specified
 in `communities` will be used to create data for the user.}
 
 \item{gradient}{Diversity gradient to show on the X-axis, one of
-"richness" or "evenness". Defaults to "richness".}
+"richness" or "evenness". Defaults to "richness". See
+`Details` for more information.}
 
-\item{add_var}{A list specifying values for additional variables
-in the model independent of the compositional variables.
+\item{add_var}{A list specifying values for additional predictor variables
+in the model independent of the compositional predictor  variables.
 This would be useful to compare the predictions across
 different values for a categorical variable. One plot will
 be generated for each unique combination of values specified
@@ -43,12 +46,22 @@ the prepared data instead. The default `TRUE` creates the plot while
 for if user wants to modify the data first and then call the plotting
 function manually.}
 
-\item{pie_data}{A subset of data-frame specified in `data`, to visualise
-the individual data-points as pie-glyphs showing the
-relative proportions of the variables in the data-point.}
+\item{average}{A boolean value indicating whether to plot a line indicating
+the average change in the predicted response with respect to
+the variable shown on the X-axis.}
+
+\item{y_var}{A character string indicating the column name of the variable
+to be shown on the Y-axis. This could be useful for plotting
+raw data on the Y-axis. By default has a value of ".Pred"
+refering to the column containing model predictions.}
+
+\item{pie_data}{Showing all points on the graph as pie-glyphs could be resource
+intensive. Hence a subset of data-frame specified in `data`,
+can be specified here to visualise only specific points as
+pie-glyphs.}
 
 \item{pie_colours}{A character vector specifying the colours for the slices
-within the pie-chart glyphs.}
+within the pie-glyphs.}
 
 \item{facet_var}{A character string or numeric index identifying the column
 in the data to be used for faceting the plot into multiple
@@ -64,7 +77,53 @@ panels.}
 A ggmultiplot (ggplot if single plot is returned) class object or data-frame (if `plot = FALSE`)
 }
 \description{
-Visualise average response at each level of richness
+A scatter-plot of the predicted response (or raw response) over a diversity
+gradient for specific observations is shown. The points can be overlaid with
+`\code{\link[PieGlyph:PieGlyph-package]{pie-glyphs}}` to show the relative
+proportions of the compositional variables. The average change in the
+(predicted) response over the chosen diversity gradient can also be shown.
+This is a wrapper function specifically for statistical models fit using the
+\code{\link[DImodels:DI]{DI()}} function from the
+\code{\link[DImodels:DImodels-package]{DImodels}} R package and it implicitly
+calls \code{\link{gradient_change_data}} followed by
+\code{\link{gradient_change_plot}}. If your model object isn't fit using
+DImodels, the associated data and plot functions can instead be called manually.
+}
+\details{
+Currently two diversity gradients are supported
+\itemize{
+  \item{\strong{Richness}: A metric describing the number of non-zero compositional
+  variables in an observation.}
+  \item{\strong{Evenness}: A metric quantifying the relative abundances of all
+  compositional variables in an observation. Defined as
+  \deqn{(2s/(s-1)) \sum_{i, j = 1; i < j}^{s}{p_i * p_j}} where \eqn{s} is the
+  total number of compositional variables and \eqn{p_i} and \eqn{p_j} are the
+  proportions of the variables \eqn{i} and \eqn{j}.
+  See \href{https://doi.org/10.1111/j.1365-2745.2007.01225.x}{Kirwan et al., 2007} and
+  \href{https://doi.org/10.1890/08-1684.1}{Kirwan et al., 2009} for more
+  information.}
+}
+
+Here's an small example of how these metrics are calculated for a few
+observations. Suppose we have four compositional variables (i.e. \eqn{s = 4})
+and have the following three observations
+\itemize{
+ \item{A = (0.5, 0.5, 0, 0)}
+ \item{B = (0.25, 0.25, 0.25, 0.25)}
+ \item{C = (1, 0, 0, 0)}
+}
+The richness values for these three observations would be as follows
+\itemize{
+ \item{A = 2 (Since two of the four compositional variables were non-zero)}
+ \item{B = 4 (Since all four compositional variables were non-zero)}
+ \item{C = 1 (Since one of the four compositional variables were non-zero)}
+}
+The evenness values would be calculated as follows
+\itemize{
+ \item{A = \eqn{2*4/(4-1)*(0.5*0.5+0.5*0+0.5*0+0.5*0+0.5*0+0*0) = 0.67}}
+ \item{B = \eqn{2*4/(4-1)*(0.25*0.25+0.25*0.25+0..25*0.25+0.25*0.25+0.25*0.25+0.25*0) = 1}}
+ \item{C = \eqn{2*4/(4-1)*(1*0+1*0+1*0+0*0+0*0+0*0) = 0}}
+}
 }
 \examples{
 ## Load DImodels package to fit the model
@@ -73,9 +132,10 @@ library(dplyr)
 
 ## Load data
 data(sim4)
+sim4 <- sim4 \%>\% filter(treatment == 50)
 
 ## Fit DI model
-mod <- DI(prop = 3:8, DImodel = 'AV', data = sim4, y = 'response') \%>\%
+mod <- DI(prop = 3:8, DImodel = "AV", data = sim4, y = "response") \%>\%
          suppressWarnings()
 
 ## Create visualisation
@@ -91,6 +151,9 @@ gradient_change(model = mod, data = sim4 \%>\% filter(richness <= 4))
 ## given level of richness
 plot_data <- get_equi_comms(6, variables = paste0("p", 1:6))
 gradient_change(model = mod, data = plot_data)
+
+## Don't show line indicating the average change by using `average = FALSE`
+gradient_change(model = mod, data = plot_data, average = FALSE)
 
 ## Can also plot average response across evenness
 gradient_change(model = mod, gradient = 'evenness')

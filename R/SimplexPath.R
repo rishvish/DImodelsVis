@@ -9,7 +9,7 @@
 #' straight line across the simplex space and the response is predicted for the
 #' starting, ending and intermediate communities along this line. The associated
 #' uncertainty along this prediction is also returned. The output of this function
-#' can be passed to the \code{\link{suggest_name_plot}} function to visualise the
+#' can be passed to the \code{\link{simplex_path_plot}} function to visualise the
 #' change in response.
 #'
 #' @param starts A data-frame specifying the starting proportions of the
@@ -60,7 +60,7 @@
 #' ## Create data for visualising change in response as we move from
 #' ## a species dominated by 70% of one species to a monoculture of
 #' ## same species
-#' head(suggest_name_data(starts = sim2[c(1, 5, 9, 13), 3:6],
+#' head(simplex_path_data(starts = sim2[c(1, 5, 9, 13), 3:6],
 #'                        ends = sim2[c(48, 52, 56, 60), 3:6],
 #'                        prop = c("p1", "p2", "p3", "p4"),
 #'                        model = mod))
@@ -71,14 +71,14 @@
 #' ## to match the number of rows in the other
 #' ## Notice starts has only one row here, but will be recycled to have 4
 #' ## since ends has 4 four rows
-#' head(suggest_name_data(starts = sim2[c(18),3:6],
+#' head(simplex_path_data(starts = sim2[c(18),3:6],
 #'                        ends = sim2[c(48, 52, 56, 60),3:6],
 #'                        prop = c("p1", "p2", "p3", "p4"),
 #'                        model = mod))
 #'
 #' ## Changing the confidence level for the prediction interval
 #' ## Use `conf.level` parameter
-#' head(suggest_name_data(starts = sim2[c(18), 3:6],
+#' head(simplex_path_data(starts = sim2[c(18), 3:6],
 #'                        ends = sim2[c(48, 52, 56, 60),3:6],
 #'                        prop = c("p1", "p2", "p3", "p4"),
 #'                        model = mod, conf.level = 0.99))
@@ -87,14 +87,14 @@
 #' ## Notice the new .add_str_ID column in the output
 #' sim2$block <- as.numeric(sim2$block)
 #' new_mod <- update(mod, ~ . + block, data = sim2)
-#' head(suggest_name_data(starts = sim2[c(18), 3:6],
+#' head(simplex_path_data(starts = sim2[c(18), 3:6],
 #'                        ends = sim2[c(48, 52, 56, 60), 3:6],
 #'                        prop = c("p1", "p2", "p3", "p4"),
 #'                        model = new_mod, conf.level = 0.99,
 #'                        add_var = list("block" = c(1, 2))))
 #'
 #' ## Use predict = FALSE to get raw data structure
-#' out_data <- suggest_name_data(starts = sim2[c(18), 3:6],
+#' out_data <- simplex_path_data(starts = sim2[c(18), 3:6],
 #'                               ends = sim2[c(48, 52, 56, 60), 3:6],
 #'                               prop = c("p1", "p2", "p3", "p4"),
 #'                               model = new_mod,
@@ -104,7 +104,7 @@
 #' out_data$block = 3
 #' ## Call `add_prediction` to get prediction
 #' head(add_prediction(data = out_data, model = new_mod, interval = "conf"))
-suggest_name_data <- function(starts, ends, prop,
+simplex_path_data <- function(starts, ends, prop,
                               add_var = list(),
                               prediction = TRUE, ...){
   if(missing(starts)){
@@ -211,14 +211,19 @@ suggest_name_data <- function(starts, ends, prop,
 #' @description
 #' The helper function for plotting the change in a response variable over a
 #' straight line between two points across the simplex space. The output of the
-#' \code{\link{suggest_name_data}} function (with any desired modifications)
+#' \code{\link{simplex_path_data}} function (with any desired modifications)
 #' should be passed here. The generated plot will show individual curves
 #' indicating the variation in the response between the points.
 #' `\code{\link[PieGlyph:PieGlyph-package]{Pie-glyphs}}` are
 #' used to highlight the compositions of the starting, ending and midpoint of the
 #' straight line between the two points.
 #'
-#' @param data A data frame created using the \code{\link{suggest_name_data}} function.
+#' @param data A data frame created using the \code{\link{simplex_path_data}} function.
+#' @param pie_positions A numeric vector with values between 0 and 1 (both inclusive)
+#'                      indicating the positions along the X-axis at which to
+#'                      show pie-glyphs for each curve. Default is c(0, 0.5, 1) meaning
+#'                      that pie-glyphs with be shown at the start, midpoint and end
+#'                      of each curve.
 #' @inheritParams visualise_effects_plot
 #' @inheritParams prediction_contributions
 #'
@@ -236,51 +241,59 @@ suggest_name_data <- function(starts, ends, prop,
 #' mod <- glm(response ~ (p1 + p2 + p3 + p4)^2 + 0, data = sim2)
 #'
 #' ## Visualise change as we move from the centroid community to each monoculture
-#' plot_data <- suggest_name_data(starts = sim2[c(19, 20, 19, 20), ],
+#' plot_data <- simplex_path_data(starts = sim2[c(19, 20, 19, 20), ],
 #'                                ends = sim2[c(47, 52, 55, 60), ],
 #'                                prop = c("p1", "p2", "p3", "p4"),
 #'                                model = mod)
-#' suggest_name_plot(data = plot_data, prop = c("p1", "p2", "p3", "p4"))
+#' simplex_path_plot(data = plot_data, prop = c("p1", "p2", "p3", "p4"))
 #'
 #' ## Show specific curves
-#' suggest_name_plot(data = plot_data[plot_data$.Group %in% c(1, 4), ],
+#' simplex_path_plot(data = plot_data[plot_data$.Group %in% c(1, 4), ],
 #'                   prop = c("p1", "p2", "p3", "p4"))
 #'
 #' ## Show uncertainty using `se = TRUE`
-#' suggest_name_plot(data = plot_data[plot_data$.Group %in% c(1, 4), ],
+#' simplex_path_plot(data = plot_data[plot_data$.Group %in% c(1, 4), ],
 #'                   prop = c("p1", "p2", "p3", "p4"), se = TRUE)
 #'
-#' ## Change colours using `colours`
-#' suggest_name_plot(data = plot_data[plot_data$.Group %in% c(1, 4), ],
+#' ## Change colours of pie-glyphs using `pie_colours`
+#' simplex_path_plot(data = plot_data[plot_data$.Group %in% c(1, 4), ],
 #'                   prop = c("p1", "p2", "p3", "p4"), se = TRUE,
-#'                   colours = c("steelblue1", "steelblue4", "orange1", "orange4"))
+#'                   pie_colours = c("steelblue1", "steelblue4", "orange1", "orange4"))
+#'
+#' ## Show pie-glyphs at different points along the curve using `pie_positions`
+#' simplex_path_plot(data = plot_data[plot_data$.Group %in% c(1, 4), ],
+#'                   prop = c("p1", "p2", "p3", "p4"), se = TRUE,
+#'                   pie_positions = c(0, 0.25, 0.5, 0.75, 1),
+#'                   pie_colours = c("steelblue1", "steelblue4", "orange1", "orange4"))
 #'
 #' ## Facet plot based on specific variables
-#' suggest_name_plot(data = plot_data,
+#' simplex_path_plot(data = plot_data,
 #'                   prop = c("p1", "p2", "p3", "p4"), se = TRUE,
 #'                   facet_var = "block",
-#'                   colours = c("steelblue1", "steelblue4", "orange1", "orange4"))
+#'                   pie_colours = c("steelblue1", "steelblue4", "orange1", "orange4"))
 #'
 #' ## Simulataneously create multiple plots for additional variables
 #' sim2$block <- as.numeric(sim2$block)
 #' new_mod <- update(mod, ~ . + block, data = sim2)
-#' plot_data <- suggest_name_data(starts = sim2[c(18), 3:6],
+#' plot_data <- simplex_path_data(starts = sim2[c(18), 3:6],
 #'                        ends = sim2[c(48, 60), 3:6],
 #'                        prop = c("p1", "p2", "p3", "p4"),
 #'                        model = new_mod, conf.level = 0.95,
 #'                        add_var = list("block" = c(1, 2)))
 #'
-#' suggest_name_plot(data = plot_data,
+#' simplex_path_plot(data = plot_data,
 #'                   prop = c("p1", "p2", "p3", "p4"), se = TRUE,
-#'                   colours = c("steelblue1", "steelblue4", "orange1", "orange4"))
-suggest_name_plot <- function(data, prop, colours = NULL,
+#'                   pie_colours = c("steelblue1", "steelblue4", "orange1", "orange4"))
+simplex_path_plot <- function(data, prop,
+                              pie_positions = c(0, 0.5, 1),
+                              pie_colours = NULL,
                               se = FALSE, facet_var = NULL,
                               nrow = 0, ncol = 0){
   # Sanity checks
   if(missing(data)){
     cli::cli_abort(c("{.var data} cannot be empty.",
                      "i" = "Specify a data-frame or tibble
-                     preferably the output of {.fn suggest_name_data} or
+                     preferably the output of {.fn simplex_path_data} or
                      a data-frame with a similar structure and column names."))
   }
 
@@ -293,7 +306,7 @@ suggest_name_plot <- function(data, prop, colours = NULL,
   }
 
   sanity_checks(data = data, prop = prop,
-                colours = colours,
+                colours = pie_colours,
                 booleans = list("se" = se),
                 numerics = list("nrow" = nrow, "ncol" = ncol),
                 unit_lengths = list("nrow" = nrow, "ncol" = ncol))
@@ -307,10 +320,12 @@ suggest_name_plot <- function(data, prop, colours = NULL,
                                        )),
                     function(i){
                       data_iter <- data %>% filter(.data$.add_str_ID == ids[i])
-                      suggest_name_plot_internal(data = data_iter, prop = prop,
-                                                 colours = colours, se = se,
+                      simplex_path_plot_internal(data = data_iter, prop = prop,
+                                                 pie_positions = pie_positions,
+                                                 pie_colours = pie_colours, se = se,
                                                  facet_var = facet_var)+
-                        labs(subtitle = ids[i])
+                        labs(subtitle = ids[i]) +
+                        ylim(min(data$.Pred), max(data$.Pred))
                     })
     if(length(plots) > 1){
       plot <- new("ggmultiplot", plots = plots, nrow = nrow, ncol = ncol)
@@ -319,9 +334,10 @@ suggest_name_plot <- function(data, prop, colours = NULL,
     }
     cli::cli_alert_success("Created all plots.")
   } else {
-    plot <- suggest_name_plot_internal(data = data, prop = prop,
-                              colours = colours, se = se,
-                              facet_var = facet_var)
+    plot <- simplex_path_plot_internal(data = data, prop = prop,
+                                       pie_positions = pie_positions,
+                                       pie_colours = pie_colours, se = se,
+                                       facet_var = facet_var)
     cli::cli_alert_success("Created plot.")
   }
   plot
@@ -345,14 +361,14 @@ suggest_name_plot <- function(data, prop, colours = NULL,
 #' This is a wrapper function specifically for statistical models fit using the
 #' \code{\link[DImodels:DI]{DI()}} function from the
 #' \code{\link[DImodels:DImodels-package]{DImodels}} R package and would implicitly
-#' call \code{\link{suggest_name_data}} followed by
-#' \code{\link{suggest_name_plot}}. If your model object isn't fit using
+#' call \code{\link{simplex_path_data}} followed by
+#' \code{\link{simplex_path_plot}}. If your model object isn't fit using
 #' DImodels, consider calling these functions manually.
 #'
 #'
 #' @inheritParams visualise_effects
-#' @inheritParams suggest_name_data
-#' @inheritParams suggest_name_plot
+#' @inheritParams simplex_path_data
+#' @inheritParams simplex_path_plot
 #' @inheritParams add_prediction
 #'
 #' @inherit prediction_contributions return
@@ -368,73 +384,81 @@ suggest_name_plot <- function(data, prop, colours = NULL,
 #'
 #' # Create plot
 #' # Move from p3 monoculture to p4 monoculture
-#' suggest_name(model = mod,
+#' simplex_path(model = mod,
 #'              starts = data.frame(p1 = 0, p2 = 0, p3 = 1, p4 = 0),
 #'              ends = data.frame(p1 = 0, p2 = 0, p3 = 0, p4 = 1))
 #'
 #' # Move from 50:50 mixture of p1 and p2 towards their monoculture
-#' suggest_name(model = mod,
+#' simplex_path(model = mod,
 #'              starts = data.frame(p1 = 0.5, p2 = 0.5, p3 = 0, p4 = 0),
 #'              ends = data.frame(p1 = c(1, 0), p2 = c(0, 1), p3 = 0, p4 = 0))
 #'
 #' # Move from dominant mixtures to p1 monoculture
-#' suggest_name(model = mod,
+#' simplex_path(model = mod,
 #'              starts = sim2[c(1, 5, 9, 13), 3:6],
 #'              ends = data.frame(p1 = 1, p2 = 0, p3 = 0, p4 = 0))
 #'
 #' # Move from centroid community to each monoculture
-#' suggest_name(model = mod,
+#' simplex_path(model = mod,
 #'              starts = sim2[c(18),],
 #'              ends = sim2[c(48, 52, 56, 60), ])
 #'
 #' # Show change across multiple points simulataneously
-#' suggest_name(model = mod,
+#' simplex_path(model = mod,
 #'              starts = sim2[c(1, 17, 22), ],
 #'              ends = sim2[c(5, 14, 17), ])
 #'
 #' # Show confidence bands
-#' suggest_name(model = mod,
+#' simplex_path(model = mod,
 #'              starts = sim2[c(1, 17, 22), ],
 #'              ends = sim2[c(5, 14, 17), ], se = TRUE)
 #'
-#' # Change colours
-#' suggest_name(model = mod,
+#' # Change pie_colours
+#' simplex_path(model = mod,
 #'              starts = sim2[c(1, 17, 22), ],
 #'              ends = sim2[c(5, 14, 17), ], se = TRUE,
-#'              colours = c("steelblue1", "steelblue4", "orange1", "orange4"))
+#'              pie_colours = c("steelblue1", "steelblue4", "orange1", "orange4"))
+#'
+#' # Show pie-glyphs at different points along the curve using `pie_positions`
+#' simplex_path(model = mod,
+#'              starts = sim2[c(1, 17, 22), ],
+#'              ends = sim2[c(5, 14, 17), ], se = TRUE,
+#'              pie_positions = c(0, 0.25, 0.5, 0.75, 1),
+#'              pie_colours = c("steelblue1", "steelblue4", "orange1", "orange4"))
 #'
 #' # Facet based on existing variables
-#' suggest_name(model = mod,
+#' simplex_path(model = mod,
 #'              starts = sim2[c(1, 17, 22), ],
 #'              ends = sim2[c(5, 14, 17), ], se = TRUE, facet_var = "block",
-#'              colours = c("steelblue1", "steelblue4", "orange1", "orange4"))
+#'              pie_colours = c("steelblue1", "steelblue4", "orange1", "orange4"))
 #'
 #' # Add additional variables and create a separate plot for each
-#' suggest_name(model = mod,
+#' simplex_path(model = mod,
 #'              starts = sim2[c(1, 17, 22), 3:6],
 #'              ends = sim2[c(5, 14, 17), 3:6], se = TRUE,
-#'              colours = c("steelblue1", "steelblue4", "orange1", "orange4"),
+#'              pie_colours = c("steelblue1", "steelblue4", "orange1", "orange4"),
 #'              add_var = list("block" = factor(c(1, 3),
 #'                                              levels = c(1, 2, 3, 4))))
 #'
 #' ## Specify `plot = FALSE` to not create the plot but return the prepared data
-#' suggest_name(model = mod, plot = FALSE,
+#' simplex_path(model = mod, plot = FALSE,
 #'              starts = sim2[c(1, 17, 22), 3:6],
 #'              ends = sim2[c(5, 14, 17), 3:6], se = TRUE,
-#'              colours = c("steelblue1", "steelblue4", "orange1", "orange4"),
+#'              pie_colours = c("steelblue1", "steelblue4", "orange1", "orange4"),
 #'              add_var = list("block" = factor(c(1, 3),
 #'                                              levels = c(1, 2, 3, 4))))
-suggest_name <- function(model, starts, ends, add_var = list(),
+simplex_path <- function(model, starts, ends, add_var = list(),
                          interval = c("confidence", "prediction", "none"),
                          conf.level = 0.95,
-                         se = FALSE, average = TRUE,
-                         colours = NULL, FG = NULL,
+                         se = FALSE,
+                         pie_positions = c(0, 0.5, 1),
+                         pie_colours = NULL, FG = NULL,
                          facet_var = NULL, plot = TRUE,
                          nrow = 0, ncol = 0){
   # Sanity checks
   # Ensure model is a DImodels object
   # Ensure specified model is fit using the DI function
-  if(missing(model) || !inherits(model, "DI")){
+  if(missing(model) || (!inherits(model, "DI") && !inherits(model, "DImulti"))){
     model_not_DI(call_fn = "visualise_effects")
   }
 
@@ -452,7 +476,11 @@ suggest_name <- function(model, starts, ends, add_var = list(),
   original_data <- model$original_data
 
   # Get all species in the model
-  model_species <- eval(model$DIcall$prop)
+  if(inherits(model, "DI")){
+    model_species <- eval(model$DIcall$prop)
+  } else if(inherits(model, "DImulti")){
+    model_species <- attr(model, "prop")
+  }
   # If species were specified as column indices extract names
   if(is.numeric(model_species)){
     model_species <- colnames(original_data)[model_species]
@@ -460,7 +488,12 @@ suggest_name <- function(model, starts, ends, add_var = list(),
 
   interval <- match.arg(interval)
 
-  plot_data <- suggest_name_data(model = model, starts = starts, ends = ends,
+  # If model object is of type DImulti add info about EFs and timepoints
+  if(inherits(model, "DImulti")) {
+    add_var <- link_DImodelsMulti(model = model, add_var = add_var)
+  }
+
+  plot_data <- simplex_path_data(model = model, starts = starts, ends = ends,
                                  prop = model_species, add_var = add_var,
                                  interval = interval, conf.level = conf.level)
 
@@ -470,13 +503,14 @@ suggest_name <- function(model, starts, ends, add_var = list(),
   }
 
   # Colours for species
-  if(is.null(colours)){
-    colours <- get_colours(vars = model_species, FG = FG)
+  if(is.null(pie_colours)){
+    pie_colours <- get_colours(vars = model_species, FG = FG)
   }
 
   if(isTRUE(plot)){
-    plot <- suggest_name_plot(data = plot_data, prop = model_species,
-                              colours = colours, se = se,
+    plot <- simplex_path_plot(data = plot_data, prop = model_species,
+                              pie_positions = pie_positions,
+                              pie_colours = pie_colours, se = se,
                               facet_var = facet_var,
                               nrow = 0, ncol = 0)
     return(plot)
@@ -492,15 +526,32 @@ suggest_name <- function(model, starts, ends, add_var = list(),
 #'
 #' @usage NULL
 NULL
-suggest_name_plot_internal <- function(data, prop, colours = NULL,
+simplex_path_plot_internal <- function(data, prop, pie_colours = NULL,
+                                       pie_positions = c(0, 0.5, 1),
                                        se = FALSE, facet_var = NULL){
+
+  # Check all columns necessary for plotting are present
+  check_plot_data(data = data,
+                  cols_to_check = c(".InterpConst", ".Group",
+                                    ".Pred"),
+                  calling_fun = "simplex_path")
+
+  # Ensure pie_positions is appropriate
+  if(!is.numeric(pie_positions) || !all(between(pie_positions, 0, 1))){
+    cli::cli_abort(c("{.var pie_positions} should be a {.cls numeric} vector
+                     with values between 0 and 1 (both inclusive).",
+                     "i" = "{.var pie_positions} was of type
+                     {.cls {class(pie_positions)}} with value{?s}
+                     {.val {as.character(pie_positions)}}"))
+  }
 
   # Get names of columns containing species proportions
   species_names <- data %>% select(all_of(prop)) %>% colnames()
 
+  slice_idx <- (pie_positions * 100) + 1
   pie_data <- data %>%
     group_by(.data$.Group) %>%
-    slice(1, 51, 101) %>%
+    slice(slice_idx) %>%
     ungroup() %>%
     # Filter out any overlapping pies to avoid overplotting
     distinct(.data$.InterpConst, .data$.Pred, .keep_all = T) %>%
@@ -508,8 +559,8 @@ suggest_name_plot_internal <- function(data, prop, colours = NULL,
 
 
   # Colours for the pie-glyph slices
-  if(is.null(colours)){
-    colours <- get_colours(species_names)
+  if(is.null(pie_colours)){
+    pie_colours <- get_colours(species_names)
   }
 
   # Create canvas for plot
@@ -518,6 +569,10 @@ suggest_name_plot_internal <- function(data, prop, colours = NULL,
 
   # Add ribbons for uncertainty of prediction
   if(se){
+    check_plot_data(data = data,
+                    cols_to_check = c(".Lower", ".Upper"),
+                    calling_fun = "simplex_path")
+
     plot <- plot +
       geom_ribbon(aes(ymin = .data$.Lower, ymax = .data$.Upper,
                       group = .data$.Group),
@@ -532,7 +587,7 @@ suggest_name_plot_internal <- function(data, prop, colours = NULL,
   plot <- plot +
     geom_pie_glyph(data = pie_data, radius = 0.3,
                    slices = prop, colour = 'black')+
-    scale_fill_manual(values = colours,
+    scale_fill_manual(values = pie_colours,
                       labels = prop)
 
   # Add facet if specified
@@ -545,11 +600,11 @@ suggest_name_plot_internal <- function(data, prop, colours = NULL,
   plot <- plot +
     labs(fill = "Variable",
          x = "Interpolation constant",
-         y = "Predicted Response",
-         caption = "The pie-glyphs on the left show the starting compositions
-         while those on the right show the ending compositions.
-         The pie-glyphs in the centre show the composition of the
-         point midway between the starting and ending compositions.")+
+         y = "Predicted Response")+
+         # caption = "The pie-glyphs on the left show the starting compositions
+         # while those on the right show the ending compositions.
+         # The pie-glyphs in the centre show the composition of the
+         # point midway between the starting and ending compositions.")+
     theme(legend.position = 'top')
 
   return(plot)

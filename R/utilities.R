@@ -14,7 +14,7 @@
 #'                combination of values of variables (i.e., their
 #'                cartesian product)in `add_var`.
 #'
-#' @return A data-frame with any additional columns specified in `add_var`
+#' @return A data-frame with all additional columns specified in `add_var`
 #'         and the following column.
 #'  \describe{
 #'    \item{.add_str_ID}{A unique identifier describing each element from the
@@ -61,7 +61,7 @@ add_add_var <- function(data, add_var = NULL){
     # Add identifier for each unique combination of experimental structures
     add_var_data$.add_str_ID <- do.call(paste, c(Map(function(x, y) {paste(x, y, sep=": ")},
                                                      names(add_var_data), add_var_data),
-                                                 sep="\t"))
+                                                 sep="; \t"))
 
     # If any clashes with common columns in data and add_var
     # Rename columns in data
@@ -75,7 +75,8 @@ add_add_var <- function(data, add_var = NULL){
       colnames(data)[idx] <- paste0(colnames(data)[idx], ".data")
     }
     # Merge experimental structures with species communities
-    data <- left_join(data, add_var_data, by = character())
+    data <- merge(data, add_var_data, by = NULL)
+    # data <- left_join(data, add_var_data, by = character())
   }
   return(data)
 }
@@ -250,34 +251,76 @@ get_colours <- function(vars, FG = NULL){
   return(cols)
 }
 
-#' @title Get all equi-proportional communities at each level of richness
+#' @title Get all equi-proportional communities at specific levels of richness
 #'
 #' @importFrom dplyr  %>% left_join
 #'
 #' @param nvars Number of variables in the design
+#' @param richness_lvl The richness (number of non-zero compositional variables
+#'                     in a community) levels at which to return the equi-proportional
+#'                     communities.
+#'                     Defaults to each richness level from 1 up to `nvars`
+#'                     (both inclusive).
 #' @param variables Names for the variables. Will be used as column names for the
 #'                  final result. Default is "Var" followed by column number.
 #' @param threshold The maximum number of communities to select for each level
 #'                  of richness for situations when there are too many
-#'                  equi-proportional communities.
+#'                  equi-proportional communities. \cr
+#'                  Note: if threshold < `number of possible equi-proportional communities`
+#'                  at a given level of richness, a random selection of communities
+#'                  equal to the number specified in threshold would be returned.
 #'
 #' @return A dataframe consisting all or a random selection of equi-proportional
 #'         communities at each level of richness
 #' @export
 #'
 #' @examples
-#' ## Get all equi-proportional communities for each level of richnness upto 10
-#' get_equi_comms(10)
+#' ## Get all equi-proportional communities for each level of richness upto 10
+#' data10 <- get_equi_comms(10)
+#' head(data10, 12)
 #'
 #' ## Change species names
-#' get_equi_comms(4, variables = c("Lollium perenne", "Chicorum intybus",
-#'                                 "Trifolium repens", "Trifolium pratense"))
+#' data4 <- get_equi_comms(4, variables = c("Lollium perenne", "Chichorum intybus",
+#'                                          "Trifolium repens", "Trifolium pratense"))
+#' head(data4)
+#'
+#' ## Get equi-proportional communities at specific levels of richness
+#' ## Get all equi-proportional communities of four variables at richness
+#' ## levels 1 and 3
+#' data4_13 <- get_equi_comms(nvars = 4, richness = c(1, 3))
+#' data4_13
+#'
+#' ## If threshold is specified and it is less than the number of possible
+#' ## equi-proportional communites at a given level of richness, then a
+#' ## random selection of communities from the total possible would be returned
+#' ## Return only 2 random equi-proportional communities at the chosen richness
+#' ## levels
+#' data4_13_2 <- get_equi_comms(nvars = 4, richness = c(1, 3), threshold = 2)
+#' data4_13_2
 get_equi_comms <- function(nvars,
+                           richness_lvl = 1:nvars,
                            variables = paste0('Var', 1:nvars),
                            threshold = round(1000000/nvars)){
+  sanity_checks(numerics = list("nvars" = nvars,
+                                "richness_lvl" = richness_lvl,
+                                "threshold" = threshold),
+                characters = list("variables" = variables))
 
+  if(any(!between(richness_lvl, 1, nvars))){
+    cli::cli_abort(c("{.var richness_lvl} can have values between 1 and {nvars}.",
+                     "i" = "{.var richness_lvl} has value{?s}
+                     {.val {as.character(richness_lvl[!between(richness_lvl, 1, nvars)])}}
+                     outside this range."))
+  }
+
+  if(length(variables) != nvars){
+    cli::cli_abort(c("The variable names specified in {.var variables} should have
+                     the same length as the value specified in {.var nvars}.",
+                     "i" = "{.var nvars} has a value {.val {nvars}} but {.var variables}
+                     has {.val {length(variables)}} name{?s} specified."))
+  }
   # Possible levels of richness
-  choices <- 1:nvars
+  choices <- richness_lvl
   # Communities to be used as seed for combinations
   seed_comms <- lapply(choices, function(rich_level){
     c(rep(1, rich_level), rep(0, nvars - rich_level))
@@ -306,7 +349,7 @@ get_equi_comms <- function(nvars,
   comms <- do.call(rbind, chosen_comms) %>%
     as.data.frame()
   # Add column names and richness variable
-  colnames(comms) <- variables
+  names(comms) <- variables
   comms$Richness <- rowSums(comms)
   # Convert to proportions
   comms[, 1:nvars] <- comms[, 1:nvars]/comms$Richness
@@ -384,7 +427,7 @@ check_equi <- function(comm){
   return(ret_value)
 }
 
-#' @importFrom stats AIC BIC logLik
+#' @importFrom stats AIC BIC logLik fitted residuals
 #' @importFrom insight n_obs n_parameters
 #' @usage NULL
 NULL
@@ -560,7 +603,7 @@ theme_DI <- function (font_size = 14, font_family = "",
 
   .theme <- theme_bw(base_size = font_size, base_family = font_family) %+replace%
     theme(axis.text = element_text(color = "black", size = axis_text_size),
-          strip.background = element_rect(fill = "#465849", colour = "black"),
+          strip.background = element_rect(fill = "#93C572", colour = "black"),
           legend.position = legend,
           legend.text = element_text(size = axis_text_size),
           complete = TRUE)
@@ -940,6 +983,10 @@ add_prediction <- function(data, model = NULL,
         data <- data %>%
           mutate(".Pred" := preds)
       }
+    } else if (inherits(model, "DImulti")){
+      preds <- predict_from_DImulti(model = model, newdata = data)
+      data <- data %>%
+        mutate(".Pred" := preds)
     } else {
       preds <- suppressWarnings(suppressMessages(insight::get_predicted(x = model, data = data)))
 
@@ -1065,11 +1112,11 @@ add_prediction <- function(data, model = NULL,
   return(data)
 }
 
-#' @title Quick filtering for compositional data
+#' @title Special custom filtering for compositional data
 #'
 #' @description
 #' A handy wrapper around the dplyr \code{\link[dplyr:filter]{filter()}} function
-#' enabling the user to quickly filter rows which satisfy specific conditions
+#' enabling the user to filter rows which satisfy specific conditions
 #' for compositional data like all equi-proportional communities, or communities
 #' with a given value of richness without having to make any changes to the data
 #' or adding any additional columns. All other functionalities are same as the
@@ -1113,29 +1160,29 @@ add_prediction <- function(data, model = NULL,
 #'
 #' # The special filter keywords should be specified as a string
 #' # Filter communities containing 3 species
-#' head(quick_filter(data = sim3, prop = 4:12,
-#'                   special = "richness == 3"))
+#' head(custom_filter(data = sim3, prop = 4:12,
+#'                    special = "richness == 3"))
 #'
 #' # Filter communities at richness 6 OR evenness 0
-#' head(quick_filter(data = sim3, prop = 4:12,
-#'                   special = "richness == 6 | evenness == 0"), 12)
+#' head(custom_filter(data = sim3, prop = 4:12,
+#'                    special = "richness == 6 | evenness == 0"), 12)
 #'
 #' # Filter all monoculture AND treatment "A" (treatment is column present in data)
-#' head(quick_filter(data = sim3, prop = 4:12,
-#'                   special = "monos == TRUE & treatment == 'A'"), 10)
+#' head(custom_filter(data = sim3, prop = 4:12,
+#'                    special = "monos == TRUE & treatment == 'A'"), 10)
 #'
 #' # Filter all equi proportional communities but NOT monocultures
-#' head(quick_filter(data = sim3, prop = 4:12,
-#'                   special = "equi == TRUE & monos == FALSE"))
+#' head(custom_filter(data = sim3, prop = 4:12,
+#'                    special = "equi == TRUE & monos == FALSE"))
 #'
 #' # Function can also be used as normal filter function and in a dplyr pipeline
-#' sim3 %>% quick_filter(p1 == 1)
+#' sim3 %>% custom_filter(p1 == 1)
 #'
 #' # Both special filtering and normal filtering can be combined as well
-#' sim3 %>% quick_filter(prop = paste0("p", 1:9),
-#'                       special = "richness == 1",
-#'                       community %in% c(7, 9))
-quick_filter <- function(data, prop = NULL, special = NULL, ...){
+#' sim3 %>% custom_filter(prop = paste0("p", 1:9),
+#'                        special = "richness == 1",
+#'                        community %in% c(7, 9))
+custom_filter <- function(data, prop = NULL, special = NULL, ...){
   # Sanity Checks
   if(missing(data)){
     cli::cli_abort(c("{.var data} cannot be empty.",
@@ -1227,6 +1274,11 @@ prop_to_tern_proj <- function(data, prop,
     cli::cli_abort(c("{.var data} cannot be empty.",
                      "i" = "Specify a data frame containing variable
                             proportions."))
+  }
+  if(length(prop) != 3){
+    cli::cli_abort(c("Currently projections are supported for systems with
+                     three compositional variables only. This lock will soon be
+                     lifted to support system with more variables."))
   }
 
   sanity_checks(data = data, prop = prop)
@@ -1432,3 +1484,90 @@ check_col_exists <- function(data, col){
     return(FALSE)
   }
 }
+
+#' @keywords internal
+#' Utility function to check if all columns necessary for creating
+#' a plot exist in the data
+#'
+#' @usage NULL
+NULL
+check_plot_data <- function(data, cols_to_check, calling_fun,
+                            data_name = "data"){
+  check_res <- check_col_exists(data, cols_to_check)
+
+  if(check_res){
+    return(TRUE)
+  } else {
+    plot_fn <- paste0(calling_fun, "_plot")
+    data_fn <- paste0(calling_fun, "_data")
+    data_fn_link <- paste0("DImodelsVis::", data_fn)
+
+    missing_vars <- cols_to_check[!cols_to_check %in% names(data)]
+    message = c("All variables necessary for creating the
+                {.var {plot_fn}} are not present in {.var {data_name}}.",
+                "!" = "The variable{?s} {.val {missing_vars}} {?is/are} not present in the data.",
+                "i" = "Recreate the data using the {.help [{.fn {data_fn}}]({data_fn_link})}
+                function or read the `{.field Value}` section on the help page of
+                {.help [{.fn {data_fn}}]({data_fn_link})} if you wish to tweak the ouptut and
+                manually add these variables to the data.")
+    cli::cli_abort(message, call = caller_env())
+  }
+}
+
+#' @keywords internal
+#' Utility function to ensure plots work for a model of class DImulti
+#'
+#' @usage NULL
+NULL
+link_DImodelsMulti <- function(model, add_var = list()){
+  if(!inherits(model, "DImulti")){
+    cli::cli_abort(c("The model object provided should be of class
+                     {.cls DImulti}"))
+  }
+
+  # Get transformed data used to fit the model
+  model_data <- attr(model, "data")
+
+  # If RM component used in model
+  time_flag <- attr(model, "Timeflag")
+  if(isTRUE(time_flag)){
+    time_col <- attr(model, "time")
+    if(is.null(add_var[[time_col]])){
+      time_vals <- unique(model_data[, time_col])
+      add_var[[time_col]] <- time_vals
+    }
+  }
+
+  # If MV component used in model
+  MV_flag <- attr(model, "MVflag")
+  if(isTRUE(MV_flag)){
+    MV_col <- attr(model, "Yfunc")
+    if(is.null(add_var[[MV_col]])){
+      MV_vals <- unique(model_data[, MV_col])
+      add_var[[MV_col]] <- MV_vals
+    }
+  }
+  return(add_var)
+}
+
+#' @keywords internal
+#' Utility function to predict from a DImodelsMulti model object
+#'
+#' @usage NULL
+NULL
+predict_from_DImulti <- function(model, newdata = model$original_data, ...){
+  # Get ID_col
+  ID_col <- attr(model, "unitIDs")
+  if(isFALSE(check_col_exists(newdata, ID_col))){
+    if(isTRUE(check_col_exists(newdata, ".add_str_ID"))){
+      reps <- length(unique(newdata$.add_str_ID))
+      idx <- 1:(nrow(newdata)/reps)
+      # newdata <- newdata %>% mutate(!!sym(ID_col) := rep(idx, times = reps))
+    }
+  }
+  preds <- suppressWarnings(predict(object = model, newdata = newdata,
+                                    stacked = F, ...))
+  preds <- preds %>% mutate(across(everything(), function(x) ifelse(is.nan(x), 0, x)))
+  return(rowSums(preds[, -1]))
+}
+

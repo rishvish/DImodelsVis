@@ -2,6 +2,9 @@
 #' @description
 #' This function helps to visualise model selection by showing a
 #' visual comparison between the information criteria for different models.
+#' It is also possible to visualise a breakup of the information criteria into
+#' deviance (goodness-of-fit) and penalty terms for each model. This could aid in
+#' understanding why a parsimonious model could be preferable over a more complex model.
 #'
 #' @importFrom ggplot2 geom_line geom_point geom_label aes scale_colour_identity
 #'                     scale_colour_manual geom_hline geom_segment arrow
@@ -194,7 +197,8 @@ model_selection <- function(models,
                          "AIC" = AIC_vec(models) %>% round(2),
                          "BIC" = BIC_vec(models) %>% round(2),
                          "AICc" = AICc_vec(models) %>% round(2),
-                         "BICc" = BICc_vec(models) %>% round(2))
+                         "BICc" = BICc_vec(models) %>% round(2)) %>%
+    mutate(model_name = forcats::fct_inorder(.data$model_name))
   # Sort models
   if(sort){
     plot_data <- plot_data %>%
@@ -222,10 +226,10 @@ model_selection <- function(models,
     # Rule of 2
     if(length(metric) == 1){
       pl <- pl +
-        geom_hline(yintercept = rule_of_2, linetype = 3, linewidth = 0.75)+
-        labs(caption = paste0("The dashed lines represent the range for `rule of 2`.
-           Models having ", metric, " values within this
-                              band are comparable to the best model."))
+        geom_hline(yintercept = rule_of_2, linetype = 3, linewidth = 0.75)
+        # labs(caption = paste0("The dashed lines represent the range for `rule of 2`.
+        #    Models having ", metric, " values within this
+        #                       band are comparable to the best model."))
     }
 
     # Remainder of plot
@@ -263,7 +267,7 @@ model_selection <- function(models,
              fill = guide_legend(order = 2))+
       theme_DI()+
       theme(legend.position = 'top')+
-      scale_fill_manual(values = c("#f59424", "#CC79A7"))
+      scale_fill_manual(values = c("#0072B2", "#f59424"))
   }
 
   if(isTRUE(plot)){

@@ -1,10 +1,10 @@
-#' @title Average response over diversity gradient
+#' @title Visualise change in (predicted) response over diversity gradient
 #'
 #' @description
-#' Helper function for creating the data to visualise the average
-#' response over a diversity gradient. The average can be calculated
-#' either over the "richness" or "evenness" gradients. The average is
-#' calculated from all communities present at a given level of the
+#' Helper function for creating the data to visualise a scatter-plot of the
+#' response over a diversity gradient. The "richness" and "evenness"
+#' diversity gradients are currently supported. The average (predicted) response
+#' is calculated from all communities present at a given level of the
 #' chosen diversity gradient in `data`. The output of this
 #' function can be passed to the \code{\link{gradient_change_plot}} function
 #' to visualise the results.
@@ -16,25 +16,34 @@
 #'             `model` or `coefficients`.
 #' @param prop A vector identifying the column-names or indices of the
 #'             columns containing the variable proportions in `data`.
+#' @param prediction A logical value indicating whether to pass the final
+#'                   data to the `add_prediction` function and append the
+#'                   predictions to the data. Default value is TRUE, but
+#'                   often it would be desirable to make additional changes
+#'                   to the data before making any predictions, so the user
+#'                   can set this to FALSE and manually call the `add_prediction`
+#'                   function.
 #' @inheritParams gradient_change
 #' @inheritDotParams add_prediction -data
 #'
 #' @return The data-frame with the following columns appended at the end
 #'  \describe{
-#'    \item{.Pred}{The predicted response for each obvervation.}
-#'    \item{.Lower}{The lower limit of the prediction/confidence interval
-#'                  for each observation.}
-#'    \item{.Upper}{The upper limit of the prediction/confidence interval
-#'                  for each observation.}
 #'    \item{.Richness}{The richness (number of non-zero compositional variables)
 #'                     within each observation.}
 #'    \item{.Evenness}{The evenness (metric quantifying the relative abundance
 #'                     of each compositional variable) within each observation.}
 #'    \item{.Gradient}{An character string defining the diversity gradient used
 #'                     for averaging the response.}
-#'    \item{.Avg}{The averaged value of the response for each unique value of
-#'                the selected diversity gradient.}
+#'    \item{.Pred}{The predicted response for each obvervation.}
+#'    \item{.Lower}{The lower limit of the prediction/confidence interval
+#'                  for each observation.}
+#'    \item{.Upper}{The upper limit of the prediction/confidence interval
+#'                  for each observation.}
+#'    \item{.Avg}{The averaged value of the predicted response for each unique
+#'                value of the selected diversity gradient.}
 #'  }
+#'
+#' @inherit gradient_change details
 #'
 #' @export
 #'
@@ -102,7 +111,8 @@
 #'                      coefficients = mod$coefficients,
 #'                      interval = "none")
 gradient_change_data <- function(data, prop, add_var = list(),
-                                 gradient = c("richness", "evenness"), ...){
+                                 gradient = c("richness", "evenness"),
+                                 prediction = TRUE, ...){
   if(missing(data)){
     cli::cli_abort(c("{.var data} cannot be empty.",
                      "i" = "Specify a data frame or tibble containing the
@@ -134,9 +144,6 @@ gradient_change_data <- function(data, prop, add_var = list(),
     data <- add_add_var(add_var = add_var, data = data)
   }
 
-  # Calculate predictions
-  plot_data <- add_prediction(data = data, ...)
-
   # Get names of columns containing variable proportions
   species_names <- data %>% select(all_of(prop)) %>% colnames()
 
@@ -148,30 +155,44 @@ gradient_change_data <- function(data, prop, add_var = list(),
   # pred_var <- if (!is.null(dotArgs$pred_name)) dotArgs$pred_name else ".Pred"
 
   # Add the average change across specified gradient
-  plot_data <- plot_data %>%
+  plot_data <- data %>%
     mutate(".Richness" = get_richness(.data, species_names),
            ".Evenness" = get_evenness(.data, species_names),
-           ".Gradient" = group_var) %>%
-    group_by(!! sym(group_var)) %>%
-    mutate('.Avg' = mean(.data$.Pred)) %>%
-    ungroup()
+           ".Gradient" = group_var)
+
+  # Add predictions if prediction is true
+  if(isTRUE(prediction)){
+    # Calculate predictions
+    plot_data <- add_prediction(data = plot_data, ...)
+
+    if(check_col_exists(data, ".add_str_ID")){
+      plot_data <- plot_data %>%
+        group_by(!! sym(group_var), .data$.add_str_ID) %>%
+        mutate('.Avg' = mean(.data$.Pred)) %>%
+        ungroup()
+    } else {
+      plot_data <- plot_data %>%
+        group_by(!! sym(group_var)) %>%
+        mutate('.Avg' = mean(.data$.Pred)) %>%
+        ungroup()
+    }
+  }
 
   cli::cli_alert_success("Finished data preparation")
   return(plot_data)
 }
 
 
-#' @title Average response over diversity gradient
+#' @title Visualise change in (predicted) response over diversity gradient
 #'
 #' @description
-#' Helper function for plotting the average response at each level of the
-#' diversity gradient. The output of the \code{\link{gradient_change_data}}
-#' function should be passed here to visualise the average response. The
-#' proportions of the compositional variables present in the data would be
-#' shown on the plot using `\code{\link[PieGlyph:PieGlyph-package]{pie-glyphs}}`.
-#'
-#' @description
-#' Helper for plotting average response at each level of species richness
+#' Helper function for plotting the average (predicted) response at each level
+#' of the diversity gradient. The output of the \code{\link{gradient_change_data}}
+#' function should be passed here to visualise a scatter-plot of the predicted
+#' response (or raw response) over a diversity gradient. The points can be overlaid with
+#' `\code{\link[PieGlyph:PieGlyph-package]{pie-glyphs}}` to show the relative
+#' proportions of the compositional variables. The average change in the
+#' (predicted) response over the chosen diversity gradient can also be shown.
 #'
 #' @param data A data-frame which is the output of the
 #'             `\link{gradient_change_data}` function, consisting of the
@@ -217,13 +238,17 @@ gradient_change_data <- function(data, prop, add_var = list(),
 #' gradient_change_plot(data = plot_data,
 #'                      prop = c("p1", "p2", "p3", "p4", "p5", "p6"))
 #'
+#' ## Don't show line indicating the average change by using `average = FALSE`
+#' gradient_change_plot(data = plot_data,
+#'                      prop = c("p1", "p2", "p3", "p4", "p5", "p6"),
+#'                      average = FALSE)
+#'
 #' ## Change colours of the pie-slices using `pie_colours`
 #' gradient_change_plot(data = plot_data,
 #'                      prop = c("p1", "p2", "p3", "p4", "p5", "p6"),
 #'                      pie_colours = c("darkolivegreen1", "darkolivegreen4",
 #'                                      "orange1", "orange4",
 #'                                      "steelblue1", "steelblue4"))
-#'
 #'
 #' ## Manually specify only specific communities to be shown as pie-chart
 #' ## glyphs using `pie_data`.
@@ -254,11 +279,34 @@ gradient_change_data <- function(data, prop, add_var = list(),
 #'                      prop = c("p1", "p2", "p3", "p4", "p5", "p6"),
 #'                      pie_data = plot_data %>% filter(.Richness %in% c(1, 6)),
 #'                      nrow = 2)
+#'
+#' ## Create plot for raw data instead of predictions
+#' ## Create the data for plotting by specifying `prediction = FALSE`
+#' plot_data <- gradient_change_data(data = sim4[sim4$treatment == 50, ],
+#'                                   prop = c("p1", "p2", "p3",
+#'                                            "p4", "p5", "p6"),
+#'                                   prediction = FALSE)
+#' ## This data will not have any predictions
+#' head(plot_data)
+#' ## Call the plotting function by specifying the variable you we wish to
+#' ## plot on the Y-axis by using the argument `y_var`
+#' gradient_change_plot(data = plot_data, y_var = "response",
+#'                      prop = c("p1", "p2", "p3",
+#'                               "p4", "p5", "p6"))
 gradient_change_plot <- function(data, prop = NULL,
                                  pie_data = NULL,
                                  pie_colours = NULL,
+                                 average = TRUE,
+                                 y_var = ".Pred",
                                  facet_var = NULL,
                                  nrow = 0, ncol = 0){
+
+  # Ensure data is specified
+  if(missing(data)){
+    cli::cli_abort(c("{.var data} cannot be empty.",
+                     "i" = "Specify a data frame or tibble (preferably the
+                            output of {.help [{.fn gradient_change_data}](DImodelsVis::gradient_change_data)})."))
+  }
 
   # If add_var is specified then unique plot for each combination of add_var
   if(check_col_exists(data, ".add_str_ID")){
@@ -273,8 +321,11 @@ gradient_change_plot <- function(data, prop = NULL,
                       gradient_change_plot_internal(data = data_iter, prop = prop,
                                                     pie_colours = pie_colours,
                                                     facet_var = facet_var,
+                                                    y_var = y_var,
+                                                    average = average,
                                                     pie_data = pie_data)+
-                        labs(subtitle = ids[i])
+                        labs(subtitle = ids[i]) +
+                        ylim(min(data[, y_var]), max(data[, y_var]))
                     })
     if(length(plots) > 1){
       plot <- new("ggmultiplot", plots = plots, nrow = nrow, ncol = ncol)
@@ -287,6 +338,8 @@ gradient_change_plot <- function(data, prop = NULL,
     plot <- gradient_change_plot_internal(data = data, prop = prop,
                                           pie_colours = pie_colours,
                                           facet_var = facet_var,
+                                          y_var = y_var,
+                                          average = average,
                                           pie_data = pie_data)
     cli::cli_alert_success("Created plot.")
   }
@@ -295,7 +348,20 @@ gradient_change_plot <- function(data, prop = NULL,
 
 
 
-#' @title Visualise average response at each level of richness
+#' @title Visualise change in (predicted) response over diversity gradient
+#'
+#' @description
+#' A scatter-plot of the predicted response (or raw response) over a diversity
+#' gradient for specific observations is shown. The points can be overlaid with
+#' `\code{\link[PieGlyph:PieGlyph-package]{pie-glyphs}}` to show the relative
+#' proportions of the compositional variables. The average change in the
+#' (predicted) response over the chosen diversity gradient can also be shown.
+#' This is a wrapper function specifically for statistical models fit using the
+#' \code{\link[DImodels:DI]{DI()}} function from the
+#' \code{\link[DImodels:DImodels-package]{DImodels}} R package and it implicitly
+#' calls \code{\link{gradient_change_data}} followed by
+#' \code{\link{gradient_change_plot}}. If your model object isn't fit using
+#' DImodels, the associated data and plot functions can instead be called manually.
 #'
 #' @importFrom dplyr mutate %>% group_by distinct across all_of
 #' @importFrom ggplot2 ggplot geom_line aes geom_point position_dodge
@@ -307,15 +373,60 @@ gradient_change_plot <- function(data, prop = NULL,
 #' @param data A dataframe specifying communities of interest for which user
 #'             wants to visualise the gradient. If left blank, the value specified
 #'             in `communities` will be used to create data for the user.
-#' @param pie_data A subset of data-frame specified in `data`, to visualise
-#'                 the individual data-points as pie-glyphs showing the
-#'                 relative proportions of the variables in the data-point.
+#' @param pie_data Showing all points on the graph as pie-glyphs could be resource
+#'                 intensive. Hence a subset of data-frame specified in `data`,
+#'                 can be specified here to visualise only specific points as
+#'                 pie-glyphs.
 #' @param gradient Diversity gradient to show on the X-axis, one of
-#'                 "richness" or "evenness". Defaults to "richness".
+#'                 "richness" or "evenness". Defaults to "richness". See
+#'                 `Details` for more information.
+#' @param average A boolean value indicating whether to plot a line indicating
+#'                the average change in the predicted response with respect to
+#'                the variable shown on the X-axis.
+#' @param y_var A character string indicating the column name of the variable
+#'              to be shown on the Y-axis. This could be useful for plotting
+#'              raw data on the Y-axis. By default has a value of ".Pred"
+#'              refering to the column containing model predictions.
 #' @inheritParams prediction_contributions
 #' @inheritParams model_diagnostics
 #'
 #' @inherit prediction_contributions return
+#'
+#' @details
+#' Currently two diversity gradients are supported
+#' \itemize{
+#'   \item{\strong{Richness}: A metric describing the number of non-zero compositional
+#'   variables in an observation.}
+#'   \item{\strong{Evenness}: A metric quantifying the relative abundances of all
+#'   compositional variables in an observation. Defined as
+#'   \deqn{(2s/(s-1)) \sum_{i, j = 1; i < j}^{s}{p_i * p_j}} where \eqn{s} is the
+#'   total number of compositional variables and \eqn{p_i} and \eqn{p_j} are the
+#'   proportions of the variables \eqn{i} and \eqn{j}.
+#'   See \href{https://doi.org/10.1111/j.1365-2745.2007.01225.x}{Kirwan et al., 2007} and
+#'   \href{https://doi.org/10.1890/08-1684.1}{Kirwan et al., 2009} for more
+#'   information.}
+#' }
+#'
+#' Here's an small example of how these metrics are calculated for a few
+#' observations. Suppose we have four compositional variables (i.e. \eqn{s = 4})
+#' and have the following three observations
+#' \itemize{
+#'  \item{A = (0.5, 0.5, 0, 0)}
+#'  \item{B = (0.25, 0.25, 0.25, 0.25)}
+#'  \item{C = (1, 0, 0, 0)}
+#' }
+#' The richness values for these three observations would be as follows
+#' \itemize{
+#'  \item{A = 2 (Since two of the four compositional variables were non-zero)}
+#'  \item{B = 4 (Since all four compositional variables were non-zero)}
+#'  \item{C = 1 (Since one of the four compositional variables were non-zero)}
+#' }
+#' The evenness values would be calculated as follows
+#' \itemize{
+#'  \item{A = \eqn{2*4/(4-1)*(0.5*0.5+0.5*0+0.5*0+0.5*0+0.5*0+0*0) = 0.67}}
+#'  \item{B = \eqn{2*4/(4-1)*(0.25*0.25+0.25*0.25+0..25*0.25+0.25*0.25+0.25*0.25+0.25*0) = 1}}
+#'  \item{C = \eqn{2*4/(4-1)*(1*0+1*0+1*0+0*0+0*0+0*0) = 0}}
+#' }
 #'
 #' @export
 #'
@@ -326,9 +437,10 @@ gradient_change_plot <- function(data, prop = NULL,
 #'
 #' ## Load data
 #' data(sim4)
+#' sim4 <- sim4 %>% filter(treatment == 50)
 #'
 #' ## Fit DI model
-#' mod <- DI(prop = 3:8, DImodel = 'AV', data = sim4, y = 'response') %>%
+#' mod <- DI(prop = 3:8, DImodel = "AV", data = sim4, y = "response") %>%
 #'          suppressWarnings()
 #'
 #' ## Create visualisation
@@ -344,6 +456,9 @@ gradient_change_plot <- function(data, prop = NULL,
 #' ## given level of richness
 #' plot_data <- get_equi_comms(6, variables = paste0("p", 1:6))
 #' gradient_change(model = mod, data = plot_data)
+#'
+#' ## Don't show line indicating the average change by using `average = FALSE`
+#' gradient_change(model = mod, data = plot_data, average = FALSE)
 #'
 #' ## Can also plot average response across evenness
 #' gradient_change(model = mod, gradient = 'evenness')
@@ -381,12 +496,14 @@ gradient_change <- function(model, data = NULL,
                             gradient = c('richness', 'evenness'),
                             add_var = list(),
                             plot = TRUE,
+                            average = TRUE,
+                            y_var = ".Pred",
                             pie_data = NULL,
                             pie_colours = NULL,
                             facet_var = NULL,
                             nrow = 0, ncol = 0){
   # Ensure specified model is fit using the DI function
-  if(missing(model) || !inherits(model, "DI")){
+  if(missing(model) || (!inherits(model, "DI") && !inherits(model, "DImulti"))){
     model_not_DI(call_fn = "gradient_change")
   }
 
@@ -397,24 +514,30 @@ gradient_change <- function(model, data = NULL,
   original_data <- model$original_data
 
   # Get all species in the model
-  model_species <- eval(model$DIcall$prop)
+  if(inherits(model, "DI")){
+    model_species <- eval(model$DIcall$prop)
+  } else if(inherits(model, "DImulti")){
+    model_species <- attr(model, "prop")
+  }
   # If species were specified as column indices extract names
   if(is.numeric(model_species)){
     model_species <- colnames(original_data)[model_species]
   }
 
-
   # If data is not specified then create data
   if(is.null(data)){
-      data <- original_data
+    data <- original_data
   }
 
   # Sanity checks for colours and data
   sanity_checks(data = data, colours = pie_colours)
 
-
   # Ensure experimental structure are specified correctly
   add_var <- check_add_var(model = model, add_var = add_var)
+  # If model object is of type DImulti add info about EFs and timepoints
+  if(inherits(model, "DImulti")) {
+    add_var <- link_DImodelsMulti(model = model, add_var = add_var)
+  }
   if(length(add_var) > 0){
     data <- add_add_var(data = data,
                         add_var = add_var)
@@ -444,15 +567,32 @@ gradient_change <- function(model, data = NULL,
                                    rlang::abort("The following error was encountered while preparing `pie_data` for plotting.",
                                                 parent = cnd))
   }
+  if(is.null(pie_data)) {
+    prop <- if(length(model_species) > 10 || nrow(plot_data) > 1024) NULL else model_species
+  } else {
+    prop <- model_species
+  }
 
-  prop <- if(length(model_species) > 10 || nrow(plot_data) > 1024) NULL else model_species
+  # Get functional groups
+  if(inherits(model, "DI")){
+      FG <- eval(model$DIcall$FG)
+  } else {
+      FG <- attr(model, "FG")
+  }
+
+  # Colours for species
+  if(is.null(pie_colours)){
+    pie_colours <- get_colours(vars = model_species, FG = FG)
+  }
 
   if(isTRUE(plot)){
     plot <- gradient_change_plot(data = plot_data,
                                  prop = prop,
                                  pie_data = pie_data,
                                  pie_colours = pie_colours,
+                                 average = average,
                                  facet_var = facet_var,
+                                 y_var = y_var,
                                  nrow = nrow, ncol = ncol)
     return(plot)
   } else {
@@ -466,12 +606,15 @@ gradient_change <- function(model, data = NULL,
 #' @usage NULL
 NULL
 gradient_change_plot_internal <- function(data, prop = NULL,
-                                 pie_data = NULL,
-                                 pie_colours = NULL,
-                                 facet_var = NULL){
+                                          pie_data = NULL,
+                                          pie_colours = NULL,
+                                          average = TRUE,
+                                          y_var = ".Pred",
+                                          facet_var = NULL){
 
   # Ensure inputs are appropriate
-  sanity_checks(data = data, prop = prop, colours = pie_colours)
+  sanity_checks(data = data, prop = prop, colours = pie_colours,
+                booleans = list("average" = average))
 
   # If pie_data is specified then prop cannot be NULL
   if(!is.null(pie_data) && is.null(prop)){
@@ -490,6 +633,11 @@ gradient_change_plot_internal <- function(data, prop = NULL,
   # Check prop is present in pie_data too
   sanity_checks(data = pie_data, prop = prop)
 
+  check_plot_data(data = data,
+                  cols_to_check = c(".Gradient", y_var,
+                                    ".Richness", ".Evenness"),
+                  calling_fun = "gradient_change")
+
   # Deciding whether to dodge points
   gradient_var <- data$.Gradient[1]
   position <- if(gradient_var == ".Richness") position_dodge(0.5) else position_identity()
@@ -505,29 +653,44 @@ gradient_change_plot_internal <- function(data, prop = NULL,
     ggplot2::scale_x_continuous()
 
   # Caption
-  if(gradient_var == ".Richness"){
-    caption <- paste0("The solid black line connects the average predicted
-                      response of all points shown at a given level of ", tolower(xlab),
-                      ".\n The points at a given level of richness are jittered according
-                      to the relative abundances of compositional variables in an observation.")
-  } else {
-    caption <- paste0("The solid black line connects the average predicted
-                      response of all points shown at a given level of ", tolower(xlab), ".")
-  }
+  # if(gradient_var == ".Richness"){
+  #   caption <- paste0("The solid black line connects the average predicted
+  #                     response of all points shown at a given level of ", tolower(xlab),
+  #                     ".\n The points at a given level of richness are jittered according
+  #                     to the relative abundances of compositional variables in an observation.")
+  # } else {
+  #   caption <- paste0("The solid black line connects the average predicted
+  #                     response of all points shown at a given level of ", tolower(xlab), ".")
+  # }
 
   # Create plot
-  plot <- ggplot(data = data, aes(x = !! sym(gradient_var), y = .data$.Pred))+
-    geom_line(aes(y = .data$.Avg), linewidth = 1)+
+  plot <- ggplot(data = data, aes(x = !! sym(gradient_var), y = !! sym(y_var)))+
     geom_point(aes(group = .data$.Evenness),
                colour = '#555555',
                position = position)+
     labs(x = xlab,
-         y = "Predicted Response",
-         fill = "Species",
-         caption = caption)+
+         y = ifelse(y_var == ".Pred", "Predicted Response", y_var),
+         fill = "Variables")+
     theme_DI()+
     x_scale
 
+  if(average){
+    if(check_col_exists(data, ".Avg")){
+      plot <- plot +
+        geom_line(aes(y = .data$.Avg),
+                  linewidth = 1, linetype = 2)
+    } else {
+      avg_data <- data %>% group_by(!! sym(gradient_var)) %>%
+        mutate('.Avg' = mean(!! sym(y_var))) %>%
+        ungroup()
+
+      plot <- plot +
+        geom_line(aes(y = .data$.Avg), data = avg_data,
+                  linewidth = 1, linetype = 2)
+    }
+  }
+
+  # If pie_data is specified then ensure colours are appropriate
   if(!is.null(pie_data)){
     # Colours for the pie-glyph slices
     if(is.null(pie_colours)){
@@ -544,12 +707,18 @@ gradient_change_plot_internal <- function(data, prop = NULL,
       }
     }
 
+    check_plot_data(data = pie_data,
+                    cols_to_check = c(".Gradient", y_var,
+                                      ".Richness", ".Evenness"),
+                    calling_fun = "gradient_change",
+                    data_name = "pie_data")
+
     plot <- plot +
       geom_pie_glyph(aes(group = .data$.Evenness),
                      slices = prop,
                      colour = 'black', data = pie_data,
                      position = position)+
-      scale_fill_manual(values = pie_colours, name = "Species")
+      scale_fill_manual(values = pie_colours, name = "Variables")
   }
 
   if(!is.null(facet_var)){

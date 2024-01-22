@@ -13,7 +13,7 @@
 #' @inheritParams prediction_contributions
 #' @inheritParams add_prediction
 #'
-#' @return A data-frame with the following columns. Any aditional columns which
+#' @return A data-frame with the following columns. Any additional columns which
 #' weren't used to fit the model would also be present.
 #'  \describe{
 #'    \item{.Community}{An identifier column to discern each
@@ -111,14 +111,17 @@ prediction_contributions_data <- function(data, model = NULL, coefficients = NUL
                                           bar_labs = rownames(data)){
   if(missing(data)){
     cli::cli_abort(c("{.var data} cannot be empty.",
-                     "i" = "Specify a data frame or tibble indicating the species communties which to use for calculating the average change across a diversity gradient."))
+                     "i" = "Specify a data frame or tibble indicating the species
+                     communties which to use for calculating the average change
+                     across a diversity gradient."))
   }
 
   # Allow user to specify labels for the bars
   if(is.null(bar_labs)){
-    cli_bullets(c("!" = "No values were specified for the bar labels and the data didn't have any rownames.",
-                  ">" = "The bars are given numeric identifiers in the order they appear
-                in the data.",
+    cli_bullets(c("!" = "No values were specified for the bar labels and the data
+                  didn't have any rownames.",
+                  ">" = "The bars are given numeric identifiers in the order they
+                  appear in the data.",
                   ">" = "If this is not desirable consider providing labels for the
                 bars using the {.var bar_labs} parameter."))
     bar_labs <- paste0("Obs", 1:nrow(data))
@@ -209,7 +212,7 @@ prediction_contributions_data <- function(data, model = NULL, coefficients = NUL
   }
 
   # Express the prediction into contribution from each coefficient in the model
-  if(!is.null(model) && inherits(model, "lm")) {
+  if(!is.null(model) && inherits(model, "lm") && (is.null(eval(model$DIcall$FG)))) {
     contr_data <- as.data.frame(suppressWarnings(predict(model, newdata = data, type = "terms")))
   } else {
     contr_data <- as.data.frame(sweep(X_matrix, MARGIN = 2, coefficients, `*`))
@@ -350,7 +353,7 @@ prediction_contributions_plot <- function(data, colours = NULL, se = FALSE,
   if(missing(data)){
     cli::cli_abort(c("{.var data} cannot be empty.",
                      "i" = "Specify a data frame or tibble (preferably the
-                            output of {.fn prediction_contributions_data})."))
+                            output of {.help [{.fn prediction_contributions_data}](DImodelsVis::prediction_contributions_data)})."))
   }
 
   if(check_col_exists(data, ".add_str_ID")){
@@ -388,19 +391,19 @@ prediction_contributions_plot <- function(data, colours = NULL, se = FALSE,
 #'
 #' @description
 #' A stacked bar_chart is shown where the individual contributions
-#' (\eqn{\beta} * predictor value) for each term in a statistical model are stacked
+#' (parameter estimate * predictor value) for each term in a statistical model are stacked
 #' on top of another. The total height of the stacked bar gives the value of the
 #' predicted response. The uncertainty around the predicted response can also be shown
 #' on the plot.
 #' This is a wrapper function specifically for statistical models fit using the
 #' \code{\link[DImodels:DI]{DI()}} function from the
-#' \code{\link[DImodels:DImodels-package]{DImodels}} R package and would implicitly
-#' call \code{\link{prediction_contributions_data}} followed by
+#' \code{\link[DImodels:DImodels-package]{DImodels}} R package and it implicitly
+#' calls \code{\link{prediction_contributions_data}} followed by
 #' \code{\link{prediction_contributions_plot}}. If your model object isn't fit using
-#' DImodels, consider calling these functions manually.
+#' DImodels, the associated data and plot functions can instead be called manually.
 #'
 #' @importFrom dplyr mutate %>% group_by distinct across
-#'                   all_of slice_sample ungroup near
+#'                   all_of slice_head ungroup near
 #' @importFrom tidyr pivot_longer
 #' @importFrom forcats fct_rev fct_inorder
 #' @importFrom ggplot2 ggplot element_text aes geom_col labs geom_errorbar
@@ -416,19 +419,19 @@ prediction_contributions_plot <- function(data, colours = NULL, se = FALSE,
 #' @param model A Diversity Interactions model object fit by using the
 #'              \code{\link[DImodels:DI]{DI()}} function from the
 #'              \code{\link[DImodels:DImodels-package]{DImodels}} package.
-#' @param data A data-frame containing compositional variables specifying
-#'             observations of interest for which user wants to compare the
-#'             predicted response. If left blank, a selection of observations
-#'             (2 from each level of richness) from the original data used
-#'             to fit the model would be selected.
+#' @param data A user-defined data-frame containing compositional variables
+#'             specifying values for predictor variables (fitted within the
+#'             model object) that the user wished to predict for. If left blank,
+#'             a selection of observations (2 from each level of richness) from
+#'             the original data used to fit the model would be selected.
 #' @param FG A higher level grouping for the compositional variables in the
 #'           data. Variables belonging to the same group will be assigned with
 #'           different shades of the same colour. The user can manually specify
 #'           a character vector giving the group each variable belongs to.
 #'           If left empty the function will try to get a grouping
 #'           from the original \code{\link[DImodels:DI]{DI}} model object.
-#' @param add_var A list specifying values for additional variables
-#'                in the model independent of the compositional variables.
+#' @param add_var A list specifying values for additional predictor variables
+#'                in the model independent of the compositional predictor  variables.
 #'                This would be useful to compare the predictions across
 #'                different values for a categorical variable. One plot will
 #'                be generated for each unique combination of values specified
@@ -568,7 +571,7 @@ prediction_contributions <- function(model, data = NULL,
                                      facet_var = NULL, plot = TRUE,
                                      nrow = 0, ncol = 0){
   # Ensure specified model is fit using the DI function
-  if(missing(model) || !inherits(model, "DI")){
+  if(missing(model) || (!inherits(model, "DI") && !inherits(model, "DImulti"))){
     model_not_DI(call_fn = "prediction_contributions")
   }
 
@@ -576,7 +579,11 @@ prediction_contributions <- function(model, data = NULL,
   original_data <- model$original_data
 
   # Get all species in the model
-  model_species <- eval(model$DIcall$prop)
+  if(inherits(model, "DI")){
+    model_species <- eval(model$DIcall$prop)
+  } else if(inherits(model, "DImulti")){
+    model_species <- attr(model, "prop")
+  }
   # If species were specified as column indices extract names
   if(is.numeric(model_species)){
     model_species <- colnames(original_data)[model_species]
@@ -590,7 +597,7 @@ prediction_contributions <- function(model, data = NULL,
       add_ID_terms(model) %>%
       mutate(.Richness = get_richness(.data, model_species)) %>%
       group_by(.data$.Richness) %>%
-      slice(n = 2, replace = TRUE) %>%
+      slice_head(n = 2) %>%
       ungroup() %>%
       distinct(across(all_of(model_species)), .keep_all = T) %>%
       mutate(.Community = as.character(1:length(.data$.Richness))) %>%
@@ -694,7 +701,14 @@ prediction_contributions_plot_internal <- function(data, colours = NULL,
                                                    se = FALSE,
                                                    bar_orientation = c("vertical", "horizontal"),
                                                    facet_var = NULL){
-    # Colours for the bar segments
+  # Sanity checks before creating the plot
+  sanity_checks(data = data, colours = colours,
+                booleans = list("se" = se))
+  check_plot_data(data = data,
+                  cols_to_check = c(".Community", ".Value", ".Contributions"),
+                  calling_fun = "prediction_contributions")
+
+  # Colours for the bar segments
   if(is.null(colours)){
     rlang::warn(c("No colours were specified for the response contributions.",
                   "i" = "The default colours might not result in an informative
@@ -717,6 +731,10 @@ prediction_contributions_plot_internal <- function(data, colours = NULL,
          fill = 'Contributions')
 
   if(se){
+    check_plot_data(data = data,
+                    cols_to_check = c(".Pred", ".Lower", ".Upper"),
+                    calling_fun = "prediction_contributions")
+
     plot <- plot +
       geom_errorbar(aes(y = .data$.Pred,
                         ymin = .data$.Lower, ymax = .data$.Upper),

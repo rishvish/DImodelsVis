@@ -1,27 +1,26 @@
-#' @title Ternary diagram with contours
+#' @title Prepare data for showing contours in ternary diagrams.
 #'
 #' @description
-#' The data preparation function to create a gradient of proportions of three
-#' entities where their proportions sum to 1, thereby representing a 2 dimensional
-#' simplex which can be shown on a ternary surface. The projections of the three
-#' entities on the x-y plane is also calculated. The final output can then used with a
-#' relevant statistical model to make predictions for the response and visualise it
-#' as the proportions of the three entities change over the simplex (response surface
-#' analysis). The output of this function can be passed to the
-#' \code{\link{ternary_plot}} function to plot the results.
+#' The data preparation function for creating an equally spaced grid of three
+#' compositional variables (i.e., the three variables sum to 1 at each point
+#' along the grid). The projection of each point in the grid on the x-y plane is
+#' also calculated. This data can be used with a relevant statistical model
+#' to predict the response across the ternary surface. The output of this
+#' function can then be passed to the \code{\link{ternary_plot}} function to
+#' visualise the change in the response as a contour plot. \cr
+#' \emph{Note:} This function works only for models with three compositional
+#' predictors. For models with more than three compositional predictors see
+#' \code{\link{conditional_ternary}}.
 #'
-#' @param prop A character vector specifying the columns names of entities
-#'             whose proportions to manipulate. Default is ".P1", ".P2",
+#' @param prop A character vector specifying the columns names of compositional
+#'             variables whose proportions to manipulate. Default is ".P1", ".P2",
 #'             and ".P3".
-#' @param x A character string specifying the name for the column containing
-#'          the x component of the x-y projection of the simplex. Default is ".x".
-#' @param y A character string specifying the name for the column containing
-#'          the y component of the x-y projection of the simplex. Default is ".y".
 #' @param add_var A list specifying values for additional variables
-#'                in the model other than the proportions (i.e. not part of the simplex design).
-#'                This would be useful to compare the predictions across
-#'                different values for a categorical variable.
-#'                One plot will be generated for each unique combination
+#'                in the model other than the proportions (i.e. not part of the
+#'                simplex design).
+#'                This could be useful for comparing the predictions across
+#'                different values for a non-compositional variable.
+#'                One ternary plot will be generated for each unique combination
 #'                of values specified here.
 #' @param resolution A number between 1 and 5 describing the resolution of the
 #'                   resultant graph.
@@ -41,9 +40,9 @@
 #'  \describe{
 #'    \item{.x}{The x component of the x-y projection of the simplex point.}
 #'    \item{.y}{The y component of the x-y projection of the simplex point.}
-#'    \item{.P1}{The first entity whose proportion is varied across the simplex.}
-#'    \item{.P2}{The second entity whose proportion is varied across the simplex.}
-#'    \item{.P3}{The third entity whose proportion is varied across the simplex.}
+#'    \item{.P1}{The first variable whose proportion is varied across the simplex.}
+#'    \item{.P2}{The second variable whose proportion is varied across the simplex.}
+#'    \item{.P3}{The third variable whose proportion is varied across the simplex.}
 #'    \item{.add_str_ID}{An identifier column for grouping the cartesian product
 #'                       of all additional columns specified in `add_var`
 #'                       parameter (if `add_var` is specified).}
@@ -67,18 +66,24 @@
 #' ## Fit model
 #' mod <- lm(response ~ 0 + (p1 + p2 + p3)^2, data = sim0)
 #'
-#' ## Create a contour map of predicted response over the ternary surface
+#' ## Preapre data for creating a contour map of predicted response over
+#' ## the ternary surface
 #' ## Remember to specify prop with the same character values as the names
 #' ## of the variables in the model containing the prop.
-#' head(ternary_data(resolution = 1, model = mod,
-#'                   prop = c("p1", "p2", "p3")))
+#' plot_data <- ternary_data(resolution = 1, model = mod,
+#'                           prop = c("p1", "p2", "p3"))
+#' ## Show plot
+#' ternary_plot(data = plot_data)
 #'
-#' ## Can also add any additional variables independent of the simplex
+#' ## Can also add any additional variables independent of the simplex using
+#' ## the `add_var` argument
 #' sim0$treatment <-  rep(c("A", "B", "C", "D"), each = 16)
 #' new_mod <- update(mod, ~. + treatment, data = sim0)
-#' head(ternary_data(prop = c("p1", "p2", "p3"),
-#'                   add_var = list("treatment" = c("A", "B")),
-#'                   resolution = 1, model = new_mod))
+#' plot_data <- ternary_data(prop = c("p1", "p2", "p3"),
+#'                           add_var = list("treatment" = c("A", "B")),
+#'                           resolution = 1, model = new_mod)
+#' ## Plot to compare between additional variables
+#' ternary_plot(plot_data)
 #'
 #' ## It could be desirable to take the output of this function and add
 #' ## additional variables to the data before making predictions
@@ -113,16 +118,26 @@
 #'                                vcov = vcov(mod),
 #'                                interval = "confidence")
 #' head(contour_data)
+#' ## Show plot
+#' ternary_plot(contour_data)
+#' ## See `?ternary_plot` for options to customise the ternary_plot
 ternary_data <- function(prop = c(".P1", ".P2", ".P3"),
-                         x = ".x", y = ".y",
                          add_var = list(),
                          resolution = 3, prediction = TRUE, ...){
   # Ensure inputs are proper
-  sanity_checks(characters = list("prop" = prop, "x" = x, "y" = y),
+  sanity_checks(characters = list("prop" = prop),
                 numerics = list("resolution" = resolution),
                 booleans = list("prediction" = prediction),
-                unit_lengths = list("resolution" = resolution, "x" = x,
-                                    "prediction" = prediction, "y" = y))
+                unit_lengths = list("resolution" = resolution,
+                                    "prediction" = prediction))
+
+  # Ensure prop has length three
+  if(length(prop) != 3){
+    cli::cli_abort(c("{.fn ternary_data} works only for models with three compositional
+                     predictors.",
+                     "i" = "See {.help [{.fn conditional_ternary}](DImodelsVis::conditional_ternary)}
+                     for models with more than three compositonal predictors."))
+  }
 
   if(!isTRUE(all.equal(resolution, as.integer(resolution))) ||
                                      !between(resolution, 1, 10)){
@@ -132,6 +147,10 @@ ternary_data <- function(prop = c(".P1", ".P2", ".P3"),
                           {as.character(resolution)}.",
                     "i" = "Reverting back to the default value of 3."))
   }
+
+  # Column variables containing the projections
+  x <-  ".x"
+  y <-  ".y"
 
   # Prepare data for creating conditional proportions
   base <- seq(0,1,l=100*2*resolution)
@@ -169,39 +188,40 @@ ternary_data <- function(prop = c(".P1", ".P2", ".P3"),
   # Order columns
   triangle <- triangle %>% select(all_of(c(prop, x, y)), everything())
 
+  attr(triangle, "prop") <- prop
+  attr(triangle, "tern_vars") <- prop
+  attr(triangle, "x_proj") <- ".x"
+  attr(triangle, "y_proj") <- ".y"
+  attr(triangle, "add_var") <- names(add_var)
+
   return(triangle)
 }
 
 #' @title Ternary diagram
 #'
 #' @description
-#' The plotting function to visualise response change over a 2-d simplex
-#' surface (ternary diagram). Create the ternary surface using the
-#' `\link{ternary_data}` function and add predictions of the
-#' response using the `\link{add_prediction}`. This function can then be used to visualise response change over the
-#' ternary surface as a contour map. One could also visualise raw data-points
-#' across the simplex by projecting them onto the ternary surface by using
-#' `\link{prop_to_tern_proj}` function and using the `show = "points"`
-#' parameter. See examples for more details.
+#' Create a ternary diagram showing the a scatter-plot of points across the surface
+#' or a contour map showing the change in a continuous variable across the
+#' ternary surface. The ternary surface can be created using the `\link{ternary_data}`
+#' function.
 #'
 #' @param data A data-frame consisting of the x-y plane projection of the
 #'             2-d simplex. This data could be the output of the
 #'             `\link{ternary_data}` function, and contain the  predicted
 #'             response at each point along the simplex to show the variation
 #'             in response as a contour map.
-#' @param x The column name or index containing the x-component of the x-y
-#'          projection of the 2-d simplex.
-#' @param y The column name or index containing the y-component of the x-y
-#'          projection of the 2-d simplex.
+#' @param prop A character vector specifying the columns names of compositional
+#'             variables. By default, the function will try to automatically
+#'             interpret these values from the data.
 #' @param tern_labels A character vector containing the labels of the vertices
 #'                    of the ternary. The default is the column names of the
 #'                    first three columns of the data, with the first column
 #'                    corresponding to the top vertex, second column corresponding
 #'                    to the left vertex and the third column corresponding to
 #'                    the right vertex of the ternary.
-#' @param pred The column name or index containing the predicted response
-#'             (for showing contours).
-#' @param show A character string indicating whether to show raw points or contours
+#' @param col_var The column name containing the variable to be used for
+#'                colouring the contours or points. The default is ".Pred".
+#' @param show A character string indicating whether to show data-points or contours
 #'             on the ternary. The default is to show "contours".
 #' @param show_axis_labels A boolean value indicating whether to show axis
 #'                         labels along the edges of the ternary. The default
@@ -217,9 +237,12 @@ ternary_data <- function(prop = c(".P1", ".P2", ".P3"),
 #'                    of the points.
 #' @param nlevels The number of levels to show on the contour map.
 #' @param colours A character vector or function specifying the colours for the
-#'                contour map. The number of colours should be same as `nlevels`.
+#'                contour map or points. The number of colours should be same as
+#'                `nlevels` if (`show = "contours"`). \cr
 #'                The default colours scheme is the
-#'                \code{\link[grDevices:terrain.colors]{terrain.colors()}}.
+#'                \code{\link[grDevices:terrain.colors]{terrain.colors()}} for
+#'                continuous variables and an extended version of the Okabe-Ito
+#'                colour scale for categoricl variables.
 #' @param lower_lim A number to set a custom lower limit for the contour
 #'                  (if `show = "contours"`). The default is minimum of the prediction.
 #' @param upper_lim A number to set a custom upper limit for the contour
@@ -244,23 +267,31 @@ ternary_data <- function(prop = c(".P1", ".P2", ".P3"),
 #' ## Load data
 #' data(sim0)
 #'
-#' ### Show raw data in ternary
-#' ## Project the 3-d simplex data into x-y plane
-#' raw_data <-  prop_to_tern_proj(data = sim0, prop = c("p1", "p2" , "p3"))
-#'
-#' ## ternary_plot shows contours by default, use `show = "points"` to show
+#' ### Show raw data as points in ternary
+#' ## `ternary_plot` shows contours by default, use `show = "points"` to show
 #' ## points across the ternary
-#' ternary_plot(data = raw_data, show = "points")
+#' ternary_plot(data = sim0, prop = c("p1", "p2", "p3"), show = "points")
+#'
+#' ## The points can also be coloured using an additional variable by
+#' ## specifying it in `col_var`
+#' ternary_plot(data = sim0, prop = c("p1", "p2", "p3"),
+#'              col_var = "response", show = "points")
+#'
+#' ## Categorical variables can also be shown
+#' sim0$richness <- as.factor(sim0$richness)
+#' ternary_plot(data = sim0, prop = c("p1", "p2", "p3"),
+#'              col_var = "richness", show = "points")
+#'
+#' ## Change colours by using `colours` argument
+#' ternary_plot(data = sim0, prop = c("p1", "p2", "p3"),
+#'              col_var = "richness", show = "points",
+#'              colours = c("tomato", "steelblue", "orange"))
 #'
 #' ## Show axis guides and increase points size
-#' ternary_plot(data = raw_data, show = "points",
+#' ternary_plot(data = sim0, prop = c("p1", "p2", "p3"),
+#'              show = "points", col_var = "richness",
 #'              show_axis_guides = TRUE, points_size = 4)
 #'
-#' ## Overlay the output of the plot with geom_point to customise the points
-#' ## further
-#' ternary_plot(data = raw_data, show = "points",
-#'              show_axis_guides = TRUE) +
-#'              geom_point(aes(colour = response))
 #'
 #' ### Show contours of response
 #' ## Fit model
@@ -299,10 +330,8 @@ ternary_data <- function(prop = c(".P1", ".P2", ".P3"),
 #'                           add_var = list("treatment" = c("A", "C")))
 #' ## Arrange plot in 2 columns
 #' ternary_plot(data = tern_data, ncol = 2)
-ternary_plot <- function(data,
-                         x = ".x",
-                         y = ".y",
-                         pred = ".Pred",
+ternary_plot <- function(data, prop = NULL,
+                         col_var = ".Pred",
                          show = c("contours", "points"),
                          tern_labels = c("P1", "P2", "P3"),
                          show_axis_labels = TRUE,
@@ -320,13 +349,48 @@ ternary_plot <- function(data,
   if(missing(data)){
     cli::cli_abort(c("{.var data} cannot be empty.",
                      "i" = "Specify a data-frame or tibble
-                     preferably the output of {.fn visualise_effects_data} or
+                     preferably the output of {.fn ternary_data} or
                      a data-frame with a similar structure and column names."))
   }
+  # Ensure prop is specified
+  if(is.null(prop)){
+    data_prop <- attr(data, "tern_vars")
+    if(is.null(data_prop)){
+      cli::cli_abort(c("{.var prop} was not specified and can not be inferred
+                       from the {.var data} either.",
+                       "i" = "Specify a character vector indicating the names of the three
+                       variables to be shown within the ternary in {.var prop} or create your data
+                       using the {.help [{.fn ternary_data}](DImodelsVis::ternary_data)}
+                       function."))
+    } else {
+      prop <- data_prop
+    }
+  }
   show <-  match.arg(show)
+
   # Multiple plots if additional variables were specified
   if(check_col_exists(data, ".add_str_ID")){
     ids <- unique(data$.add_str_ID)
+    # If contours are shown then ensure we have same scale for all plots
+    if(show == "contours"){
+      check_presence(data = data, col = col_var,
+                     message = c("The column name/index specified in {.var col_var} is
+                               not present in the data.",
+                                 "i" = "Specify the name/index of the column
+                                     containing the predictions for the
+                                     communities in the simplex in {.var col_var}."))
+
+      # If user didn't specify lower limit assume it to be min of predicted response
+      if(is.null(lower_lim)){
+        lower_lim <- round(min(data[, col_var]), 2)
+      }
+
+      # If user didn't specify upper limit assume it to be max of predicted response
+      if(is.null(upper_lim)){
+        upper_lim <- round(max(data[, col_var]), 2)
+      }
+    }
+
     plots <- lapply(cli_progress_along(1:length(ids), name = "Creating plot",
                                        format = paste0(
                                          "{pb_spin} Creating plot ",
@@ -335,9 +399,8 @@ ternary_plot <- function(data,
                     function(i){
                       data_iter <- data %>% filter(.data$.add_str_ID == ids[i])
                       ternary_plot_internal(data = data_iter,
-                                            x = x,
-                                            y = y,
-                                            pred = pred,
+                                            prop = prop,
+                                            col_var = col_var,
                                             show = show,
                                             points_size = points_size,
                                             nlevels = nlevels,
@@ -361,9 +424,8 @@ ternary_plot <- function(data,
   # Single plot otherwise
   } else {
     plot <- ternary_plot_internal(data = data,
-                                  x = x,
-                                  y = y,
-                                  pred = pred,
+                                  prop = prop,
+                                  col_var = col_var,
                                   show = show,
                                   points_size = points_size,
                                   nlevels = nlevels,
@@ -384,12 +446,12 @@ ternary_plot <- function(data,
 #' @keywords internal
 #' Internal function for creating a ternary plot
 #'
+#' @importFrom ggplot2 scale_colour_gradientn scale_color_manual
+#'
 #' @usage NULL
 NULL
-ternary_plot_internal <- function(data,
-                                  x = ".x",
-                                  y = ".y",
-                                  pred = ".Pred",
+ternary_plot_internal <- function(data, prop,
+                                  col_var = ".Pred",
                                   show = c("contours", "points"),
                                   nlevels = 7,
                                   colours = NULL,
@@ -417,37 +479,32 @@ ternary_plot_internal <- function(data,
                   colours = colours)
     show <- match.arg(show)
 
-    # Ensure x, y and predictions are present in data
-    check_presence(data = data, col = x,
-                   message = c("The column name/index specified in {.var x} is
-                               not present in the data.",
-                               "i" = "Specify the name/index of the column
-                                     containing the x-coordinates of the 2-d
-                                     projection of the communities in the simplex
-                                     in {.var x}."))
-    check_presence(data = data, col = y,
-                   message = c("The column name/index specified in {.var y} is
-                               not present in the data.",
-                               "i" = "Specify the name/index of the column
-                                     containing the y-coordinates of the 2-d
-                                     projection of the communities in the simplex
-                                     in {.var y}."))
+    # Calculate x-y projection if it's not present in data
+    x <- attr(data, "x_proj")
+    y <- attr(data, "y_proj")
+    if(is.null(x) || is.null(y)){
+      x <- ".x"
+      y <- ".y"
+      data <- prop_to_tern_proj(data, prop = prop, x = x, y = y)
+    }
+
     if(show == "contours"){
-      check_presence(data = data, col = pred,
-                     message = c("The column name/index specified in {.var pred} is
+      # Ensure column containing col_var is present in data
+      check_presence(data = data, col = col_var,
+                     message = c("The column name/index specified in {.var col_var} is
                                not present in the data.",
                                  "i" = "Specify the name/index of the column
                                      containing the predictions for the
-                                     communities in the simplex in {.var pred}."))
+                                     communities in the simplex in {.var col_var}."))
 
       # If user didn't specify lower limit assume it to be min of predicted response
       if(is.null(lower_lim)){
-        lower_lim <- round(min(data[, pred]), 2)
+        lower_lim <- round(min(data[, col_var]), 2)
       }
 
       # If user didn't specify upper limit assume it to be max of predicted response
       if(is.null(upper_lim)){
-        upper_lim <- round(max(data[, pred]), 2)
+        upper_lim <- round(max(data[, col_var]), 2)
       }
     } else {
       lower_lim <- upper_lim <- 0
@@ -459,7 +516,7 @@ ternary_plot_internal <- function(data,
                                   "lower_lim" = lower_lim),
                   unit_lengths = list("upper_lim" = upper_lim,
                                       "lower_lim" = lower_lim,
-                                      "x" = x, "y" = y, "pred" = pred,
+                                      "col_var" = col_var,
                                       "nlevels" = nlevels,
                                       "points_size" = points_size,
                                       "axis_label_size" = axis_label_size,
@@ -482,20 +539,23 @@ ternary_plot_internal <- function(data,
     }
 
 
+
+
     if(show == "contours"){
       # Create colour-scale (legend) for plot
       # Create breaks between range of legend
       size <- nlevels + 1
       breaks <- round(seq(lower_lim, upper_lim, length.out= size), 2)
 
-      # Choose colours for contour
+      # Choose colours
       # If user didn't specify colours then use the default terrain colours
       if(is.null(colours)){
         colours <- terrain.colors(nlevels, rev = T)
       }
+
       pl <- ggplot(data, aes(x = .data[[x]], y = .data[[y]],
-                             z = .data[[pred]])) +
-        geom_raster(aes(fill = .data[[pred]]))+
+                             z = .data[[col_var]])) +
+        geom_raster(aes(fill = .data[[col_var]]))+
         scale_fill_stepsn(colours = colours, breaks = breaks,
                           labels = function(val){
                             val
@@ -505,12 +565,12 @@ ternary_plot_internal <- function(data,
         geom_contour(breaks = breaks, colour = 'black')+
         guides(fill = guide_colorbar(frame.colour = 'black',
                                      ticks.colour = 'black',
-                                     title = 'Predicted\nResponse',
+                                     title = 'Prediction',
                                      show.limits = T))+
         theme_void()+
         theme(legend.key.size = unit(0.1, 'npc'),
               legend.key.height = unit(0.04, 'npc'),
-              legend.title = element_text(size = 14, vjust = 1.25),
+              legend.title = element_text(size = 14, vjust = 1),
               plot.subtitle = element_text(hjust=0.5, size=14),
               strip.text = element_text(size =14, vjust = 0.5),
               legend.text = element_text(size = 12, angle = 45,
@@ -519,7 +579,14 @@ ternary_plot_internal <- function(data,
     } else {
       # Base of plot
       pl <- ggplot(data, aes(x = .data[[x]], y = .data[[y]])) +
-        theme_void()
+        theme_void()+
+        theme(legend.key.size = unit(0.1, 'npc'),
+              legend.key.height = unit(0.04, 'npc'),
+              legend.title = element_text(size = 14, vjust = 1),
+              plot.subtitle = element_text(hjust=0.5, size=14),
+              strip.text = element_text(size =14, vjust = 0.5),
+              legend.text = element_text(size = 12),
+              legend.position = 'bottom')
     }
 
     # Showing axis labels
@@ -533,7 +600,7 @@ ternary_plot_internal <- function(data,
                             y3 = sqrt(3)/2-.data$x1*sqrt(3)/2,
                             label = .data$x1,
                             rev_label = rev(.data$label),
-                            !! pred := 0)
+                            !! col_var := 0)
 
       pl <- pl +
         geom_text(data = axis_labels,
@@ -569,7 +636,7 @@ ternary_plot_internal <- function(data,
     pl <- pl +
       geom_text(data = tibble(x = c(0.5, 0, 1), y = c(sqrt(3)/2, 0,  0),
                               label = tern_labels,
-                              !! pred := 0),
+                              !! col_var := 0),
                 aes(x= .data$x, y= .data$y, label = .data$label),
                 size = vertex_label_size, fontface='plain',
                 nudge_x = c(0, -0.05, 0.05),
@@ -577,7 +644,7 @@ ternary_plot_internal <- function(data,
       geom_segment(data = tibble(x = c(0, 0, 1), y = c(0,0,0),
                                  xend = c(1, 0.5, 0.5),
                                  yend = c(0, sqrt(3)/2, sqrt(3)/2),
-                                 !! pred := 0),
+                                 !! col_var := 0),
                    aes(x=.data$x, y=.data$y, xend=.data$xend, yend=.data$yend),
                    linewidth = 1)+
       #facet_wrap(~ Value, ncol = length(values))+
@@ -585,7 +652,26 @@ ternary_plot_internal <- function(data,
 
     # Show points
     if(show == "points"){
-      pl <- pl + geom_point(size = points_size)
+      if(check_col_exists(data, col_var)){
+        pl <- pl + geom_point(aes(colour = .data[[col_var]]), size = points_size)
+
+        # Add colours
+        if(is.numeric(data[, col_var])){
+          # Add colours
+          if(is.null(colours)){
+            colours <- terrain.colors(nlevels, rev = T)
+          }
+          pl <- pl + scale_colour_gradientn(colours = colours)
+        } else {
+          # Add colours
+          if(is.null(colours)){
+            colours <- get_colours(length(unique(data[, col_var])))
+          }
+          pl <- pl + scale_color_manual(values = colours)
+        }
+      } else {
+        pl <- pl + geom_point(size = points_size)
+      }
     }
 
     if(show == "contours" && contour_text){

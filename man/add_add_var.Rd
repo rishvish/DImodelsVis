@@ -17,7 +17,7 @@ combination of values of variables (i.e., their
 cartesian product)in `add_var`.}
 }
 \value{
-A data-frame with any additional columns specified in `add_var`
+A data-frame with all additional columns specified in `add_var`
         and the following column.
  \describe{
    \item{.add_str_ID}{A unique identifier describing each element from the

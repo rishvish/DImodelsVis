@@ -6,7 +6,6 @@
 \usage{
 conditional_ternary_plot(
   data,
-  show = c("contours", "points"),
   nlevels = 7,
   colours = NULL,
   lower_lim = NULL,
@@ -26,15 +25,15 @@ conditional_ternary_plot(
 \item{data}{A data-frame which is the output of the
 `\link{conditional_ternary_data}` function.}
 
-\item{show}{A character string indicating whether to show raw points or contours
-on the ternary. The default is to show "contours".}
-
 \item{nlevels}{The number of levels to show on the contour map.}
 
 \item{colours}{A character vector or function specifying the colours for the
-contour map. The number of colours should be same as `nlevels`.
+contour map or points. The number of colours should be same as
+`nlevels` if (`show = "contours"`). \cr
 The default colours scheme is the
-\code{\link[grDevices:terrain.colors]{terrain.colors()}}.}
+\code{\link[grDevices:terrain.colors]{terrain.colors()}} for
+continuous variables and an extended version of the Okabe-Ito
+colour scale for categoricl variables.}
 
 \item{lower_lim}{A number to set a custom lower limit for the contour
 (if `show = "contours"`). The default is minimum of the prediction.}
@@ -99,7 +98,7 @@ mod <- glm(response ~ 0 + (p1 + p2 + p3 + p4 + p5 + p6)^2, data = sim4)
 ## We only condition on the variable "p3"
 plot_data <- conditional_ternary_data(prop = c("p1", "p2", "p3", "p4", "p5", "p6"),
                                       tern_vars = c("p1", "p2", "p4"),
-                                      conditional = list("p3" = c(0, 0.2, 0.5)),
+                                      conditional = data.frame("p3" = c(0, 0.2, 0.5)),
                                       model = mod,
                                       resolution = 1)
 
@@ -125,7 +124,7 @@ mod <- glm(response ~ 0 + (p1 + p2 + p3 + p4 + p5 + p6)^2 + treatment,
 ## Notice the additional `.add_str_ID` column
 plot_data <- conditional_ternary_data(prop = c("p1", "p2", "p3", "p4", "p5", "p6"),
                                       tern_vars = c("p1", "p2", "p3"),
-                                      conditional = list("p4" = c(0, 0.2, 0.5)),
+                                      conditional = data.frame("p4" = c(0, 0.2, 0.5)),
                                       add_var = list("treatment" = c(50, 150)),
                                       model = mod,
                                       resolution = 1)

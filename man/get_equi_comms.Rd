@@ -2,10 +2,11 @@
 % Please edit documentation in R/Utilities.R
 \name{get_equi_comms}
 \alias{get_equi_comms}
-\title{Get all equi-proportional communities at each level of richness}
+\title{Get all equi-proportional communities at specific levels of richness}
 \usage{
 get_equi_comms(
   nvars,
+  richness_lvl = 1:nvars,
   variables = paste0("Var", 1:nvars),
   threshold = round(1e+06/nvars)
 )
@@ -13,25 +14,50 @@ get_equi_comms(
 \arguments{
 \item{nvars}{Number of variables in the design}
 
+\item{richness_lvl}{The richness (number of non-zero compositional variables
+in a community) levels at which to return the equi-proportional
+communities.
+Defaults to each richness level from 1 up to `nvars`
+(both inclusive).}
+
 \item{variables}{Names for the variables. Will be used as column names for the
 final result. Default is "Var" followed by column number.}
 
 \item{threshold}{The maximum number of communities to select for each level
 of richness for situations when there are too many
-equi-proportional communities.}
+equi-proportional communities. \cr
+Note: if threshold < `number of possible equi-proportional communities`
+at a given level of richness, a random selection of communities
+equal to the number specified in threshold would be returned.}
 }
 \value{
 A dataframe consisting all or a random selection of equi-proportional
         communities at each level of richness
 }
 \description{
-Get all equi-proportional communities at each level of richness
+Get all equi-proportional communities at specific levels of richness
 }
 \examples{
-## Get all equi-proportional communities for each level of richnness upto 10
-get_equi_comms(10)
+## Get all equi-proportional communities for each level of richness upto 10
+data10 <- get_equi_comms(10)
+head(data10, 12)
 
 ## Change species names
-get_equi_comms(4, variables = c("Lollium perenne", "Chicorum intybus",
-                                "Trifolium repens", "Trifolium pratense"))
+data4 <- get_equi_comms(4, variables = c("Lollium perenne", "Chichorum intybus",
+                                         "Trifolium repens", "Trifolium pratense"))
+head(data4)
+
+## Get equi-proportional communities at specific levels of richness
+## Get all equi-proportional communities of four variables at richness
+## levels 1 and 3
+data4_13 <- get_equi_comms(nvars = 4, richness = c(1, 3))
+data4_13
+
+## If threshold is specified and it is less than the number of possible
+## equi-proportional communites at a given level of richness, then a
+## random selection of communities from the total possible would be returned
+## Return only 2 random equi-proportional communities at the chosen richness
+## levels
+data4_13_2 <- get_equi_comms(nvars = 4, richness = c(1, 3), threshold = 2)
+data4_13_2
 }

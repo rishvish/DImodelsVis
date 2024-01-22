@@ -44,6 +44,9 @@ A ggplot object or data-frame (if `plot == FALSE`)
 \description{
 This function helps to visualise model selection by showing a
 visual comparison between the information criteria for different models.
+It is also possible to visualise a breakup of the information criteria into
+deviance (goodness-of-fit) and penalty terms for each model. This could aid in
+understanding why a parsimonious model could be preferable over a more complex model.
 }
 \examples{
 library(DImodels)
