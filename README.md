@@ -120,8 +120,9 @@ functions present in the package along with a short description.
   communities, or communities with a given value of richness without
   having to make any changes to the data or adding any additional
   columns.
-- [prop_to_tern_proj]() and [tern_to_prop_proj](): Helper functions for
-  converting between 3-d compositional data and their 2-d projection.  
+- [`prop_to_tern_proj`]() and [`tern_to_prop_proj`](): Helper functions
+  for converting between 3-d compositional data and their 2-d
+  projection.  
 - [`ternary_data`]() and [`ternary_plot`](): Visualise the change in the
   predicted response across a set of three compositional predictor
   variables as a contour map within a ternary diagram.
@@ -385,7 +386,7 @@ proportions is 1.
 conditional_ternary(model = mod_FG, 
                     tern_vars = c("p1", "p3", "p4"),
                     conditional = data.frame("p2" = c(0.2, 0.5, 0.8)))
-#> Preparing data ■■■■■■■■■■■■■■■■■■■■■             67% | ETA:  1s                                                                ✔ Finished data preparation.
+#> ✔ Finished data preparation.
 #> ✔ Created plot.
 ```
 

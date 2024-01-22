@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-Statistical models fit to compositional data are often difficult to interpret due to the sum to 1 constraint on data variables. `DImodelsVis` provides novel visualisations tools to aid with the interpretation of models fit to compositional data. All visualisations in the package are created using the `ggplot2` plotting framework and can be extended like every other ggplot object.
+Statistical models fit to compositional data are often difficult to interpret due to the sum to one constraint on data variables. `DImodelsVis` provides novel visualisations tools to aid with the interpretation of models fit to compositional data. All visualisations in the package are created using the `ggplot2` plotting framework and can be extended like every other ggplot object.
 
 ## Installation
 
@@ -63,7 +63,7 @@ The functions in the package can be categorised as functions for visualising mod
   * [`add_prediction`](): A utility function to add prediction and associated uncertainty to data using a statistical model object or raw model coefficients.
   * [`get_equi_comms`](): Utility function to create all possible combinations of equi-proportional communities at a given level of richness from a set of n compositional variables.
   * [`custom_filter`](): A handy wrapper around the dplyr [`filter()`](https://dplyr.tidyverse.org/reference/filter.html) function enabling the user to filter rows which satisfy specific conditions for compositional data like all equi-proportional communities, or communities with a given value of richness without having to make any changes to the data or adding any additional columns.
-  * [prop_to_tern_proj]() and [tern_to_prop_proj](): Helper functions for converting between 3-d compositional data and their 2-d projection.    
+  * [`prop_to_tern_proj`]() and [`tern_to_prop_proj`](): Helper functions for converting between 3-d compositional data and their 2-d projection.    
   * [`ternary_data`]() and [`ternary_plot`](): Visualise the change in the predicted response across a set of three compositional predictor variables as a contour map within a ternary diagram.
 
 ## Examples
