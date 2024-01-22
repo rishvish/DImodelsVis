@@ -1,13 +1,18 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# DImodelsVis
+# DImodelsVis <img src="man/figures/logo.png" align="right" height="139" />
 
 <!-- badges: start -->
+
+[![CRAN
+status](https://www.r-pkg.org/badges/version/DImodelsVis)](https://CRAN.R-project.org/package=DImodelsVis)
+[![Lifecycle:
+stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 <!-- badges: end -->
 
 Statistical models fit to compositional data are often difficult to
-interpret due to the sum to 1 constraint on data variables.
+interpret due to the sum to one constraint on data variables.
 `DImodelsVis` provides novel visualisations tools to aid with the
 interpretation of models fit to compositional data. All visualisations
 in the package are created using the `ggplot2` plotting framework and
@@ -386,7 +391,7 @@ proportions is 1.
 conditional_ternary(model = mod_FG, 
                     tern_vars = c("p1", "p3", "p4"),
                     conditional = data.frame("p2" = c(0.2, 0.5, 0.8)))
-#> ✔ Finished data preparation.
+#> Preparing data ■■■■■■■■■■■■■■■■■■■■■             67% | ETA:  1s                                                                ✔ Finished data preparation.
 #> ✔ Created plot.
 ```
 
