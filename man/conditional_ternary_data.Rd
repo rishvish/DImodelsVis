@@ -119,12 +119,11 @@ A data-frame containing compositional columns with names specified
 }
 \description{
 The helper function for preparing the underlying data for creating conditional
-ternary diagrams, where the high dimensional simplex is sliced at various
-values along the range of a particular variable(s) by conditioning the variables
-to have a fixed value and we visualise the change in the response with respect
-to the remaining three variables in a ternary diagram such that the proportions
-within the ternary would sum to 1 - x, where x is the sum of all values at which
-the different variables are conditioned. The output of this function can be passed to the
+ternary diagrams, where we fix \eqn{n-3} variables to have a constant value
+\eqn{x_1, x_2, x_3, ..., x_{n-3}} such that \eqn{x = x_1 + x_2 + x_3 + ... x_{n - 3}}
+and \eqn{0 \le x \le 1} and vary the proportion of the remaining three variables
+between \eqn{0} and \eqn{1-x} to visualise the change in the predicted response as a
+contour map within a ternary diagram. The output of this function can be passed to the
 \code{\link{conditional_ternary_plot}} function to plot the results. Viewing multiple
 2-d slices across multiple variables should allow to create an approximation of
 how the response varies across the n-dimensional simplex.

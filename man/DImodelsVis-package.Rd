@@ -7,7 +7,7 @@
 \title{DImodelsVis: Model interpretation and visualisation for compositional data}
 \description{
 Statistical models fit to compositional data are often difficult to
-interpret due to the sum to 1 constraint on data variables. \code{DImodelsVis} provides
+interpret due to the sum to one constraint on data variables. \code{DImodelsVis} provides
 novel visualisations tools to aid with the interpretation of models fit to
 compositional data. All visualisations in the package are created using the
 \code{\link[ggplot2:ggplot2-package]{ggplot2}} plotting framework and can be
@@ -180,6 +180,7 @@ conditional_ternary(model = mod, tern_vars = c("p2", "p3", "p4"),
                     resolution = 1)
 
 
+## Group compositional variables into
 }
 \references{
 \itemize{

@@ -7,7 +7,7 @@ the simplex space}
 \usage{
 simplex_path_plot(
   data,
-  prop,
+  prop = NULL,
   pie_positions = c(0, 0.5, 1),
   pie_colours = NULL,
   se = FALSE,
@@ -20,7 +20,10 @@ simplex_path_plot(
 \item{data}{A data frame created using the \code{\link{simplex_path_data}} function.}
 
 \item{prop}{A vector of column names or indices identifying the columns containing the
-species proportions in the data.}
+species proportions in the data. Will be inferred from the data if
+it is created using the `\code{\link{simplex_path_data}}`
+function, but the user also has the flexibility of manually
+specifying the values.}
 
 \item{pie_positions}{A numeric vector with values between 0 and 1 (both inclusive)
 indicating the positions along the X-axis at which to

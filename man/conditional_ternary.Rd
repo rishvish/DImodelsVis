@@ -103,14 +103,12 @@ labels in the ternary plot. The default size is 5.}
 A ggmultiplot (ggplot if single plot is returned) class object or data-frame (if `plot = FALSE`)
 }
 \description{
-Conditional ternary diagrams are a way to visualise n-dimensional
-compositional data residing in the n-1 dimensional space as 2-d ternary
-diagrams. We slice the high dimensional simplex at values along the range of
-particular variable(s) by conditioning the variables to have a fixed value and
-visualise the change in the response with respect to the remaining three
-variables in a ternary diagram such that the proportions within the ternary
-would sum to 1 - x, where x is the sum of all values at which the different
-variables are conditioned. Taking multiple 2-d slices across multiple
+We fix \eqn{n-3} variables to have a constant value \eqn{x_1, x_2, x_3, ... x_{n-3}}
+such that \eqn{x = x_1 + x_2 + x_3 + ... x_{n - 3}} and \eqn{0 \le x \le 1} and
+vary the proportion of the remaining three variables between \eqn{0} and \eqn{1-x}
+to visualise the change in the predicted response as a contour map within a
+ternary diagram. This is equivalent to taking multiple 2-d slices of the
+high dimensional simplex space. Taking multiple 2-d slices across multiple
 variables should allow to create an approximation of how the response varies
 across the n-dimensional simplex.
 This is a wrapper function specifically for statistical models fit using the

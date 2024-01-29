@@ -209,6 +209,7 @@
 #'                     resolution = 1)
 #'
 #'
+#' ## Group compositional variables into
 #' @keywords internal
 "_PACKAGE"
 NULL

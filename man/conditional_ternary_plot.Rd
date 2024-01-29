@@ -83,7 +83,7 @@ The helper function for plotting conditional ternary diagrams. The output of
 the `\code{\link{conditional_ternary_data}}` should be passed here to
 visualise the n-dimensional simplex space as 2-d slices showing the change
 in the response across any three variables, when the other variables are
-conditioned to have a fixed value.
+conditioned to have fixed values.
 }
 \examples{
 library(DImodels)

@@ -2,12 +2,11 @@
 #'
 #' @description
 #' The helper function for preparing the underlying data for creating conditional
-#' ternary diagrams, where the high dimensional simplex is sliced at various
-#' values along the range of a particular variable(s) by conditioning the variables
-#' to have a fixed value and we visualise the change in the response with respect
-#' to the remaining three variables in a ternary diagram such that the proportions
-#' within the ternary would sum to 1 - x, where x is the sum of all values at which
-#' the different variables are conditioned. The output of this function can be passed to the
+#' ternary diagrams, where we fix \eqn{n-3} variables to have a constant value
+#' \eqn{x_1, x_2, x_3, ..., x_{n-3}} such that \eqn{x = x_1 + x_2 + x_3 + ... x_{n - 3}}
+#' and \eqn{0 \le x \le 1} and vary the proportion of the remaining three variables
+#' between \eqn{0} and \eqn{1-x} to visualise the change in the predicted response as a
+#' contour map within a ternary diagram. The output of this function can be passed to the
 #' \code{\link{conditional_ternary_plot}} function to plot the results. Viewing multiple
 #' 2-d slices across multiple variables should allow to create an approximation of
 #' how the response varies across the n-dimensional simplex.
@@ -295,7 +294,7 @@ conditional_ternary_data <- function(prop, tern_vars,
 #' the `\code{\link{conditional_ternary_data}}` should be passed here to
 #' visualise the n-dimensional simplex space as 2-d slices showing the change
 #' in the response across any three variables, when the other variables are
-#' conditioned to have a fixed value.
+#' conditioned to have fixed values.
 #'
 #' @importFrom ggplot2 facet_wrap
 #'
@@ -435,14 +434,12 @@ conditional_ternary_plot <- function(data,
 #' @title Conditional ternary diagrams
 #'
 #' @description
-#' Conditional ternary diagrams are a way to visualise n-dimensional
-#' compositional data residing in the n-1 dimensional space as 2-d ternary
-#' diagrams. We slice the high dimensional simplex at values along the range of
-#' particular variable(s) by conditioning the variables to have a fixed value and
-#' visualise the change in the response with respect to the remaining three
-#' variables in a ternary diagram such that the proportions within the ternary
-#' would sum to 1 - x, where x is the sum of all values at which the different
-#' variables are conditioned. Taking multiple 2-d slices across multiple
+#' We fix \eqn{n-3} variables to have a constant value \eqn{x_1, x_2, x_3, ... x_{n-3}}
+#' such that \eqn{x = x_1 + x_2 + x_3 + ... x_{n - 3}} and \eqn{0 \le x \le 1} and
+#' vary the proportion of the remaining three variables between \eqn{0} and \eqn{1-x}
+#' to visualise the change in the predicted response as a contour map within a
+#' ternary diagram. This is equivalent to taking multiple 2-d slices of the
+#' high dimensional simplex space. Taking multiple 2-d slices across multiple
 #' variables should allow to create an approximation of how the response varies
 #' across the n-dimensional simplex.
 #' This is a wrapper function specifically for statistical models fit using the
@@ -600,6 +597,21 @@ conditional_ternary_plot_internal <- function(data,
                                               show_axis_guides = FALSE,
                                               axis_label_size = 4,
                                               vertex_label_size = 5){
+  # If user messes up data attributes
+  if(any(sapply(list(attr(data, "x_proj"), attr(data, "y_proj"), attr(data, "tern_vars")), is.null))){
+    cli::cli_warn(c("!" = "Certain attributes of the data which are needed to prepare
+                    the plot are missing. This could happen if data manipulation
+                    performed by the user mess up the {.cls data.frame} attributes.",
+                    "i" = "The function will try to reconstruct the necessary attributes
+                    and create the plot but it might not always be possible.",
+                    "i" = "To avoid this, consider using dplyr versions of the respective
+                    base R functions as these preserve data-attributes. For example, use
+                    {.fn bind_cols} instead of {.fn cbind}."))
+    attr(data, "x_proj") <- ".x"
+    attr(data, "y_proj") <- ".y"
+    attr(data, "tern_vars") <- names(data)[1:3]
+  }
+
   # Create the simple ternary plot
   pl <- ternary_plot_internal(data = data,
                               nlevels = nlevels,

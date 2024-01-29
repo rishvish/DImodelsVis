@@ -227,8 +227,8 @@ get_colours <- function(vars, FG = NULL){
 
   nSpecies <- length(vars)
   if(!is.null(FG) & (!is.character(FG) | length(FG) != nSpecies)){
-    stop(glue::glue("'FG' should be a character vector having the same length
-                    as species vector ({nSpecies}) giving the functional group
+    cli::cli_abort(c("{.var FG} should be a character vector having the same length
+                    as species vector ({nSpecies}) giving the group
                     each species belongs to."))
   }
 
@@ -1009,6 +1009,8 @@ add_prediction <- function(data, model = NULL,
   }
   # Branch here if regression coefficients are specified
   else if(!is.null(coefficients)){
+    # If matrix is specified convert to data for time being
+    data <- as.data.frame(data)
     # Ensure coefficients are numeric
     if(!is.numeric(coefficients)){
       cli::cli_abort(c("{.var coefficients} should be a numeric vector.",

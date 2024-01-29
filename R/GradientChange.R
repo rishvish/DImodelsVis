@@ -178,6 +178,9 @@ gradient_change_data <- function(data, prop, add_var = list(),
     }
   }
 
+  # Add attribute to identify prop cols
+  attr(plot_data, "prop") <- prop
+
   cli::cli_alert_success("Finished data preparation")
   return(plot_data)
 }
@@ -200,6 +203,11 @@ gradient_change_data <- function(data, prop, add_var = list(),
 #' @param pie_data A subset of data-frame specified in `data`, to visualise
 #'                 the individual data-points as pie-glyphs showing the
 #'                 relative proportions of the variables in the data-point.
+#' @param prop A vector of column names or indices identifying the columns containing the
+#'             species proportions in the data. Will be inferred from the data if
+#'             it is created using the `\code{\link{gradient_change_data}}`
+#'             function, but the user also has the flexibility of manually
+#'             specifying the values.
 #' @inheritParams gradient_change
 #' @inheritParams gradient_change_data
 #'
@@ -612,6 +620,11 @@ gradient_change_plot_internal <- function(data, prop = NULL,
                                           y_var = ".Pred",
                                           facet_var = NULL){
 
+  # When possible infer prop from data
+  if(is.null(prop)){
+    prop <- attr(data, "prop")
+  }
+
   # Ensure inputs are appropriate
   sanity_checks(data = data, prop = prop, colours = pie_colours,
                 booleans = list("average" = average))
@@ -674,15 +687,27 @@ gradient_change_plot_internal <- function(data, prop = NULL,
     theme_DI()+
     x_scale
 
+  # Add facet
+  if(!is.null(facet_var)){
+    plot <- add_facet(plot, data, facet_var, labeller = label_both)
+  }
+
+
   if(average){
-    if(check_col_exists(data, ".Avg")){
+    if(check_col_exists(data, ".Avg") && is.null(facet_var)){
       plot <- plot +
         geom_line(aes(y = .data$.Avg),
                   linewidth = 1, linetype = 2)
     } else {
-      avg_data <- data %>% group_by(!! sym(gradient_var)) %>%
-        mutate('.Avg' = mean(!! sym(y_var))) %>%
-        ungroup()
+      if(is.null(facet_var)){
+        avg_data <- data %>% group_by(!! sym(gradient_var)) %>%
+          mutate('.Avg' = mean(!! sym(y_var))) %>%
+          ungroup()
+      } else {
+        avg_data <- data %>% group_by(!! sym(gradient_var), !!sym(facet_var)) %>%
+          mutate('.Avg' = mean(!! sym(y_var))) %>%
+          ungroup()
+      }
 
       plot <- plot +
         geom_line(aes(y = .data$.Avg), data = avg_data,
@@ -719,10 +744,6 @@ gradient_change_plot_internal <- function(data, prop = NULL,
                      colour = 'black', data = pie_data,
                      position = position)+
       scale_fill_manual(values = pie_colours, name = "Variables")
-  }
-
-  if(!is.null(facet_var)){
-    plot <- add_facet(plot, data, facet_var)
   }
 
   return(plot)

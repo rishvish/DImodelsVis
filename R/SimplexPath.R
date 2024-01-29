@@ -199,6 +199,9 @@ simplex_path_data <- function(starts, ends, prop,
     #   ungroup()
   }
 
+  # Add attribute to identify prop cols
+  attr(plot_data, "prop") <- prop
+
   cli::cli_alert_success("Finished data preparation.")
   return(plot_data)
 }
@@ -219,6 +222,11 @@ simplex_path_data <- function(starts, ends, prop,
 #' straight line between the two points.
 #'
 #' @param data A data frame created using the \code{\link{simplex_path_data}} function.
+#' @param prop A vector of column names or indices identifying the columns containing the
+#'             species proportions in the data. Will be inferred from the data if
+#'             it is created using the `\code{\link{simplex_path_data}}`
+#'             function, but the user also has the flexibility of manually
+#'             specifying the values.
 #' @param pie_positions A numeric vector with values between 0 and 1 (both inclusive)
 #'                      indicating the positions along the X-axis at which to
 #'                      show pie-glyphs for each curve. Default is c(0, 0.5, 1) meaning
@@ -284,7 +292,7 @@ simplex_path_data <- function(starts, ends, prop,
 #' simplex_path_plot(data = plot_data,
 #'                   prop = c("p1", "p2", "p3", "p4"), se = TRUE,
 #'                   pie_colours = c("steelblue1", "steelblue4", "orange1", "orange4"))
-simplex_path_plot <- function(data, prop,
+simplex_path_plot <- function(data, prop = NULL,
                               pie_positions = c(0, 0.5, 1),
                               pie_colours = NULL,
                               se = FALSE, facet_var = NULL,
@@ -299,10 +307,15 @@ simplex_path_plot <- function(data, prop,
 
   # Ensure identifiers for columns in data giving species proportions are specified
   if(missing(prop)){
-    cli::cli_abort(c("{.var prop} cannot be empty.",
-                     "i" = "Specify either a character or numeric vector giving
+    # Read from data if prop is missing
+    prop <- attr(data, "prop")
+
+    if(is.null(prop)){
+      cli::cli_abort(c("{.var prop} is empty and cannot be inferred from data.",
+                       "i" = "Specify either a character or numeric vector giving
                      names/indicies of the columns containing the
                      compositional variables in {.var data}."))
+    }
   }
 
   sanity_checks(data = data, prop = prop,
@@ -548,16 +561,6 @@ simplex_path_plot_internal <- function(data, prop, pie_colours = NULL,
   # Get names of columns containing species proportions
   species_names <- data %>% select(all_of(prop)) %>% colnames()
 
-  slice_idx <- (pie_positions * 100) + 1
-  pie_data <- data %>%
-    group_by(.data$.Group) %>%
-    slice(slice_idx) %>%
-    ungroup() %>%
-    # Filter out any overlapping pies to avoid overplotting
-    distinct(.data$.InterpConst, .data$.Pred, .keep_all = T) %>%
-    ungroup()
-
-
   # Colours for the pie-glyph slices
   if(is.null(pie_colours)){
     pie_colours <- get_colours(species_names)
@@ -566,6 +569,12 @@ simplex_path_plot_internal <- function(data, prop, pie_colours = NULL,
   # Create canvas for plot
   plot <- ggplot(data, aes(x = .data$.InterpConst, y = .data$.Pred))+
     theme_bw()
+
+  # Add facet if specified
+  if(!is.null(facet_var)){
+    plot <- add_facet(plot, data, facet_var,
+                      labeller = label_both)
+  }
 
   # Add ribbons for uncertainty of prediction
   if(se){
@@ -584,17 +593,28 @@ simplex_path_plot_internal <- function(data, prop, pie_colours = NULL,
     geom_line(aes(group = .data$.Group), colour = 'black', alpha = 0.75)
 
   # Add the pie-chart glyphs for identifying the data
+  slice_idx <- (pie_positions * 100) + 1
+  pie_data <- data %>%
+    group_by(.data$.Group) %>%
+    slice(slice_idx) %>%
+    ungroup()
+
+  # Filter out any overlapping pies to avoid overplotting
+  if(is.null(facet_var)){
+    pie_data <- pie_data %>%
+      distinct(.data$.InterpConst, .data$.Pred, .keep_all = T) %>%
+      ungroup()
+  } else {
+    pie_data <- pie_data %>%
+      distinct(.data$.InterpConst, .data$.Pred, .data[[facet_var]], .keep_all = T) %>%
+      ungroup()
+  }
   plot <- plot +
     geom_pie_glyph(data = pie_data, radius = 0.3,
                    slices = prop, colour = 'black')+
     scale_fill_manual(values = pie_colours,
                       labels = prop)
 
-  # Add facet if specified
-  if(!is.null(facet_var)){
-    plot <- add_facet(plot, data, facet_var,
-                      labeller = label_both)
-  }
 
   # Adjust plot aesthetics
   plot <- plot +

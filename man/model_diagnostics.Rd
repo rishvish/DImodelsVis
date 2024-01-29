@@ -8,6 +8,7 @@ model_diagnostics(
   model,
   which = c(1, 2, 3, 5),
   prop = NULL,
+  FG = NULL,
   npoints = 3,
   cook_levels = c(0.5, 1),
   pie_radius = 0.2,
@@ -45,6 +46,9 @@ interpreted if model is a \code{Diversity-Interactions (DI)}
 model object fit using the \code{\link[DImodels:DI]{DI()}}
 function from the \code{\link[DImodels:DImodels-package]{DImodels}}
 package.}
+
+\item{FG}{A character vector of same length as \code{prop} specifying the group
+each variable belongs to.}
 
 \item{npoints}{Number of points to be labelled in each plot, starting
 with the most extreme (those points with the highest

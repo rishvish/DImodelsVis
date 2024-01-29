@@ -18,7 +18,10 @@ visualise_effects_plot(
 \item{data}{A data frame created using the \code{\link{visualise_effects_data}} function.}
 
 \item{prop}{A vector of column names or indices identifying the columns containing the
-species proportions in the data.}
+species proportions in the data. Will be inferred from the data if
+it is created using the `\code{\link{visualise_effects_data}}`
+function, but the user also has the flexibility of manually
+specifying the values.}
 
 \item{pie_colours}{A character vector indicating the colours for the slices
 in the pie-glyphs. \cr

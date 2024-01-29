@@ -380,7 +380,8 @@ grouped_ternary_plot <- function(data,
                                  show_axis_labels = TRUE,
                                  show_axis_guides = FALSE,
                                  axis_label_size = 4,
-                                 vertex_label_size = 5){
+                                 vertex_label_size = 5,
+                                 nrow = 0, ncol = 0){
   if(missing(data)){
     cli::cli_abort(c("{.var data} cannot be missing.",
                     "i" = "Specify the output of {.fn conditional_ternary_data} function."))
@@ -396,7 +397,8 @@ grouped_ternary_plot <- function(data,
                                  show_axis_labels = show_axis_labels,
                                  show_axis_guides = show_axis_guides,
                                  axis_label_size = axis_label_size,
-                                 vertex_label_size = vertex_label_size)
+                                 vertex_label_size = vertex_label_size,
+                                 nrow = nrow, ncol = ncol)
   return(pl)
 }
 

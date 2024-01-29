@@ -15,7 +15,9 @@ grouped_ternary_plot(
   show_axis_labels = TRUE,
   show_axis_guides = FALSE,
   axis_label_size = 4,
-  vertex_label_size = 5
+  vertex_label_size = 5,
+  nrow = 0,
+  ncol = 0
 )
 }
 \arguments{
@@ -62,6 +64,12 @@ in the ternary plot. The default size is 4.}
 
 \item{vertex_label_size}{A numeric value to adjust the size of the vertex
 labels in the ternary plot. The default size is 5.}
+
+\item{nrow}{Number of rows in which to arrange the final plot
+(when `add_var` is specified).}
+
+\item{ncol}{Number of columns in which to arrange the final plot
+(when `add_var` is specified).}
 }
 \value{
 A ggmultiplot (ggplot if single plot is returned) class object or data-frame (if `plot = FALSE`)

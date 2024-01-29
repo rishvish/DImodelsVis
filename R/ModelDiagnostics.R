@@ -48,6 +48,8 @@
 #'             model object fit using the \code{\link[DImodels:DI]{DI()}}
 #'             function from the \code{\link[DImodels:DImodels-package]{DImodels}}
 #'             package.
+#' @param FG 	A character vector of same length as `prop` specifying the group
+#'            each variable belongs to.
 #' @param pie_radius A numeric value specifying the radius (in cm) for the
 #'                   pie-glyphs.
 #' @param pie_colours A character vector specifying the colours for the slices
@@ -108,7 +110,7 @@
 #'#                    unit_IDs = 1, prop = paste0("p", 1:6),
 #'#                    data = simMV, DImodel = "ID", method = "ML")
 #' #model_diagnostics(model = MVmodel)
-model_diagnostics <- function(model, which = c(1,2,3,5), prop = NULL,
+model_diagnostics <- function(model, which = c(1,2,3,5), prop = NULL, FG = NULL,
                               npoints = 3, cook_levels = c(0.5, 1),
                               pie_radius = 0.2, pie_colours = NULL,
                               only_extremes = FALSE, label_size = 4,
@@ -175,14 +177,7 @@ model_diagnostics <- function(model, which = c(1,2,3,5), prop = NULL,
       original_data <- model$original_data
 
       # Get all species in the model
-      # IDs <- eval(model$DIcall$ID)
-      if(inherits(model, "DI")){
-        prop <- eval(model$DIcall$prop)
-        plot_data <- cbind(plot_data, original_data[, prop])
-      } else {
-        prop <- attr(model, "prop")
-      }
-      model_species <- original_data[, prop] %>% colnames()
+      model_species <- attr(model, "prop")
       pies <- TRUE
     }  else {
       pies <- FALSE
@@ -255,7 +250,7 @@ model_diagnostics <- function(model, which = c(1,2,3,5), prop = NULL,
 
   # Colours for the pie-glyph slices
   if(pies && is.null(pie_colours)){
-    colours <- get_colours(model_species, FG = eval(model$DIcall$FG))
+    colours <- get_colours(model_species, FG = if(is.null(FG)) eval(model$DIcall$FG) else FG)
   } else if (pies && !is.null(pie_colours)){
     # sanity_checks(colours = pie_colours)
     if(length(pie_colours) != length(model_species)){

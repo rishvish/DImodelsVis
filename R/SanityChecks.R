@@ -269,14 +269,21 @@ check_data_functions <- function(model, coefficients, prop = NULL,
   # One of model or coefficients should be specified
   if(is.null(model) && is.null(coefficients)){
     cli::cli_abort(c("Both {.var model} and {.var coefficients} cannot be empty.",
-                     "i" = "Specify either a regression model object fit using {.fn lm}, {.fn glm}, {.fn gls}, {.fn lmer}, etc. functions or a matrix with regression coefficients for calculating the predictions"),
+                     "i" = "Specify either a regression model object fit using {.fn lm},
+                     {.fn glm}, {.fn gls}, {.fn lmer}, etc. functions or a matrix with
+                     regression coefficients for calculating the predictions.",
+                     "i" = "If this error is encountered when calling any of the
+                     data preparation functions, then use {.var prediction = FALSE} and
+                     manually call the
+                     {.help [{.fn add_prediction}](DImodelsVis::add_prediction)} function."),
                    call = call)
   }
 
   # If both model and coefficients are specified then model take precedence
   if(!is.null(model) && !is.null(coefficients)){
     cli::cli_warn(c("Both {.var model} and {.var coefficients} were specified.",
-                    "i" = "Ignoring {.var coefficients} and using {.var model} for calculating predictions."),
+                    "i" = "Ignoring {.var coefficients} and using {.var model} for
+                    calculating predictions."),
                   call = call)
   }
 

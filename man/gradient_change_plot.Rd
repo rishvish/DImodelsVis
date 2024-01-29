@@ -21,8 +21,11 @@ gradient_change_plot(
 `\link{gradient_change_data}` function, consisting of the
 predicted response averaged over a particular diversity gradient.}
 
-\item{prop}{A vector identifying the column-names or indices of the
-columns containing the variable proportions in `data`.}
+\item{prop}{A vector of column names or indices identifying the columns containing the
+species proportions in the data. Will be inferred from the data if
+it is created using the `\code{\link{gradient_change_data}}`
+function, but the user also has the flexibility of manually
+specifying the values.}
 
 \item{pie_data}{A subset of data-frame specified in `data`, to visualise
 the individual data-points as pie-glyphs showing the
