@@ -71,11 +71,13 @@ additional variables.</p></dd>
 
 
 <dt>add_var</dt>
-<dd><p>A named list specifying the names and corresponding
-values of each new variable to add to the data. The
-row in the data would be replicated for each unique
-combination of values of variables (i.e., their
-cartesian product)in `add_var`.</p></dd>
+<dd><p>A named list or data-frame specifying the names and
+corresponding values of each new variable to add to the data.
+If a list is specified, each row in the data would be replicated
+for each unique combination of values of the specified variables
+(i.e., their cartesian product) in `add_var`, while specifying
+a data-frame would replicate each row in the data for each row
+in add_var (i.e., merge the two data-frames).</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -83,7 +85,7 @@ cartesian product)in `add_var`.</p></dd>
     
 
 <p>A data-frame with all additional columns specified in `add_var`
-        and the following column.</p>
+        and the following additional column.</p>
 <p></p>
 <dl><dt>.add_str_ID</dt>
 <dd><p>A unique identifier describing each element from the
@@ -112,7 +114,8 @@ cartesian product)in `add_var`.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5  0  1  0   20    Var1: 20</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6  0  0  1   20    Var1: 20</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co">## Specifying multiple variables will add values for each unique combination</span></span></span>
+<span class="r-in"><span><span class="co">## Specifying multiple variables as a list will add values for</span></span></span>
+<span class="r-in"><span><span class="co">##  each unique combination</span></span></span>
 <span class="r-in"><span><span class="fu">add_add_var</span><span class="op">(</span>data <span class="op">=</span> <span class="va">test_data</span>,</span></span>
 <span class="r-in"><span>            add_var <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"Var1"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">20</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>                           <span class="st">"Var2"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">30</span>, <span class="fl">40</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
@@ -129,6 +132,18 @@ cartesian product)in `add_var`.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 10  1  0  0   20   40 Var1: 20; \tVar2: 40</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 11  0  1  0   20   40 Var1: 20; \tVar2: 40</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 12  0  0  1   20   40 Var1: 20; \tVar2: 40</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Specifying add_var as a data.frame would simply merge the two data-frames</span></span></span>
+<span class="r-in"><span><span class="fu">add_add_var</span><span class="op">(</span>data <span class="op">=</span> <span class="va">test_data</span>,</span></span>
+<span class="r-in"><span>            add_var <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="st">"Var1"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">20</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                                 <span class="st">"Var2"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">30</span>, <span class="fl">40</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   X1 X2 X3 Var1 Var2          .add_str_ID</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  1  0  0   10   30 Var1: 10; \tVar2: 30</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  0  1  0   10   30 Var1: 10; \tVar2: 30</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  0  0  1   10   30 Var1: 10; \tVar2: 30</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  1  0  0   20   40 Var1: 20; \tVar2: 40</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  0  1  0   20   40 Var1: 20; \tVar2: 40</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  0  0  1   20   40 Var1: 20; \tVar2: 40</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## If the list specified in `add_var` is not named, then the additional</span></span></span>
 <span class="r-in"><span><span class="co">## variables will be automatically named Var1, Var2, Var3, etc.</span></span></span>

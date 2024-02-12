@@ -4,7 +4,7 @@
 on top of another. The total height of the stacked bar gives the value of the
 predicted response. The uncertainty around the predicted response can also be shown
 on the plot.
-This is a wrapper function specifically for statistical models fit using the
+This is a wrapper function specifically designed for statistical models fit using the
 DI() function from the
 DImodels R package and it implicitly
 calls prediction_contributions_data followed by
@@ -14,7 +14,7 @@ DImodels, the associated data and plot functions can instead be called manually.
 on top of another. The total height of the stacked bar gives the value of the
 predicted response. The uncertainty around the predicted response can also be shown
 on the plot.
-This is a wrapper function specifically for statistical models fit using the
+This is a wrapper function specifically designed for statistical models fit using the
 DI() function from the
 DImodels R package and it implicitly
 calls prediction_contributions_data followed by
@@ -71,7 +71,7 @@ DImodels, the associated data and plot functions can instead be called manually.
 on top of another. The total height of the stacked bar gives the value of the
 predicted response. The uncertainty around the predicted response can also be shown
 on the plot.
-This is a wrapper function specifically for statistical models fit using the
+This is a wrapper function specifically designed for statistical models fit using the
 <code><a href="https://rdrr.io/pkg/DImodels/man/DI.html" class="external-link">DI()</a></code> function from the
 <code><a href="https://rdrr.io/pkg/DImodels/man/DImodels-package.html" class="external-link">DImodels</a></code> R package and it implicitly
 calls <code><a href="prediction_contributions_data.html">prediction_contributions_data</a></code> followed by
@@ -109,20 +109,21 @@ DImodels, the associated data and plot functions can instead be called manually.
 
 
 <dt>data</dt>
-<dd><p>A user-defined data-frame containing compositional variables
-specifying values for predictor variables (fitted within the
-model object) that the user wished to predict for. If left blank,
-a selection of observations (2 from each level of richness) from
-the original data used to fit the model would be selected.</p></dd>
+<dd><p>A user-defined data-frame containing values for compositional variables
+along with any additional variables that the user wishes to predict for.
+If left blank, a selection of observations (2 from each level of
+richness) from the original data used to fit the model would be selected.</p></dd>
 
 
 <dt>add_var</dt>
 <dd><p>A list specifying values for additional predictor variables
-in the model independent of the compositional predictor  variables.
-This would be useful to compare the predictions across
-different values for a categorical variable. One plot will
-be generated for each unique combination of values specified
-here and they will be arranged in a grid according to the
+in the model independent of the compositional predictor variables.
+This could be useful for comparing the predictions across
+different values for a non-compositional variable.
+If specified as a list, it will be expanded to show a plot
+for each unique combination of values specified, while if specified
+as a data-frame, one plot would be generated for each row in the
+data and they will be arranged in a grid according to the
 value specified in `nrow` and `ncol`.</p></dd>
 
 
@@ -287,30 +288,6 @@ function manually.</p></dd>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Finished data preparation.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Created plot.</span>
 <span class="r-plt img"><img src="prediction_contributions-5.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="co">## Specify `plot = FALSE` to not create the plot but return the prepared data</span></span></span>
-<span class="r-in"><span><span class="fu">prediction_contributions</span><span class="op">(</span><span class="va">model1</span>, data <span class="op">=</span> <span class="va">my_comms</span>, plot <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
-<span class="r-in"><span>                         facet_var <span class="op">=</span> <span class="st">"richness"</span>,</span></span>
-<span class="r-in"><span>                         bar_orientation <span class="op">=</span> <span class="st">"horizontal"</span>,</span></span>
-<span class="r-in"><span>                         groups <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"Interactions"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"`p1:p2`"</span>, <span class="st">"`p1:p3`"</span>,</span></span>
-<span class="r-in"><span>                                                          <span class="st">"`p1:p4`"</span>, <span class="st">"`p2:p3`"</span>,</span></span>
-<span class="r-in"><span>                                                          <span class="st">"`p2:p4`"</span>, <span class="st">"`p3:p4`"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Finished data preparation.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 30 × 18</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    .Community    p1    p2    p3    p4 richness .Richness `p1:p2` `p1:p3` `p1:p4`</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> 1              1     0     0     0        1         1       0       0       0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> 1              1     0     0     0        1         1       0       0       0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> 1              1     0     0     0        1         1       0       0       0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> 1              1     0     0     0        1         1       0       0       0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> 1              1     0     0     0        1         1       0       0       0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> 2              0     0     1     0        1         1       0       0       0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> 2              0     0     1     0        1         1       0       0       0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> 2              0     0     1     0        1         1       0       0       0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> 2              0     0     1     0        1         1       0       0       0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> 2              0     0     1     0        1         1       0       0       0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 20 more rows</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 8 more variables: `p2:p3` &lt;dbl&gt;, `p2:p4` &lt;dbl&gt;, `p3:p4` &lt;dbl&gt;, .Pred &lt;dbl&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   .Lower &lt;dbl&gt;, .Upper &lt;dbl&gt;, .Contributions &lt;chr&gt;, .Value &lt;dbl&gt;</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Can also add additional variables independent of the simplex design</span></span></span>
 <span class="r-in"><span><span class="co">## to get a separate plot for unique combination of the variables</span></span></span>
@@ -341,6 +318,23 @@ function manually.</p></dd>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Finished data preparation.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Created all plots.</span>
 <span class="r-plt img"><img src="prediction_contributions-7.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Specify `plot = FALSE` to not create the plot but return the prepared data</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu">prediction_contributions</span><span class="op">(</span><span class="va">model1</span>, data <span class="op">=</span> <span class="va">my_comms</span>, plot <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
+<span class="r-in"><span>                              facet_var <span class="op">=</span> <span class="st">"richness"</span>,</span></span>
+<span class="r-in"><span>                              bar_orientation <span class="op">=</span> <span class="st">"horizontal"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Finished data preparation.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 6 × 18</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .Community    p1    p2    p3    p4 richness .Richness `p1:p2` `p1:p3` `p1:p4`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> 1              1     0     0     0        1         1       0       0       0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> 1              1     0     0     0        1         1       0       0       0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> 1              1     0     0     0        1         1       0       0       0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> 1              1     0     0     0        1         1       0       0       0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> 1              1     0     0     0        1         1       0       0       0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span> 1              1     0     0     0        1         1       0       0       0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 8 more variables: `p2:p3` &lt;dbl&gt;, `p2:p4` &lt;dbl&gt;, `p3:p4` &lt;dbl&gt;, .Pred &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   .Lower &lt;dbl&gt;, .Upper &lt;dbl&gt;, .Contributions &lt;chr&gt;, .Value &lt;dbl&gt;</span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

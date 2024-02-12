@@ -65,6 +65,7 @@ conditioned to have fixed values.</p>
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">conditional_ternary_plot</span><span class="op">(</span></span>
 <span>  <span class="va">data</span>,</span>
+<span>  col_var <span class="op">=</span> <span class="st">".Pred"</span>,</span>
 <span>  nlevels <span class="op">=</span> <span class="fl">7</span>,</span>
 <span>  colours <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  lower_lim <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -88,6 +89,11 @@ conditioned to have fixed values.</p>
 `<a href="conditional_ternary_data.html">conditional_ternary_data</a>` function.</p></dd>
 
 
+<dt>col_var</dt>
+<dd><p>The column name containing the variable to be used for
+colouring the contours or points. The default is ".Pred".</p></dd>
+
+
 <dt>nlevels</dt>
 <dd><p>The number of levels to show on the contour map.</p></dd>
 
@@ -99,7 +105,7 @@ contour map or points. The number of colours should be same as
 The default colours scheme is the
 <code><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">terrain.colors()</a></code> for
 continuous variables and an extended version of the Okabe-Ito
-colour scale for categoricl variables.</p></dd>
+colour scale for categorical variables.</p></dd>
 
 
 <dt>lower_lim</dt>
@@ -214,6 +220,7 @@ labels in the ternary plot. The default size is 5.</p></dd>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Create multiple plots for additional variables using `add_var`</span></span></span>
 <span class="r-in"><span><span class="co">## Fit model</span></span></span>
+<span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="va">mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm</a></span><span class="op">(</span><span class="va">response</span> <span class="op">~</span> <span class="fl">0</span> <span class="op">+</span> <span class="op">(</span><span class="va">p1</span> <span class="op">+</span> <span class="va">p2</span> <span class="op">+</span> <span class="va">p3</span> <span class="op">+</span> <span class="va">p4</span> <span class="op">+</span> <span class="va">p5</span> <span class="op">+</span> <span class="va">p6</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="va">treatment</span>,</span></span>
 <span class="r-in"><span>           data <span class="op">=</span> <span class="va">sim4</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
@@ -230,6 +237,7 @@ labels in the ternary plot. The default size is 5.</p></dd>
 <span class="r-in"><span><span class="fu">conditional_ternary_plot</span><span class="op">(</span>data <span class="op">=</span> <span class="va">plot_data</span>, nrow <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Created all plots.</span>
 <span class="r-plt img"><img src="conditional_ternary_plot-3.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

@@ -93,7 +93,7 @@ highest to lowest value of chosen metric.</p></dd>
 
 <dt>breakup</dt>
 <dd><p>A boolean value indicating whether to breakup the metric value
-into goodness of fit (defined as -2*loglikelihood) and
+into deviance (defined as -2*loglikelihood) and
 penalty components. Will work only if a single metric out of
 "AIC", "AICc", "BIC", or "BICc" is chosen to plot.</p></dd>
 
@@ -102,7 +102,7 @@ penalty components. Will work only if a single metric out of
 <dd><p>A boolean variable indicating whether to create the plot or return
 the prepared data instead. The default `TRUE` creates the plot while
 `FALSE` would return the prepared data for plotting. Could be useful
-for if user wants to modify the data first and then call the plotting</p></dd>
+if user wants to modify the data first and then call the plotting</p></dd>
 
 
 <dt>model_names</dt>
@@ -215,26 +215,20 @@ models parameter.</p></dd>
 <span class="r-plt img"><img src="model_selection-8.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Specify `plot = FALSE` to not create the plot but return the prepared data</span></span></span>
-<span class="r-in"><span><span class="fu">model_selection</span><span class="op">(</span>models <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">mod_AV</span>, <span class="va">mod_FULL</span>, <span class="va">mod_FG</span>,</span></span>
-<span class="r-in"><span>                              <span class="va">mod_AV_theta</span>, <span class="va">mod_FULL_theta</span>, <span class="va">mod_FG_theta</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                metric <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"AIC"</span>, <span class="st">"BIC"</span><span class="op">)</span>, sort <span class="op">=</span> <span class="cn">TRUE</span>, plot <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
-<span class="r-in"><span>                model_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"AV model"</span>, <span class="st">"Full model"</span>, <span class="st">"FG model"</span>,</span></span>
-<span class="r-in"><span>                                <span class="st">"AV theta"</span>, <span class="st">"Full theta"</span>, <span class="st">"FG theta"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 12 × 7</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    model_name deviance logLik  AICc  BICc Metric Value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> AV theta      104.    203.  220.  237. AIC     217.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> AV theta      104.    203.  220.  237. BIC     232.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> FG theta      102.    202.  224   247. AIC     220.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> FG theta      102.    202.  224   247. BIC     239.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> Full theta     99.0   200.  231.  263. AIC     224.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> Full theta     99.0   200.  231.  263. BIC     249.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> AV model      123.    213.  227.  241. AIC     225.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> AV model      123.    213.  227.  241. BIC     238 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> FG model      121.    213.  231.  251. AIC     229.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> FG model      121.    213.  231.  251. BIC     245.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">11</span> Full model    118.    211.  238.  267. AIC     233.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">12</span> Full model    118.    211.  238.  267. BIC     256.</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu">model_selection</span><span class="op">(</span>models <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">mod_AV</span>, <span class="va">mod_FULL</span>, <span class="va">mod_FG</span>,</span></span>
+<span class="r-in"><span>                                   <span class="va">mod_AV_theta</span>, <span class="va">mod_FULL_theta</span>, <span class="va">mod_FG_theta</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                     metric <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"AIC"</span>, <span class="st">"BIC"</span><span class="op">)</span>, sort <span class="op">=</span> <span class="cn">TRUE</span>, plot <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
+<span class="r-in"><span>                     model_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"AV model"</span>, <span class="st">"Full model"</span>, <span class="st">"FG model"</span>,</span></span>
+<span class="r-in"><span>                                     <span class="st">"AV theta"</span>, <span class="st">"Full theta"</span>, <span class="st">"FG theta"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 6 × 7</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   model_name deviance logLik  AICc  BICc Metric Value</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> AV theta      104.    203.  220.  237. AIC     217.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> AV theta      104.    203.  220.  237. BIC     232.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> FG theta      102.    202.  224   247. AIC     220.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> FG theta      102.    202.  224   247. BIC     239.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> Full theta     99.0   200.  231.  263. AIC     224.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span> Full theta     99.0   200.  231.  263. BIC     249.</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

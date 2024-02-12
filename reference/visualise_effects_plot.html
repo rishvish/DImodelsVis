@@ -97,7 +97,7 @@ community after the variable of interest either completes dominates the communit
 
 <dt>prop</dt>
 <dd><p>A vector of column names or indices identifying the columns containing the
-species proportions in the data. Will be inferred from the data if
+compositional variables in the data. Will be inferred from the data if
 it is created using the `<code><a href="visualise_effects_data.html">visualise_effects_data</a></code>`
 function, but the user also has the flexibility of manually
 specifying the values.</p></dd>
@@ -116,8 +116,9 @@ the effect of species increase or decrease</p></dd>
 
 
 <dt>average</dt>
-<dd><p>A boolean variable indicating whether to add a line describing the "average"
-effect of species increase or decrease</p></dd>
+<dd><p>A boolean value indicating whether to add a line describing the "average"
+effect of variable increase or decrease. The average is calculated at the
+median value of any variables not specified.</p></dd>
 
 
 <dt>nrow</dt>

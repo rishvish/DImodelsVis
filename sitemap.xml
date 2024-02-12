@@ -16,6 +16,9 @@
     <loc>https://rishvish.github.io/DImodelsVis/authors.html</loc>
   </url>
   <url>
+    <loc>https://rishvish.github.io/DImodelsVis/coming_soon.html</loc>
+  </url>
+  <url>
     <loc>https://rishvish.github.io/DImodelsVis/index.html</loc>
   </url>
   <url>
@@ -47,6 +50,9 @@
   </url>
   <url>
     <loc>https://rishvish.github.io/DImodelsVis/reference/conditional_ternary_plot.html</loc>
+  </url>
+  <url>
+    <loc>https://rishvish.github.io/DImodelsVis/reference/copy_attributes.html</loc>
   </url>
   <url>
     <loc>https://rishvish.github.io/DImodelsVis/reference/custom_filter.html</loc>

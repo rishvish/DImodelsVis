@@ -95,17 +95,19 @@ and ".P3".</p></dd>
 
 
 <dt>add_var</dt>
-<dd><p>A list specifying values for additional variables
+<dd><p>A list or data-frame specifying values for additional variables
 in the model other than the proportions (i.e. not part of the
 simplex design).
 This could be useful for comparing the predictions across
 different values for a non-compositional variable.
-One ternary plot will be generated for each unique combination
-of values specified here.</p></dd>
+If specified as a list, it will be expanded to show a plot
+for each unique combination of values specified, while if specified
+as a data-frame, one plot would be generated for each row in the
+data.</p></dd>
 
 
 <dt>resolution</dt>
-<dd><p>A number between 1 and 5 describing the resolution of the
+<dd><p>A number between 1 and 10 describing the resolution of the
 resultant graph.
 A high value would result in a higher definition figure
 but at the cost of being computationally expensive.</p></dd>
@@ -133,7 +135,7 @@ the regression coefficients from a model fit in some other
 language can be used to calculate predictions. However, the
 user would have to ensure there's an appropriate one-to-one
 positional mapping between the data columns and the
-coefficient values. Further, the would also have to provide
+coefficient values. Further, they would also have to provide
 a variance-covariance matrix of the coefficients in the `vcov`
 parameter if they want the associated CI for the prediction or
 it would not be possible to calculate confidence/prediction
@@ -228,7 +230,7 @@ intervals. Default is 0.95.</p></dd>
 <span class="r-in"><span><span class="co">## Fit model</span></span></span>
 <span class="r-in"><span><span class="va">mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">response</span> <span class="op">~</span> <span class="fl">0</span> <span class="op">+</span> <span class="op">(</span><span class="va">p1</span> <span class="op">+</span> <span class="va">p2</span> <span class="op">+</span> <span class="va">p3</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span>, data <span class="op">=</span> <span class="va">sim0</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co">## Preapre data for creating a contour map of predicted response over</span></span></span>
+<span class="r-in"><span><span class="co">## Prepare data for creating a contour map of predicted response over</span></span></span>
 <span class="r-in"><span><span class="co">## the ternary surface</span></span></span>
 <span class="r-in"><span><span class="co">## Remember to specify prop with the same character values as the names</span></span></span>
 <span class="r-in"><span><span class="co">## of the variables in the model containing the prop.</span></span></span>
@@ -247,9 +249,11 @@ intervals. Default is 0.95.</p></dd>
 <span class="r-in"><span>                          add_var <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"treatment"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span>, <span class="st">"B"</span><span class="op">)</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>                          resolution <span class="op">=</span> <span class="fl">1</span>, model <span class="op">=</span> <span class="va">new_mod</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co">## Plot to compare between additional variables</span></span></span>
+<span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="ternary_plot.html">ternary_plot</a></span><span class="op">(</span><span class="va">plot_data</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Created all plots.</span>
 <span class="r-plt img"><img src="ternary_data-2.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## It could be desirable to take the output of this function and add</span></span></span>
 <span class="r-in"><span><span class="co">## additional variables to the data before making predictions</span></span></span>
@@ -270,7 +274,7 @@ intervals. Default is 0.95.</p></dd>
 <span class="r-in"><span><span class="co">## Manually add the treatment variable</span></span></span>
 <span class="r-in"><span><span class="va">contour_data</span><span class="op">$</span><span class="va">treatment</span> <span class="op">&lt;-</span> <span class="st">"A"</span></span></span>
 <span class="r-in"><span><span class="co">## Make predictions</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="add_prediction.html">add_prediction</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">contour_data</span>, model <span class="op">=</span> <span class="va">new_mod</span><span class="op">)</span><span class="op">)</span><span class="co">#'</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="add_prediction.html">add_prediction</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">contour_data</span>, model <span class="op">=</span> <span class="va">new_mod</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   p1        p2          p3          .x .y treatment    .Pred</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1  0 1.0000000 0.000000000 0.000000000  0         A 19.16711</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2  0 0.9949749 0.005025126 0.005025126  0         A 19.38754</span>
@@ -327,9 +331,11 @@ intervals. Default is 0.95.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 5 19.48273 18.07015 20.89532</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 6 19.69349 18.30327 21.08370</span>
 <span class="r-in"><span><span class="co">## Show plot</span></span></span>
+<span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="ternary_plot.html">ternary_plot</a></span><span class="op">(</span><span class="va">contour_data</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Created plot.</span>
 <span class="r-plt img"><img src="ternary_data-3.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span><span class="co">## See `?ternary_plot` for options to customise the ternary_plot</span></span></span>
 </code></pre></div>
     </div>
