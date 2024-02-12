@@ -18,7 +18,7 @@ visualise_effects_plot(
 \item{data}{A data frame created using the \code{\link{visualise_effects_data}} function.}
 
 \item{prop}{A vector of column names or indices identifying the columns containing the
-species proportions in the data. Will be inferred from the data if
+compositional variables in the data. Will be inferred from the data if
 it is created using the `\code{\link{visualise_effects_data}}`
 function, but the user also has the flexibility of manually
 specifying the values.}
@@ -31,8 +31,9 @@ for the pie-glyph slices.}
 \item{se}{A boolean variable indicating whether to plot confidence intervals associated with
 the effect of species increase or decrease}
 
-\item{average}{A boolean variable indicating whether to add a line describing the "average"
-effect of species increase or decrease}
+\item{average}{A boolean value indicating whether to add a line describing the "average"
+effect of variable increase or decrease. The average is calculated at the
+median value of any variables not specified.}
 
 \item{nrow}{Number of rows in which to arrange the final plot
 (when `add_var` is specified).}

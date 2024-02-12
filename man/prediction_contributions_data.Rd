@@ -18,11 +18,10 @@ prediction_contributions_data(
 )
 }
 \arguments{
-\item{data}{A user-defined data-frame containing compositional variables
-specifying values for predictor variables (fitted within the
-model object) that the user wished to predict for. If left blank,
-a selection of observations (2 from each level of richness) from
-the original data used to fit the model would be selected.}
+\item{data}{A user-defined data-frame containing values for compositional variables
+along with any additional variables that the user wishes to predict for.
+If left blank, a selection of observations (2 from each level of
+richness) from the original data used to fit the model would be selected.}
 
 \item{model}{A Diversity Interactions model object fit by using the
 \code{\link[DImodels:DI]{DI()}} function from the
@@ -33,7 +32,7 @@ the regression coefficients from a model fit in some other
 language can be used to calculate predictions. However, the
 user would have to ensure there's an appropriate one-to-one
 positional mapping between the data columns and the
-coefficient values. Further, the would also have to provide
+coefficient values. Further, they would also have to provide
 a variance-covariance matrix of the coefficients in the `vcov`
 parameter if they want the associated CI for the prediction or
 it would not be possible to calculate confidence/prediction
@@ -53,11 +52,13 @@ so would result in no confidence intervals being returned. Ensure
 `coefficients` and `vcov` have the same positional mapping with the data.}
 
 \item{add_var}{A list specifying values for additional predictor variables
-in the model independent of the compositional predictor  variables.
-This would be useful to compare the predictions across
-different values for a categorical variable. One plot will
-be generated for each unique combination of values specified
-here and they will be arranged in a grid according to the
+in the model independent of the compositional predictor variables.
+This could be useful for comparing the predictions across
+different values for a non-compositional variable.
+If specified as a list, it will be expanded to show a plot
+for each unique combination of values specified, while if specified
+as a data-frame, one plot would be generated for each row in the
+data and they will be arranged in a grid according to the
 value specified in `nrow` and `ncol`.}
 
 \item{groups}{A list specifying groupings to arrange coefficients into.
@@ -89,11 +90,14 @@ assign a unique ID for each bar.}
 }
 \value{
 A data-frame with the following columns. Any additional columns which
-weren't used to fit the model would also be present.
+weren't used when fitting the model would also be present.
  \describe{
    \item{.Community}{An identifier column to discern each
                      observation in the data. These are the labels which
                      will be displayed for the bars in the plot.}
+   \item{.add_str_ID}{An identifier column for grouping the cartesian product
+                      of all additional columns specified in `add_var`
+                      parameter (if `add_var` is specified).}
    \item{.Pred}{The predicted repsonse for each observation.}
    \item{.Lower}{The lower limit of the prediction interval for
                  each observation.}
@@ -107,7 +111,7 @@ weren't used to fit the model would also be present.
 }
 \description{
 The helper function for preparing the data to split the predicted response
-from a regression model into contributions (\eqn{\beta} * predictor value)
+from a regression model into contributions (predictor coefficient * predictor value)
 by the terms in the model. The output of this function can be passed to the
 `\link{prediction_contributions_plot}` function to visualise the results.
 }
@@ -153,7 +157,7 @@ head(prediction_contributions_data(data = subset_data,
                                    model = new_mod,
                                    add_var = list(block = c(1, 2))))
 ## The benefit of specifying the variable this way is we have an ID
-## columns now called `.add_str_ID` which could be used to create a
+## columns now called `.add_str_ID` which would be used to create a
 ## separate plot for each value of the additional variable
 
 

@@ -32,9 +32,11 @@ Default theme for DImodelsVis
 \examples{
 library(ggplot2)
 
-ggplot(data = iris,
-       aes(x = Sepal.Length, y = Sepal.Width, colour = Species))+
+plot_data <- mtcars
+plot_data$gear <- as.factor(plot_data$gear)
+ggplot(data = plot_data,
+       aes(x = mpg, y = disp, colour = gear))+
    geom_point(size = 3)+
+   facet_wrap(~cyl) +
    theme_DI()
-
 }

@@ -21,7 +21,7 @@ grouped_ternary_data(
 corresponding to variable proportions. These variables should
 be compositional in nature (i.e., proportions should sum to 1).}
 
-\item{FG}{A character vector specifying the grouping of the variables specified in `prop`.}
+\item{FG}{A character vector specifying the groupings of the variables specified in `prop`.}
 
 \item{values}{A numeric vector specifying the proportional split of the variables within a group.
 The default is to split the group proportion equally between
@@ -30,24 +30,26 @@ each variable in the group.}
 \item{tern_vars}{A character vector giving the names of the three variables
 to be shown in the ternary diagram.}
 
-\item{conditional}{A data-frame describing the names of the variables
+\item{conditional}{A data-frame describing the names of the compositional variables
 and their respective values at which to slice the
 simplex space. The format should be, for example, as follows: \cr
 \code{data.frame("p1" = c(0, 0.5), "p2" = c(0.2, 0.1))} \cr
-Once figure would be created for row in `conditional` with
+One figure would be created for each row in `conditional` with
 the respective values of all specified variables. Any
 compositional variables not specified in `conditional` will
 be assumed to be 0.}
 
-\item{add_var}{A list specifying values for additional variables
+\item{add_var}{A list or data-frame specifying values for additional variables
 in the model other than the proportions (i.e. not part of the
 simplex design).
 This could be useful for comparing the predictions across
 different values for a non-compositional variable.
-One ternary plot will be generated for each unique combination
-of values specified here.}
+If specified as a list, it will be expanded to show a plot
+for each unique combination of values specified, while if specified
+as a data-frame, one plot would be generated for each row in the
+data.}
 
-\item{resolution}{A number between 1 and 5 describing the resolution of the
+\item{resolution}{A number between 1 and 10 describing the resolution of the
 resultant graph.
 A high value would result in a higher definition figure
 but at the cost of being computationally expensive.}
@@ -71,7 +73,7 @@ the regression coefficients from a model fit in some other
 language can be used to calculate predictions. However, the
 user would have to ensure there's an appropriate one-to-one
 positional mapping between the data columns and the
-coefficient values. Further, the would also have to provide
+coefficient values. Further, they would also have to provide
 a variance-covariance matrix of the coefficients in the `vcov`
 parameter if they want the associated CI for the prediction or
 it would not be possible to calculate confidence/prediction
@@ -127,18 +129,18 @@ A data-frame containing compositional columns with names specified
 \description{
 The helper function for preparing the underlying data for creating grouped
 ternary diagrams where the proportions of the compositional variables
-are combined into groups and visualised on a 2-d ternary diagram.
+are combined into groups and visualised on a ternary diagram.
 These are very useful when we have multiple compositional variables that can
-be grouped together by some hierarchical grouping structure. For e.g., grouping
+be grouped together by some hierarchical grouping structure. For example, grouping
 species in a ecosystem based on the functions they perform, or grouping
 political parties based on their national alliances. Grouping variables this
 way allows us to reduce the dimensionality of the compositional data and
 visualise it. This is akin to looking at a 2-d slice of the high
 dimensional simplex. The relative proportions of each variable within a group
-can be adjust to look at "different" slices of the simplex. Looking at multiple
+can be adjust to look at different slices of the simplex. Looking at multiple
 such slices would enable us to create an approximation of how the response varies
 across the original n-dimensional simplex. The output of this function can be passed to the
-\code{\link{conditional_ternary_plot}} function to plot the results.
+\code{\link{grouped_ternary_plot}} function to plot the results.
 }
 \examples{
 library(DImodels)

@@ -10,15 +10,17 @@ add_add_var(data, add_var = NULL)
 \item{data}{A data frame containing the data in which to add the
 additional variables.}
 
-\item{add_var}{A named list specifying the names and corresponding
-values of each new variable to add to the data. The
-row in the data would be replicated for each unique
-combination of values of variables (i.e., their
-cartesian product)in `add_var`.}
+\item{add_var}{A named list or data-frame specifying the names and
+corresponding values of each new variable to add to the data.
+If a list is specified, each row in the data would be replicated
+for each unique combination of values of the specified variables
+(i.e., their cartesian product) in `add_var`, while specifying
+a data-frame would replicate each row in the data for each row
+in add_var (i.e., merge the two data-frames).}
 }
 \value{
 A data-frame with all additional columns specified in `add_var`
-        and the following column.
+        and the following additional column.
  \describe{
    \item{.add_str_ID}{A unique identifier describing each element from the
                       cartesian product of all variables specified in `add_var`.}
@@ -38,10 +40,16 @@ print(test_data)
 add_add_var(data = test_data,
             add_var = list("Var1" = c(10, 20)))
 
-## Specifying multiple variables will add values for each unique combination
+## Specifying multiple variables as a list will add values for
+##  each unique combination
 add_add_var(data = test_data,
             add_var = list("Var1" = c(10, 20),
                            "Var2" = c(30, 40)))
+
+## Specifying add_var as a data.frame would simply merge the two data-frames
+add_add_var(data = test_data,
+            add_var = data.frame("Var1" = c(10, 20),
+                                 "Var2" = c(30, 40)))
 
 ## If the list specified in `add_var` is not named, then the additional
 ## variables will be automatically named Var1, Var2, Var3, etc.

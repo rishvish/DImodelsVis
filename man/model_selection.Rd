@@ -25,14 +25,14 @@ different models.}
 highest to lowest value of chosen metric.}
 
 \item{breakup}{A boolean value indicating whether to breakup the metric value
-into goodness of fit (defined as -2*loglikelihood) and
+into deviance (defined as -2*loglikelihood) and
 penalty components. Will work only if a single metric out of
 "AIC", "AICc", "BIC", or "BICc" is chosen to plot.}
 
 \item{plot}{A boolean variable indicating whether to create the plot or return
 the prepared data instead. The default `TRUE` creates the plot while
 `FALSE` would return the prepared data for plotting. Could be useful
-for if user wants to modify the data first and then call the plotting}
+if user wants to modify the data first and then call the plotting}
 
 \item{model_names}{A character string describing the names to display
 on X-axis for each model in order they appear in the
@@ -118,9 +118,9 @@ model_selection(models = list(mod_AV, mod_FULL, mod_FG,
                                 "AV theta", "Full theta", "FG theta"))
 
 ## Specify `plot = FALSE` to not create the plot but return the prepared data
-model_selection(models = list(mod_AV, mod_FULL, mod_FG,
-                              mod_AV_theta, mod_FULL_theta, mod_FG_theta),
-                metric = c("AIC", "BIC"), sort = TRUE, plot = FALSE,
-                model_names = c("AV model", "Full model", "FG model",
-                                "AV theta", "Full theta", "FG theta"))
+head(model_selection(models = list(mod_AV, mod_FULL, mod_FG,
+                                   mod_AV_theta, mod_FULL_theta, mod_FG_theta),
+                     metric = c("AIC", "BIC"), sort = TRUE, plot = FALSE,
+                     model_names = c("AV model", "Full model", "FG model",
+                                     "AV theta", "Full theta", "FG theta")))
 }

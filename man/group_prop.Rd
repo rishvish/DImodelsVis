@@ -34,6 +34,6 @@ head(group_prop(data = sim1, prop = 3:6,
 head(group_prop(data = sim1, prop = 3:6,
                 FG = c("Group1", "Group2", "Group1", "Group3")))
 
-# Data is returned as is, if no groups are specified in FG
+## Data is returned as is, if no groups are specified in FG
 head(group_prop(data = sim1, prop = 3:6))
 }

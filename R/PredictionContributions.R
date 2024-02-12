@@ -2,7 +2,7 @@
 #'
 #' @description
 #' The helper function for preparing the data to split the predicted response
-#' from a regression model into contributions (\eqn{\beta} * predictor value)
+#' from a regression model into contributions (predictor coefficient * predictor value)
 #' by the terms in the model. The output of this function can be passed to the
 #' `\link{prediction_contributions_plot}` function to visualise the results.
 #'
@@ -14,11 +14,14 @@
 #' @inheritParams add_prediction
 #'
 #' @return A data-frame with the following columns. Any additional columns which
-#' weren't used to fit the model would also be present.
+#' weren't used when fitting the model would also be present.
 #'  \describe{
 #'    \item{.Community}{An identifier column to discern each
 #'                      observation in the data. These are the labels which
 #'                      will be displayed for the bars in the plot.}
+#'    \item{.add_str_ID}{An identifier column for grouping the cartesian product
+#'                       of all additional columns specified in `add_var`
+#'                       parameter (if `add_var` is specified).}
 #'    \item{.Pred}{The predicted repsonse for each observation.}
 #'    \item{.Lower}{The lower limit of the prediction interval for
 #'                  each observation.}
@@ -74,7 +77,7 @@
 #'                                    model = new_mod,
 #'                                    add_var = list(block = c(1, 2))))
 #' ## The benefit of specifying the variable this way is we have an ID
-#' ## columns now called `.add_str_ID` which could be used to create a
+#' ## columns now called `.add_str_ID` which would be used to create a
 #' ## separate plot for each value of the additional variable
 #'
 #'
@@ -111,9 +114,9 @@ prediction_contributions_data <- function(data, model = NULL, coefficients = NUL
                                           bar_labs = rownames(data)){
   if(missing(data)){
     cli::cli_abort(c("{.var data} cannot be empty.",
-                     "i" = "Specify a data frame or tibble indicating the species
-                     communties which to use for calculating the average change
-                     across a diversity gradient."))
+                     "i" = "Specify a data frame or tibble containing the model
+                     terms needed to calculate their contributions to the predicted
+                     response."))
   }
 
   # Allow user to specify labels for the bars
@@ -277,14 +280,15 @@ prediction_contributions_data <- function(data, model = NULL, coefficients = NUL
   return(grouped_data)
 }
 
-#' @title Model term contributions to predicted response
+#' @title Visualise model term contributions to predicted response
 #'
 #' @description
 #' The plotting function to visualise the predicted response from a
 #' regression model as a stacked bar-chart showing the contributions
-#' (\eqn{\beta} * predictor value) of each model term to the total
-#' predicted value. Requires the output of the
-#' `\link{prediction_contributions_data}` as an input in the `data` parameter.
+#' (predictor coefficient * predictor value) of each model term to the total
+#' predicted value (represented by the total height of the bar).
+#' Requires the output of the `\link{prediction_contributions_data}` as an
+#' input in the `data` parameter.
 #'
 #' @param data A data-frame which is the output of the
 #'             `\link{prediction_contributions_data}` function, consisting of
@@ -295,7 +299,7 @@ prediction_contributions_data <- function(data, model = NULL, coefficients = NUL
 #'                If not specified, a default colour-scheme would be chosen,
 #'                however it could be uninformative and it is recommended to
 #'                manually choose contrasting colours for each coefficient
-#'                group to render a more useful plot.
+#'                group to render a more informative plot.
 #' @inheritParams prediction_contributions
 #'
 #' @inherit prediction_contributions return
@@ -307,9 +311,10 @@ prediction_contributions_data <- function(data, model = NULL, coefficients = NUL
 #'
 #' ## Load data
 #' data(sim2)
+#' sim2$AV <- DI_data_E_AV(data = sim2, prop = 3:6)$AV
 #'
 #' ## Fit model
-#' mod <- glm(response ~ 0 + (p1 + p2 + p3 + p4)^2, data = sim2)
+#' mod <- glm(response ~ 0 + (p1 + p2 + p3 + p4 + AV), data = sim2)
 #'
 #' ## Create data for plotting
 #' plot_data <- prediction_contributions_data(data = sim2[c(1,5,9,11,15,19,23), ],
@@ -318,8 +323,8 @@ prediction_contributions_data <- function(data, model = NULL, coefficients = NUL
 #' prediction_contributions_plot(data = plot_data)
 #'
 #' ## Choose distinct colours for groups of coefficients for better visibility
-#' ID_cols <- get_colours(4)
-#' int_cols <- get_shades("#808080", 6)[[1]]
+#' ID_cols <- get_colours(4, FG = c("G", "G", "H", "H"))
+#' int_cols <- "#808080"
 #' cols <- c(ID_cols, int_cols)
 #' ## Specify colours using `cols`
 #' prediction_contributions_plot(data = plot_data, colours = cols)
@@ -338,9 +343,9 @@ prediction_contributions_data <- function(data, model = NULL, coefficients = NUL
 #'
 #' ## If multiple plots are desired `add_var` can be specified during
 #' ## data preparation and the plots can be arranged using nrow and ncol
-#' sim2$block <- as.numeric(sim2$block)
+#' sim2$block <- as.character(sim2$block)
 #' new_mod <- update(mod, ~. + block, data = sim2)
-#' plot_data <- prediction_contributions_data(data = sim2[c(1,5,9,11,15,19,23), 3:6],
+#' plot_data <- prediction_contributions_data(data = sim2[c(1,5,9,11,15,19,23), c(3:6, 8)],
 #'                                            model = new_mod,
 #'                                            add_var = list("block" = c("1", "2")))
 #' ## Arrange in two columns
@@ -352,8 +357,8 @@ prediction_contributions_plot <- function(data, colours = NULL, se = FALSE,
   # Ensure data is specified
   if(missing(data)){
     cli::cli_abort(c("{.var data} cannot be empty.",
-                     "i" = "Specify a data frame or tibble (preferably the
-                            output of {.help [{.fn prediction_contributions_data}](DImodelsVis::prediction_contributions_data)})."))
+                     "i" = "Specify a data frame or tibble, preferably the
+                            output of {.help [{.fn {col_green(\"prediction_contributions_data\")}}](DImodelsVis::prediction_contributions_data)}."))
   }
 
   if(check_col_exists(data, ".add_str_ID")){
@@ -395,7 +400,7 @@ prediction_contributions_plot <- function(data, colours = NULL, se = FALSE,
 #' on top of another. The total height of the stacked bar gives the value of the
 #' predicted response. The uncertainty around the predicted response can also be shown
 #' on the plot.
-#' This is a wrapper function specifically for statistical models fit using the
+#' This is a wrapper function specifically designed for statistical models fit using the
 #' \code{\link[DImodels:DI]{DI()}} function from the
 #' \code{\link[DImodels:DImodels-package]{DImodels}} R package and it implicitly
 #' calls \code{\link{prediction_contributions_data}} followed by
@@ -419,11 +424,10 @@ prediction_contributions_plot <- function(data, colours = NULL, se = FALSE,
 #' @param model A Diversity Interactions model object fit by using the
 #'              \code{\link[DImodels:DI]{DI()}} function from the
 #'              \code{\link[DImodels:DImodels-package]{DImodels}} package.
-#' @param data A user-defined data-frame containing compositional variables
-#'             specifying values for predictor variables (fitted within the
-#'             model object) that the user wished to predict for. If left blank,
-#'             a selection of observations (2 from each level of richness) from
-#'             the original data used to fit the model would be selected.
+#' @param data A user-defined data-frame containing values for compositional variables
+#'             along with any additional variables that the user wishes to predict for.
+#'             If left blank, a selection of observations (2 from each level of
+#'             richness) from the original data used to fit the model would be selected.
 #' @param FG A higher level grouping for the compositional variables in the
 #'           data. Variables belonging to the same group will be assigned with
 #'           different shades of the same colour. The user can manually specify
@@ -431,11 +435,13 @@ prediction_contributions_plot <- function(data, colours = NULL, se = FALSE,
 #'           If left empty the function will try to get a grouping
 #'           from the original \code{\link[DImodels:DI]{DI}} model object.
 #' @param add_var A list specifying values for additional predictor variables
-#'                in the model independent of the compositional predictor  variables.
-#'                This would be useful to compare the predictions across
-#'                different values for a categorical variable. One plot will
-#'                be generated for each unique combination of values specified
-#'                here and they will be arranged in a grid according to the
+#'                in the model independent of the compositional predictor variables.
+#'                This could be useful for comparing the predictions across
+#'                different values for a non-compositional variable.
+#'                If specified as a list, it will be expanded to show a plot
+#'                for each unique combination of values specified, while if specified
+#'                as a data-frame, one plot would be generated for each row in the
+#'                data and they will be arranged in a grid according to the
 #'                value specified in `nrow` and `ncol`.
 #' @param groups A list specifying groupings to arrange coefficients into.
 #'               The coefficients within a group will be added together and
@@ -531,13 +537,6 @@ prediction_contributions_plot <- function(data, colours = NULL, se = FALSE,
 #'                          groups = list("Interactions" = c("`p1:p2`", "`p1:p3`",
 #'                                                           "`p1:p4`", "`p2:p3`",
 #'                                                           "`p2:p4`", "`p3:p4`")))
-#' ## Specify `plot = FALSE` to not create the plot but return the prepared data
-#' prediction_contributions(model1, data = my_comms, plot = FALSE,
-#'                          facet_var = "richness",
-#'                          bar_orientation = "horizontal",
-#'                          groups = list("Interactions" = c("`p1:p2`", "`p1:p3`",
-#'                                                           "`p1:p4`", "`p2:p3`",
-#'                                                           "`p2:p4`", "`p3:p4`")))
 #'
 #' ## Can also add additional variables independent of the simplex design
 #' ## to get a separate plot for unique combination of the variables
@@ -562,6 +561,11 @@ prediction_contributions_plot <- function(data, colours = NULL, se = FALSE,
 #'                          groups = list("Interactions" = c("`p1:p2`", "`p1:p3`",
 #'                                                           "`p1:p4`", "`p2:p3`",
 #'                                                           "`p2:p4`", "`p3:p4`")))
+#'
+#' ## Specify `plot = FALSE` to not create the plot but return the prepared data
+#' head(prediction_contributions(model1, data = my_comms, plot = FALSE,
+#'                               facet_var = "richness",
+#'                               bar_orientation = "horizontal"))
 prediction_contributions <- function(model, data = NULL,
                                      add_var = list(), groups = list(),
                                      conf.level = 0.95, bar_labs = rownames(data),
@@ -708,13 +712,20 @@ prediction_contributions_plot_internal <- function(data, colours = NULL,
                   cols_to_check = c(".Community", ".Value", ".Contributions"),
                   calling_fun = "prediction_contributions")
 
+  if(any(data[, ".Value"] < 0)){
+    cli::cli_warn(c("Some terms in the model had negative contributions to the
+                    predictions.",
+                    "i" = "The plot will be created but might not be
+                    interpretable for this example."))
+  }
+
   # Colours for the bar segments
   if(is.null(colours)){
     rlang::warn(c("No colours were specified for the response contributions.",
                   "i" = "The default colours might not result in an informative
                          plot, consider choosing specific colours to contrast
                          the contributions of different groups in the response."),
-                .frequency = "regularly", .frequency_id = "2")
+                .frequency = "once", .frequency_id = "2")
     colours <- get_colours(levels(factor(data$.Contributions)))
   }
 

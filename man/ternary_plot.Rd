@@ -2,7 +2,7 @@
 % Please edit documentation in R/Ternary.R
 \name{ternary_plot}
 \alias{ternary_plot}
-\title{Ternary diagram}
+\title{Ternary diagrams}
 \usage{
 ternary_plot(
   data,
@@ -73,7 +73,7 @@ contour map or points. The number of colours should be same as
 The default colours scheme is the
 \code{\link[grDevices:terrain.colors]{terrain.colors()}} for
 continuous variables and an extended version of the Okabe-Ito
-colour scale for categoricl variables.}
+colour scale for categorical variables.}
 
 \item{lower_lim}{A number to set a custom lower limit for the contour
 (if `show = "contours"`). The default is minimum of the prediction.}
@@ -97,8 +97,8 @@ A ggmultiplot (ggplot if single plot is returned) class object or data-frame (if
 \description{
 Create a ternary diagram showing the a scatter-plot of points across the surface
 or a contour map showing the change in a continuous variable across the
-ternary surface. The ternary surface can be created using the `\link{ternary_data}`
-function.
+ternary surface. The ternary surface can be created using the
+\code{\link{ternary_data}} function.
 }
 \examples{
 library(DImodels)
@@ -164,6 +164,7 @@ ternary_plot(plot_data, tern_labels = c("Sp1", "Sp2", "Sp3"),
              vertex_label_size = 6, axis_label_size = 5)
 
 ## Add additional variables and create a separate plot for each
+\donttest{
 sim0$treatment <-  rep(c("A", "B", "C", "D"), each = 16)
 new_mod <- update(mod, ~. + treatment, data = sim0)
 tern_data <- ternary_data(resolution = 1, model = new_mod,
@@ -171,4 +172,5 @@ tern_data <- ternary_data(resolution = 1, model = new_mod,
                           add_var = list("treatment" = c("A", "C")))
 ## Arrange plot in 2 columns
 ternary_plot(data = tern_data, ncol = 2)
+}
 }

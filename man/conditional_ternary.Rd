@@ -6,7 +6,9 @@
 \usage{
 conditional_ternary(
   model,
-  tern_vars,
+  FG = NULL,
+  values = NULL,
+  tern_vars = NULL,
   conditional = NULL,
   add_var = list(),
   resolution = 3,
@@ -29,27 +31,38 @@ conditional_ternary(
 \code{\link[DImodels:DI]{DI()}} function from the
 \code{\link[DImodels:DImodels-package]{DImodels}} package.}
 
+\item{FG}{A character vector specifying the grouping of the variables
+specified in `prop`. Specifying this parameter would call the
+grouped_ternary_data function internally. See \code{\link{grouped_ternary}}
+or \code{\link{grouped_ternary_data}} for more information.}
+
+\item{values}{A numeric vector specifying the proportional split of the
+variables within a group. The default is to split the group
+proportion equally between each variable in the group.}
+
 \item{tern_vars}{A character vector giving the names of the three variables
 to be shown in the ternary diagram.}
 
-\item{conditional}{A data-frame describing the names of the variables
+\item{conditional}{A data-frame describing the names of the compositional variables
 and their respective values at which to slice the
 simplex space. The format should be, for example, as follows: \cr
 \code{data.frame("p1" = c(0, 0.5), "p2" = c(0.2, 0.1))} \cr
-Once figure would be created for row in `conditional` with
+One figure would be created for each row in `conditional` with
 the respective values of all specified variables. Any
 compositional variables not specified in `conditional` will
 be assumed to be 0.}
 
-\item{add_var}{A list specifying values for additional variables
+\item{add_var}{A list or data-frame specifying values for additional variables
 in the model other than the proportions (i.e. not part of the
 simplex design).
 This could be useful for comparing the predictions across
 different values for a non-compositional variable.
-One ternary plot will be generated for each unique combination
-of values specified here.}
+If specified as a list, it will be expanded to show a plot
+for each unique combination of values specified, while if specified
+as a data-frame, one plot would be generated for each row in the
+data.}
 
-\item{resolution}{A number between 1 and 5 describing the resolution of the
+\item{resolution}{A number between 1 and 10 describing the resolution of the
 resultant graph.
 A high value would result in a higher definition figure
 but at the cost of being computationally expensive.}
@@ -57,7 +70,7 @@ but at the cost of being computationally expensive.}
 \item{plot}{A boolean variable indicating whether to create the plot or return
 the prepared data instead. The default \code{TRUE} creates the plot while
 \code{FALSE} would return the prepared data for plotting. Could be useful
-for if user wants to modify the data first and then call the plotting.}
+if user wants to modify the data first and then create the plot.}
 
 \item{nlevels}{The number of levels to show on the contour map.}
 
@@ -67,7 +80,7 @@ contour map or points. The number of colours should be same as
 The default colours scheme is the
 \code{\link[grDevices:terrain.colors]{terrain.colors()}} for
 continuous variables and an extended version of the Okabe-Ito
-colour scale for categoricl variables.}
+colour scale for categorical variables.}
 
 \item{lower_lim}{A number to set a custom lower limit for the contour
 (if `show = "contours"`). The default is minimum of the prediction.}
@@ -103,9 +116,9 @@ labels in the ternary plot. The default size is 5.}
 A ggmultiplot (ggplot if single plot is returned) class object or data-frame (if `plot = FALSE`)
 }
 \description{
-We fix \eqn{n-3} variables to have a constant value \eqn{x_1, x_2, x_3, ... x_{n-3}}
-such that \eqn{x = x_1 + x_2 + x_3 + ... x_{n - 3}} and \eqn{0 \le x \le 1} and
-vary the proportion of the remaining three variables between \eqn{0} and \eqn{1-x}
+We fix \eqn{n-3} variables to have a constant value \eqn{p_1, p_2, p_3, ... p_{n-3}}
+such that \eqn{P = p_1 + p_2 + p_3 + ... p_{n - 3}} and \eqn{0 \le P \le 1} and
+vary the proportion of the remaining three variables between \eqn{0} and \eqn{1-P}
 to visualise the change in the predicted response as a contour map within a
 ternary diagram. This is equivalent to taking multiple 2-d slices of the
 high dimensional simplex space. Taking multiple 2-d slices across multiple
@@ -137,23 +150,27 @@ m2 <- DI(y = "response", prop = paste0("p", 1:6),
          suppressWarnings()
 
 ## Conditioning on multiple variables
-cond <- data.frame(p4 = c(0, 0.2), p5 = c(0.5, 0.1), p6 = c(0, 0.3))
+cond <- data.frame(p4 = c(0, 0.2), p3 = c(0.5, 0.1), p6 = c(0, 0.3))
 conditional_ternary(model = m2, conditional = cond,
-                    resolution = 1)
+                    tern_vars = c("p1", "p2", "p5"), resolution = 1)
 
 ## Create separate plots for additional variables not a part of the simplex
 m3 <- DI(y = "response", prop = paste0("p", 1:6),
          DImodel = "AV", data = sim4, treat = "treatment") \%>\%
          suppressWarnings()
 
-## Create plot and arrange it using nrow
+## Create plot and arrange it using nrow and ncol
+\donttest{
 conditional_ternary(model = m3, conditional = cond[1, ],
+                    tern_vars = c("p1", "p2", "p5"),
                     resolution = 1,
-                    add_var = list("treatment" = c(50, 150, 250)),
-                    nrow = 3)
+                    add_var = list("treatment" = c(50, 150)),
+                    nrow = 2, ncol = 1)
+}
 
 ## Specify `plot = FALSE` to not create the plot but return the prepared data
-conditional_ternary(model = m3, conditional = cond[1, ],
-                    resolution = 1, plot = FALSE,
-                    add_var = list("treatment" = c(50, 150, 250)))
+head(conditional_ternary(model = m3, conditional = cond[1, ],
+                         resolution = 1, plot = FALSE,
+                         tern_vars = c("p1", "p2", "p5"),
+                         add_var = list("treatment" = c(50, 150))))
 }

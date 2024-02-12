@@ -3,25 +3,25 @@
 #' @description
 #' The helper function for preparing the underlying data for creating grouped
 #' ternary diagrams where the proportions of the compositional variables
-#' are combined into groups and visualised on a 2-d ternary diagram.
+#' are combined into groups and visualised on a ternary diagram.
 #' These are very useful when we have multiple compositional variables that can
-#' be grouped together by some hierarchical grouping structure. For e.g., grouping
+#' be grouped together by some hierarchical grouping structure. For example, grouping
 #' species in a ecosystem based on the functions they perform, or grouping
 #' political parties based on their national alliances. Grouping variables this
 #' way allows us to reduce the dimensionality of the compositional data and
 #' visualise it. This is akin to looking at a 2-d slice of the high
 #' dimensional simplex. The relative proportions of each variable within a group
-#' can be adjust to look at "different" slices of the simplex. Looking at multiple
+#' can be adjust to look at different slices of the simplex. Looking at multiple
 #' such slices would enable us to create an approximation of how the response varies
 #' across the original n-dimensional simplex. The output of this function can be passed to the
-#' \code{\link{conditional_ternary_plot}} function to plot the results.
+#' \code{\link{grouped_ternary_plot}} function to plot the results.
 #'
 #'
-#' @inheritParams conditional_ternary_data
-#' @param FG A character vector specifying the grouping of the variables specified in `prop`.
+#' @param FG A character vector specifying the groupings of the variables specified in `prop`.
 #' @param values A numeric vector specifying the proportional split of the variables within a group.
 #'               The default is to split the group proportion equally between
 #'               each variable in the group.
+#' @inheritParams conditional_ternary_data
 #' @inheritDotParams add_prediction -data
 #'
 #' @return A data-frame containing compositional columns with names specified
@@ -292,7 +292,6 @@ grouped_ternary_data <- function(prop, FG,
 
   cli::cli_alert_success("Finished data preparation.")
   return(cond_data)
-  #return(list(data = cond_data, cond_FG = cond_FG, cond_values = cond_values))
 }
 
 #' @title Conditional ternary diagrams at functional group level
@@ -300,9 +299,9 @@ grouped_ternary_data <- function(prop, FG,
 #' @description
 #' The helper function for plotting grouped ternary diagrams. The output of
 #' the `\code{\link{grouped_ternary_data}}` with the compositional variables
-#' combined into groups should be passed here visualised on a 2-d ternary diagram.
+#' combined into groups should be passed here to be visualised on a 2-d ternary diagram.
 #' These are very useful when we have multiple compositional variables that can
-#' be grouped together by some hierarchical grouping structure. For e.g., grouping
+#' be grouped together by some hierarchical grouping structure. For example, grouping
 #' species in a ecosystem based on the functions they perform, or grouping
 #' political parties based on their national alliances.
 #'
@@ -323,7 +322,7 @@ grouped_ternary_data <- function(prop, FG,
 #'            data = sim3)
 #'
 #' ## Create data
-#' ## We have nine (p1 to p9) variables here and using \code{\link{conditional_ternary}}
+#' ## We have nine (p1 to p9) variables here and using conditional_ternary
 #' ## to visualise the simplex space won't be very helpful as there are too
 #' ## variables to condition on
 #' ## Instead we group the nine-variables into three groups called "G", "L" and "H"
@@ -371,6 +370,7 @@ grouped_ternary_data <- function(prop, FG,
 #'                                   resolution = 1)
 #' grouped_ternary_plot(data = plot_data)
 grouped_ternary_plot <- function(data,
+                                 col_var = ".Pred",
                                  nlevels = 7,
                                  colours = NULL,
                                  lower_lim = NULL,
@@ -383,11 +383,13 @@ grouped_ternary_plot <- function(data,
                                  vertex_label_size = 5,
                                  nrow = 0, ncol = 0){
   if(missing(data)){
-    cli::cli_abort(c("{.var data} cannot be missing.",
-                    "i" = "Specify the output of {.fn conditional_ternary_data} function."))
+    cli::cli_abort(c("{.var data} cannot be empty.",
+                     "i" = "Specify a data frame or tibble (preferably the
+                            output of {.help [{.fn {col_green(\"grouped_ternary_data\")}}](DImodelsVis::grouped_ternary_data)})."))
   }
 
   pl <- conditional_ternary_plot(data = data,
+                                 col_var = col_var,
                                  nlevels = nlevels,
                                  colours = colours,
                                  tern_labels = tern_labels,
@@ -409,12 +411,12 @@ grouped_ternary_plot <- function(data,
 #' compositional variables into groups and visualising these groups on a 2-d
 #' ternary diagram. These are very useful when we have multiple compositional
 #' variables that can be grouped together by some hierarchical grouping structure.
-#' For e.g., grouping species in a ecosystem based on the functions they perform,
+#' For example, grouping species in a ecosystem based on the functions they perform,
 #' or grouping political parties based on their national alliances. Grouping
 #' variables this way allows us to reduce the dimensionality of the compositional
 #' data and visualise it. This is akin to looking at a 2-d slice of the high
 #' dimensional simplex. The relative proportions of each variable within a group
-#' can be adjust to look at "different" slices of the simplex. Looking at multiple
+#' can be adjusted to look at different slices of the simplex. Looking at multiple
 #' such slices would enable us to create an approximation of how the response varies
 #' across the original n-dimensional simplex.
 #' This is a wrapper function specifically for statistical models fit using the
@@ -445,7 +447,7 @@ grouped_ternary_plot <- function(data,
 #'          DImodel = "AV", data = sim3) %>%
 #'          suppressWarnings()
 #'
-#' ## We have nine (p1 to p9) variables here and using \code{\link{conditional_ternary}}
+#' ## We have nine (p1 to p9) variables here and using `conditional_ternary`
 #' ## to visualise the simplex space won't be very helpful as there are too
 #' ## variables to condition on
 #' ## Instead we group the nine-variables into three groups called "G", "L" and "H"
@@ -460,7 +462,7 @@ grouped_ternary_plot <- function(data,
 #' ## also extend to points along the edges and interior of the ternary.
 #'
 #' ## We can also manually specify the split of the species within a group
-#' ## This would mean we're looking at a different slice of the simplex
+#' ## This would mean we are looking at a different slice of the simplex
 #' ## For example this would mean the groups "L" group is made up of 100% of
 #' ## p7 and doesn't contain any p6, while "H" group contains 30% of p8 and
 #' ## 70% of p9, while "G" group still contains 20% of each p1 to p5.
@@ -474,7 +476,7 @@ grouped_ternary_plot <- function(data,
 #' ## to have a fixed value while three groups are manipulated within a ternary
 #' ## The group "G" is now split into two groups "G1" and "G2"
 #' ## We can create conditional ternary diagram at the grouped level as well
-#' ## Just notice the values going in `tern_vars` and `conditional` are names
+#' ## Notice the values going in `tern_vars` and `conditional` are names
 #' ## of the groups and not the original compositional variables
 #' grouped_ternary(m1, FG = c("G1","G1","G2","G2","G2","L","L","H","H"),
 #'                 resolution = 1,
@@ -482,10 +484,10 @@ grouped_ternary_plot <- function(data,
 #'                 conditional = data.frame("G2" = c(0, 0.25, 0.5)))
 #'
 #' ## Specify `plot = FALSE` to not create the plot but return the prepared data
-#' grouped_ternary(m1, FG = c("G1","G1","G2","G2","G2","L","L","H","H"),
-#'                 resolution = 1, plot = FALSE,
-#'                 tern_vars = c("G1", "L", "H"),
-#'                 conditional = data.frame("G2" = c(0, 0.25, 0.5)))
+#' head(grouped_ternary(m1, FG = c("G1","G1","G2","G2","G2","L","L","H","H"),
+#'                      resolution = 1, plot = FALSE,
+#'                      tern_vars = c("G1", "L", "H"),
+#'                      conditional = data.frame("G2" = c(0, 0.25, 0.5))))
 #'
 #' ## All other functionality from \code{\link{condtional_ternary_plot}} is
 #' ## available in this function too.
@@ -534,7 +536,10 @@ grouped_ternary <- function(model,
       FG <- attr(model, "FG")
     } else {
       cli::cli_abort(c("The {.var FG} argument cannot be empty.",
-                       "i" = "The {.var FG} argument should be specified as a character vector of same length as the {.var prop} argument, specifying the functional group to which each species in prop belongs."))
+                       "i" = "The {.var FG} argument should be specified as a
+                       character vector of same length as the {.var prop} argument,
+                       specifying the functional group to which each variable
+                       in {.var prop} belongs."))
     }
   }
 
@@ -616,13 +621,20 @@ FG_sanity_checks <- function(prop, FG,
                              conditional = NULL){
 
   if(!is.character(FG)){
-    cli::cli_abort(c("The {.var FG} argument should be specified as a character vector of same length as the {.var prop} argument, specifying the functional group to which each species in prop belongs.",
+    cli::cli_abort(c("The {.var FG} argument should be specified as a character
+                     vector of same length as the {.var prop} argument,
+                     specifying the functional group to which each variable
+                     in {.var prop} belongs.",
                      "i" = "{.var FG} was specified as a {.cls {class(FG)}} object."))
   }
 
   if(length(prop) != length(FG)){
-    cli::cli_abort(c("The {.var FG} argument should be specified as a character vector of same length as the {.var prop} argument, specifying the functional group to which each species in prop belongs.",
-                     "i" = "{.var FG} has length {length(FG)} while {.var prop} has length {length(prop)}."))
+    cli::cli_abort(c("The {.var FG} argument should be specified as a character
+                     vector of same length as the {.var prop} argument,
+                     specifying the functional group to which each variable
+                     in {.var prop} belongs.",
+                     "i" = "{.var FG} has length {length(FG)} while {.var prop}
+                     has length {length(prop)}."))
   }
 
   if(is.null(values)){
@@ -687,9 +699,9 @@ FG_sanity_checks <- function(prop, FG,
       as.data.frame()
     cli::cli_warn(msg)
   } else if(length(all_FGs) > 3 && is.null(tern_vars)){
-    if(!(inherits(conditional, "data.frame") || is.list(conditional))){
-      cli::cli_abort("{.var conditional} should be a list or data-frame containing
-                   the names and conditioning values for the variables at which
+    if(!(inherits(conditional, "data.frame"))){
+      cli::cli_abort("{.var conditional} should be a data-frame containing
+                   the names and values for the variables at which
                    the simplex space should be sliced.",
                      "i" = "{.var conditional} was specified as a
                           {.cls {conditional}}.",
@@ -721,11 +733,11 @@ FG_sanity_checks <- function(prop, FG,
                           {.cls {tern_vars}}.")
   }
 
-  if(!is.null(tern_vars) && !any(tern_vars %in% all_FGs)){
-    cli::cli_abort(c("All values specified in {.var tern_vars} should be present
-                    in {.var FG}.",
-                    "i" = "{.val {tern_vars[! tern_vars %in% all_FGs]}} {?is/are}
-                            not specified in {.var FG}."))
+  if(!is.null(tern_vars) && any(!tern_vars %in% all_FGs)){
+    cli::cli_abort(c("If specifying the {.var FG} parameter, {.var tern_vars}
+                     should consist of values specified in {.var FG}.",
+                    "i" = "Choose three values from {.val {all_FGs}} in
+                    {.var tern_vars} to be shown in the ternary."))
   }
   if(!is.null(tern_vars) && length(tern_vars) > 3){
     cli::cli_abort(c("{.var tern_vars} cannot have more than three elements.",
@@ -737,7 +749,9 @@ FG_sanity_checks <- function(prop, FG,
   if(!is.null(conditional)){
     conditional <- check_conditional_parameter(conditional = conditional,
                                                prop = all_FGs,
-                                               tern_vars = tern_vars)
+                                               tern_vars = tern_vars,
+                                               cond_FGs = all_FGs[!all_FGs %in% tern_vars],
+                                               FG_flag = TRUE)
   }
 
   # # Check for conditional FG and conditioning values

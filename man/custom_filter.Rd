@@ -16,16 +16,16 @@ compositional variables in `data`.}
 \item{special}{A character string specifying the filtering condition.
 Four special keywords can be specified here for filtering
   1. richness: A positive integer value to filter communities with
-               a specific number of species (variables with non-zero values).
+               a specific number of compositional variables (variables with non-zero values).
   2. evenness: A numeric value between 0 and 1, to filter rows based on
-               the relative abundances of the species where a higher
+               the relative abundances of the compositional variables where a higher
                value signifies a more even community with equal proportions
-               of all species.
+               of all variables.
   3. equi: A boolean variable indicating whether to filter rows containing
-           equi-proportional communities, i.e., communities where all species
+           equi-proportional communities, i.e., communities where all variables
            have the same non-zero proportion.
   4. monos: A boolean value indicating whether to filter communities
-            containing a single species, i.e., richness == 1.
+            containing a single compositional variable, i.e., richness == 1.
 These keywords can be combined using any logical operators and can even
 be combined with any other variables in the data. Please use the exact
 keywords (case-sensitive) in the query to get appropriate results. See
@@ -69,8 +69,8 @@ head(custom_filter(data = sim3, prop = 4:12,
 head(custom_filter(data = sim3, prop = 4:12,
                    special = "equi == TRUE & monos == FALSE"))
 
-# Function can also be used as normal filter function and in a dplyr pipeline
-sim3 \%>\% custom_filter(p1 == 1)
+# Can also use normal filter
+sim3 \%>\% custom_filter(p1 == 1, special = NULL, prop = NULL)
 
 # Both special filtering and normal filtering can be combined as well
 sim3 \%>\% custom_filter(prop = paste0("p", 1:9),

@@ -30,7 +30,7 @@ simplex_path(
 \item{starts}{A data-frame specifying the starting proportions of the
 compositional variables.
 If a model object is specified then this data should contain all the
-variables present in the model object including any experimental structures.
+variables present in the model object including any additional non-compositional variables.
 If a coefficient vector is specified then data should contain same number of
 columns as the number of elements in the coefficient vector and a one-to-one
 positional mapping would be assumed between the data columns and the
@@ -39,7 +39,7 @@ elements of the coefficient vector.}
 \item{ends}{A data-frame specifying the ending proportions of the
 compositional variables.
 If a model object is specified then this data should contain all the
-variables present in the model object including any experimental structures.
+variables present in the model object including any additional non-compositional variables.
 If a coefficient vector is specified then data should contain same number of
 columns as the number of elements in the coefficient vector and a one-to-one
 positional mapping would be assumed between the data columns and the
@@ -104,11 +104,11 @@ A ggmultiplot (ggplot if single plot is returned) class object or data-frame (if
 }
 \description{
 This function will prepare the underlying data and plot the results for visualising the
-change in a response variable between two points in the simplex space in a single
-function call. The two points are specified by the `starts` and `ends`
-parameters are joined by a straight line across the simplex space and the
-response is predicted for the starting, ending and intermediate communities
-along this line. The associated uncertainty along this prediction is also shown.
+change in a response variable as we move across a straight line between two points
+in the simplex space in a single function call. The two sets of points specified
+by the `starts` and `ends` parameters are joined by a straight line across the
+simplex space and the response is predicted for the starting, ending and intermediate
+communities along this line. The associated uncertainty along this prediction is also shown.
 The generated plot will show individual curves indicating the variation in the
 response between the points. `\code{\link[PieGlyph:PieGlyph-package]{Pie-glyphs}}`
 are used to highlight the compositions of the starting, ending and midpoint
@@ -133,12 +133,7 @@ simplex_path(model = mod,
              starts = data.frame(p1 = 0, p2 = 0, p3 = 1, p4 = 0),
              ends = data.frame(p1 = 0, p2 = 0, p3 = 0, p4 = 1))
 
-# Move from 50:50 mixture of p1 and p2 towards their monoculture
-simplex_path(model = mod,
-             starts = data.frame(p1 = 0.5, p2 = 0.5, p3 = 0, p4 = 0),
-             ends = data.frame(p1 = c(1, 0), p2 = c(0, 1), p3 = 0, p4 = 0))
-
-# Move from dominant mixtures to p1 monoculture
+# Move from each 70\% dominant mixtures to p1 monoculture
 simplex_path(model = mod,
              starts = sim2[c(1, 5, 9, 13), 3:6],
              ends = data.frame(p1 = 1, p2 = 0, p3 = 0, p4 = 0))
@@ -148,23 +143,14 @@ simplex_path(model = mod,
              starts = sim2[c(18),],
              ends = sim2[c(48, 52, 56, 60), ])
 
-# Show change across multiple points simulataneously
-simplex_path(model = mod,
-             starts = sim2[c(1, 17, 22), ],
-             ends = sim2[c(5, 14, 17), ])
-
-# Show confidence bands
+# Show change across multiple points simultaneously and show confidence bands
+# using `se = TRUE`
 simplex_path(model = mod,
              starts = sim2[c(1, 17, 22), ],
              ends = sim2[c(5, 14, 17), ], se = TRUE)
 
-# Change pie_colours
-simplex_path(model = mod,
-             starts = sim2[c(1, 17, 22), ],
-             ends = sim2[c(5, 14, 17), ], se = TRUE,
-             pie_colours = c("steelblue1", "steelblue4", "orange1", "orange4"))
-
-# Show pie-glyphs at different points along the curve using `pie_positions`
+# Change pie_colours using `pie_colours` and show pie-glyph at different
+# points along the curve using `pie_positions`
 simplex_path(model = mod,
              starts = sim2[c(1, 17, 22), ],
              ends = sim2[c(5, 14, 17), ], se = TRUE,
@@ -172,6 +158,7 @@ simplex_path(model = mod,
              pie_colours = c("steelblue1", "steelblue4", "orange1", "orange4"))
 
 # Facet based on existing variables
+\donttest{
 simplex_path(model = mod,
              starts = sim2[c(1, 17, 22), ],
              ends = sim2[c(5, 14, 17), ], se = TRUE, facet_var = "block",
@@ -184,12 +171,14 @@ simplex_path(model = mod,
              pie_colours = c("steelblue1", "steelblue4", "orange1", "orange4"),
              add_var = list("block" = factor(c(1, 3),
                                              levels = c(1, 2, 3, 4))))
+}
 
 ## Specify `plot = FALSE` to not create the plot but return the prepared data
-simplex_path(model = mod, plot = FALSE,
-             starts = sim2[c(1, 17, 22), 3:6],
-             ends = sim2[c(5, 14, 17), 3:6], se = TRUE,
-             pie_colours = c("steelblue1", "steelblue4", "orange1", "orange4"),
-             add_var = list("block" = factor(c(1, 3),
-                                             levels = c(1, 2, 3, 4))))
+head(simplex_path(model = mod, plot = FALSE,
+                  starts = sim2[c(1, 17, 22), 3:6],
+                  ends = sim2[c(5, 14, 17), 3:6], se = TRUE,
+                  pie_colours = c("steelblue1", "steelblue4",
+                                  "orange1", "orange4"),
+                  add_var = list("block" = factor(c(1, 3),
+                                                  levels = c(1, 2, 3, 4)))))
 }

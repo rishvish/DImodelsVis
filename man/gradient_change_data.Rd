@@ -2,7 +2,7 @@
 % Please edit documentation in R/GradientChange.R
 \name{gradient_change_data}
 \alias{gradient_change_data}
-\title{Visualise change in (predicted) response over diversity gradient}
+\title{Calculate change in predicted response over diversity gradient}
 \usage{
 gradient_change_data(
   data,
@@ -22,11 +22,13 @@ any other necessary variables to make predictions from
 columns containing the variable proportions in `data`.}
 
 \item{add_var}{A list specifying values for additional predictor variables
-in the model independent of the compositional predictor  variables.
-This would be useful to compare the predictions across
-different values for a categorical variable. One plot will
-be generated for each unique combination of values specified
-here and they will be arranged in a grid according to the
+in the model independent of the compositional predictor variables.
+This could be useful for comparing the predictions across
+different values for a non-compositional variable.
+If specified as a list, it will be expanded to show a plot
+for each unique combination of values specified, while if specified
+as a data-frame, one plot would be generated for each row in the
+data and they will be arranged in a grid according to the
 value specified in `nrow` and `ncol`.}
 
 \item{gradient}{Diversity gradient to show on the X-axis, one of
@@ -52,7 +54,7 @@ the regression coefficients from a model fit in some other
 language can be used to calculate predictions. However, the
 user would have to ensure there's an appropriate one-to-one
 positional mapping between the data columns and the
-coefficient values. Further, the would also have to provide
+coefficient values. Further, they would also have to provide
 a variance-covariance matrix of the coefficients in the `vcov`
 parameter if they want the associated CI for the prediction or
 it would not be possible to calculate confidence/prediction
@@ -87,7 +89,10 @@ The data-frame with the following columns appended at the end
                     of each compositional variable) within each observation.}
    \item{.Gradient}{An character string defining the diversity gradient used
                     for averaging the response.}
-   \item{.Pred}{The predicted response for each obvervation.}
+   \item{.add_str_ID}{An identifier column for grouping the cartesian product
+                      of all additional columns specified in `add_var`
+                      parameter (if `add_var` is specified).}
+   \item{.Pred}{The predicted response for each obsvervation.}
    \item{.Lower}{The lower limit of the prediction/confidence interval
                  for each observation.}
    \item{.Upper}{The upper limit of the prediction/confidence interval
@@ -103,7 +108,7 @@ diversity gradients are currently supported. The average (predicted) response
 is calculated from all communities present at a given level of the
 chosen diversity gradient in `data`. The output of this
 function can be passed to the \code{\link{gradient_change_plot}} function
-to visualise the results.
+to visualise results.
 }
 \details{
 Currently two diversity gradients are supported
@@ -115,12 +120,12 @@ Currently two diversity gradients are supported
   \deqn{(2s/(s-1)) \sum_{i, j = 1; i < j}^{s}{p_i * p_j}} where \eqn{s} is the
   total number of compositional variables and \eqn{p_i} and \eqn{p_j} are the
   proportions of the variables \eqn{i} and \eqn{j}.
-  See \href{https://doi.org/10.1111/j.1365-2745.2007.01225.x}{Kirwan et al., 2007} and
-  \href{https://doi.org/10.1890/08-1684.1}{Kirwan et al., 2009} for more
+  See Kirwan et al., 2007 <\doi{doi:10.1890/08-1684.1}> and Kirwan et al., 2009
+  <\doi{doi:10.1890/08-1684.1}> for more
   information.}
 }
 
-Here's an small example of how these metrics are calculated for a few
+Here's a small example of how these metrics are calculated for a few
 observations. Suppose we have four compositional variables (i.e. \eqn{s = 4})
 and have the following three observations
 \itemize{

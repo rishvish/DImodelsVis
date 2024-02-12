@@ -3,7 +3,7 @@
 \name{prop_to_tern_proj}
 \alias{prop_to_tern_proj}
 \alias{tern_to_prop_proj}
-\title{Project 3-d compositional data onto x-y plane}
+\title{Project 3-d compositional data onto x-y plane and vice versa}
 \usage{
 prop_to_tern_proj(data, prop, x = ".x", y = ".y")
 
@@ -22,13 +22,13 @@ the x component of the x-y projection of the simplex.}
 the y component of the x-y projection of the simplex.}
 }
 \value{
-A data-frame with the following two columns appended
+A data-frame with the following two columns appended (when transforming to x-y projection)
 \describe{
    \item{.x (or value specified in "x")}{The x component of the x-y projection of the simplex point.}
    \item{.y (or value specified in "y")}{The y component of the x-y projection of the simplex point.}
    }
 
-A data-frame with the following three columns appended
+A data-frame with the following three columns appended (when transforming to compositional projection)
 \describe{
    \item{p1 (or first value specified in "prop")}{The first component of the 3-d simplex point.}
    \item{p2 (or second value specified in "prop")}{The second component of the 3-d simplex point.}
@@ -43,16 +43,20 @@ on the plots output by \code{\link{ternary_plot}},
 \code{\link{conditional_ternary_plot}} and \code{\link{grouped_ternary_plot}}.
 }
 \examples{
+## Convert proportions to x-y co-ordinates
 library(DImodels)
 data(sim0)
+sim0 <- sim0[1:16, ]
 
 prop_to_tern_proj(data = sim0, prop = c("p1", "p2", "p3"))
 
 # Change names of the x and y projections
 prop_to_tern_proj(data = sim0, prop = c("p1", "p2", "p3"),
                   x = "x-proj", y = "y-proj")
+## Convert x-y co-ordinates to proportions
 library(DImodels)
 data(sim0)
+sim0 <- sim0[1:16, ]
 
 proj_data <- prop_to_tern_proj(data = sim0, prop = c("p1", "p2", "p3"))
 

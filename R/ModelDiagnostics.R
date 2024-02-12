@@ -59,11 +59,12 @@
 #' @param points_size A numeric value specifying the size of points (when
 #'                    pie-glyphs not shown) shown in the plots.
 #' @param only_extremes A logical value indicating whether to show pie-glyphs
-#'                      only for extreme observations.
+#'                      only for extreme observations (points with the highest
+#'                      absolute residuals or hat values).
 #' @param plot A boolean variable indicating whether to create the plot or return
 #'             the prepared data instead. The default `TRUE` creates the plot while
 #'             `FALSE` would return the prepared data for plotting. Could be useful
-#'             for if user wants to modify the data first and then call the plotting.
+#'             if user wants to modify the data first and then create the plot.
 #'
 #' @return A ggmultiplot (ggplot if single plot is returned) class object or data-frame (if `plot = FALSE`).
 #' @export
@@ -87,8 +88,10 @@
 #' print(diagnostics[[4]])
 #'
 #' ## Change plot arrangement
+#' \donttest{
 #' model_diagnostics(mod1, prop = c("p1", "p2", "p3", "p4"),
 #'                   which = c(1, 3), nrow = 2, ncol = 1)
+#' }
 #'
 #' ## Show only extreme points as pie-glyphs to avoid overplotting
 #' model_diagnostics(mod1, prop = c("p1", "p2", "p3", "p4"),
@@ -100,16 +103,7 @@
 #' model_diagnostics(DI_mod, which = 1)
 #'
 #' ## Specify `plot = FALSE` to not create the plot but return the prepared data
-#' model_diagnostics(DI_mod, which = 1, plot  = FALSE)
-#'
-#' ## If the specified model object does not inherit the lm class, then
-#' ## only residual vs fitted and normal qqplot will be produced
-#' library(DImodelsMulti)
-#' data(simMV)
-# # MVmodel <- DImulti(y = paste0("Y", 1:4), eco_func = c("NA", "UN"),
-#'#                    unit_IDs = 1, prop = paste0("p", 1:6),
-#'#                    data = simMV, DImodel = "ID", method = "ML")
-#' #model_diagnostics(model = MVmodel)
+#' head(model_diagnostics(DI_mod, which = 1, plot  = FALSE))
 model_diagnostics <- function(model, which = c(1,2,3,5), prop = NULL, FG = NULL,
                               npoints = 3, cook_levels = c(0.5, 1),
                               pie_radius = 0.2, pie_colours = NULL,
@@ -162,7 +156,7 @@ model_diagnostics <- function(model, which = c(1,2,3,5), prop = NULL, FG = NULL,
                    the {.cls lm} class.",
                    "i" = "Only {.val Residual vs Fitted} ({.var which} = 1) and
                          {.val Normal QQ plot} ({.var which} = 2)
-                          will be created for this object.")
+                          can be created for this object.")
       if(length(which) > 0){
         cli::cli_warn(message)
       } else {
@@ -192,8 +186,8 @@ model_diagnostics <- function(model, which = c(1,2,3,5), prop = NULL, FG = NULL,
   # If only_extremes in TRUE, the show pies only for extreme
   if(only_extremes){
     if(!pies){
-      cli_warn(c("No values were specified in {.var pies} nor can they
-                 be interepreted from the model object.",
+      cli_warn(c("No compositional variables were specified in {.var prop}
+                  nor can they be interepreted from the model object.",
                  "i" = "The extreme values will be shown a black points
                         and be identified with their observation numbers."))
       only_extremes <- FALSE
@@ -255,8 +249,8 @@ model_diagnostics <- function(model, which = c(1,2,3,5), prop = NULL, FG = NULL,
     # sanity_checks(colours = pie_colours)
     if(length(pie_colours) != length(model_species)){
       cli::cli_abort(c("The number of {.var colours} specified should be
-                       same as the number of columns specified in prop.",
-                       "i" = "There are {length(model_species)} in prop
+                       same as the number of columns specified in {.var prop}.",
+                       "i" = "There are {length(model_species)} in {.var prop}
                               but only {length(colours)} colour{?s}
                               {?was/were} specified."))
     }

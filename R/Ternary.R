@@ -15,14 +15,16 @@
 #' @param prop A character vector specifying the columns names of compositional
 #'             variables whose proportions to manipulate. Default is ".P1", ".P2",
 #'             and ".P3".
-#' @param add_var A list specifying values for additional variables
+#' @param add_var A list or data-frame specifying values for additional variables
 #'                in the model other than the proportions (i.e. not part of the
 #'                simplex design).
 #'                This could be useful for comparing the predictions across
 #'                different values for a non-compositional variable.
-#'                One ternary plot will be generated for each unique combination
-#'                of values specified here.
-#' @param resolution A number between 1 and 5 describing the resolution of the
+#'                If specified as a list, it will be expanded to show a plot
+#'                for each unique combination of values specified, while if specified
+#'                as a data-frame, one plot would be generated for each row in the
+#'                data.
+#' @param resolution A number between 1 and 10 describing the resolution of the
 #'                   resultant graph.
 #'                   A high value would result in a higher definition figure
 #'                   but at the cost of being computationally expensive.
@@ -66,7 +68,7 @@
 #' ## Fit model
 #' mod <- lm(response ~ 0 + (p1 + p2 + p3)^2, data = sim0)
 #'
-#' ## Preapre data for creating a contour map of predicted response over
+#' ## Prepare data for creating a contour map of predicted response over
 #' ## the ternary surface
 #' ## Remember to specify prop with the same character values as the names
 #' ## of the variables in the model containing the prop.
@@ -83,7 +85,9 @@
 #'                           add_var = list("treatment" = c("A", "B")),
 #'                           resolution = 1, model = new_mod)
 #' ## Plot to compare between additional variables
+#' \donttest{
 #' ternary_plot(plot_data)
+#' }
 #'
 #' ## It could be desirable to take the output of this function and add
 #' ## additional variables to the data before making predictions
@@ -97,7 +101,7 @@
 #' ## Manually add the treatment variable
 #' contour_data$treatment <- "A"
 #' ## Make predictions
-#' head(add_prediction(data = contour_data, model = new_mod))#'
+#' head(add_prediction(data = contour_data, model = new_mod))
 #'
 #' ## Manually add the interaction terms
 #' contour_data <- contour_data %>%
@@ -119,7 +123,9 @@
 #'                                interval = "confidence")
 #' head(contour_data)
 #' ## Show plot
+#' \donttest{
 #' ternary_plot(contour_data)
+#' }
 #' ## See `?ternary_plot` for options to customise the ternary_plot
 ternary_data <- function(prop = c(".P1", ".P2", ".P3"),
                          add_var = list(),
@@ -197,13 +203,13 @@ ternary_data <- function(prop = c(".P1", ".P2", ".P3"),
   return(triangle)
 }
 
-#' @title Ternary diagram
+#' @title Ternary diagrams
 #'
 #' @description
 #' Create a ternary diagram showing the a scatter-plot of points across the surface
 #' or a contour map showing the change in a continuous variable across the
-#' ternary surface. The ternary surface can be created using the `\link{ternary_data}`
-#' function.
+#' ternary surface. The ternary surface can be created using the
+#' \code{\link{ternary_data}} function.
 #'
 #' @param data A data-frame consisting of the x-y plane projection of the
 #'             2-d simplex. This data could be the output of the
@@ -242,7 +248,7 @@ ternary_data <- function(prop = c(".P1", ".P2", ".P3"),
 #'                The default colours scheme is the
 #'                \code{\link[grDevices:terrain.colors]{terrain.colors()}} for
 #'                continuous variables and an extended version of the Okabe-Ito
-#'                colour scale for categoricl variables.
+#'                colour scale for categorical variables.
 #' @param lower_lim A number to set a custom lower limit for the contour
 #'                  (if `show = "contours"`). The default is minimum of the prediction.
 #' @param upper_lim A number to set a custom upper limit for the contour
@@ -323,6 +329,7 @@ ternary_data <- function(prop = c(".P1", ".P2", ".P3"),
 #'              vertex_label_size = 6, axis_label_size = 5)
 #'
 #' ## Add additional variables and create a separate plot for each
+#' \donttest{
 #' sim0$treatment <-  rep(c("A", "B", "C", "D"), each = 16)
 #' new_mod <- update(mod, ~. + treatment, data = sim0)
 #' tern_data <- ternary_data(resolution = 1, model = new_mod,
@@ -330,6 +337,7 @@ ternary_data <- function(prop = c(".P1", ".P2", ".P3"),
 #'                           add_var = list("treatment" = c("A", "C")))
 #' ## Arrange plot in 2 columns
 #' ternary_plot(data = tern_data, ncol = 2)
+#' }
 ternary_plot <- function(data, prop = NULL,
                          col_var = ".Pred",
                          show = c("contours", "points"),
@@ -349,7 +357,8 @@ ternary_plot <- function(data, prop = NULL,
   if(missing(data)){
     cli::cli_abort(c("{.var data} cannot be empty.",
                      "i" = "Specify a data-frame or tibble
-                     preferably the output of {.fn ternary_data} or
+                     preferably the output of
+                     {.help [{.fn {col_green('ternary_data')}}](DImodelsVis::ternary_data)} or
                      a data-frame with a similar structure and column names."))
   }
   # Ensure prop is specified
@@ -360,7 +369,7 @@ ternary_plot <- function(data, prop = NULL,
                        from the {.var data} either.",
                        "i" = "Specify a character vector indicating the names of the three
                        variables to be shown within the ternary in {.var prop} or create your data
-                       using the {.help [{.fn ternary_data}](DImodelsVis::ternary_data)}
+                       using the {.help [{.fn {col_green('ternary_data')}}](DImodelsVis::ternary_data)}
                        function."))
     } else {
       prop <- data_prop
@@ -374,9 +383,9 @@ ternary_plot <- function(data, prop = NULL,
     # If contours are shown then ensure we have same scale for all plots
     if(show == "contours"){
       check_presence(data = data, col = col_var,
-                     message = c("The column name/index specified in {.var col_var} is
+                     message = c("The column name specified in {.var col_var} is
                                not present in the data.",
-                                 "i" = "Specify the name/index of the column
+                                 "i" = "Specify the name of the column
                                      containing the predictions for the
                                      communities in the simplex in {.var col_var}."))
 
@@ -465,7 +474,8 @@ ternary_plot_internal <- function(data, prop,
                                   points_size = 2,
                                   axis_label_size = 4,
                                   vertex_label_size = 5){
-    # Check all inputs are appropriate. Print informative error messages if not
+
+  # Check all inputs are appropriate. Print informative error messages if not
     sanity_checks(data = data,
                   characters = list("tern_labels" = tern_labels),
                   numerics = list("nlevels" = nlevels,
@@ -489,11 +499,27 @@ ternary_plot_internal <- function(data, prop,
     }
 
     if(show == "contours"){
+      # If user messes up data attributes
+      if(any(sapply(list(attr(data, "x_proj"), attr(data, "y_proj"), attr(data, "tern_vars")), is.null))){
+        cli::cli_warn(c("!" = "Certain attributes of the data which are needed to prepare
+                    the plot are missing. This could happen if any data manipulation
+                    performed by the user messes up the {.cls data.frame} attributes.",
+                        "i" = "The function will try to reconstruct the necessary attributes
+                    and create the plot but it might not always be possible.",
+                        "i" = "To avoid this, consider using the
+                    {.help [{.fun copy_attributes}](DImodelsVis::copy_attributes)}
+                    function to ensure the specified data has the necessary attributes
+                    after performing any data manipulation."))
+        attr(data, "x_proj") <- ".x"
+        attr(data, "y_proj") <- ".y"
+        attr(data, "tern_vars") <- names(data)[1:3]
+      }
+
       # Ensure column containing col_var is present in data
       check_presence(data = data, col = col_var,
-                     message = c("The column name/index specified in {.var col_var} is
+                     message = c("The column name specified in {.var col_var} is
                                not present in the data.",
-                                 "i" = "Specify the name/index of the column
+                                 "i" = "Specify the name of the column
                                      containing the predictions for the
                                      communities in the simplex in {.var col_var}."))
 
@@ -538,9 +564,6 @@ ternary_plot_internal <- function(data, prop,
       }
     }
 
-
-
-
     if(show == "contours"){
       # Create colour-scale (legend) for plot
       # Create breaks between range of legend
@@ -561,7 +584,8 @@ ternary_plot_internal <- function(data, prop,
                             val
                           },
                           limits = c(lower_lim, upper_lim),
-                          show.limits = T)+
+                          show.limits = T,
+                          oob = scales::censor)+
         geom_contour(breaks = breaks, colour = 'black')+
         guides(fill = guide_colorbar(frame.colour = 'black',
                                      ticks.colour = 'black',
@@ -570,7 +594,7 @@ ternary_plot_internal <- function(data, prop,
         theme_void()+
         theme(legend.key.size = unit(0.1, 'npc'),
               legend.key.height = unit(0.04, 'npc'),
-              legend.title = element_text(size = 14, vjust = 1),
+              legend.title = element_text(size = 14, vjust = 0.9),
               plot.subtitle = element_text(hjust=0.5, size=14),
               strip.text = element_text(size =14, vjust = 0.5),
               legend.text = element_text(size = 12, angle = 45,

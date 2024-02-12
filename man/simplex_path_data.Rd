@@ -11,7 +11,7 @@ simplex_path_data(starts, ends, prop, add_var = list(), prediction = TRUE, ...)
 \item{starts}{A data-frame specifying the starting proportions of the
 compositional variables.
 If a model object is specified then this data should contain all the
-variables present in the model object including any experimental structures.
+variables present in the model object including any additional non-compositional variables.
 If a coefficient vector is specified then data should contain same number of
 columns as the number of elements in the coefficient vector and a one-to-one
 positional mapping would be assumed between the data columns and the
@@ -20,22 +20,24 @@ elements of the coefficient vector.}
 \item{ends}{A data-frame specifying the ending proportions of the
 compositional variables.
 If a model object is specified then this data should contain all the
-variables present in the model object including any experimental structures.
+variables present in the model object including any additional non-compositional variables.
 If a coefficient vector is specified then data should contain same number of
 columns as the number of elements in the coefficient vector and a one-to-one
 positional mapping would be assumed between the data columns and the
 elements of the coefficient vector.}
 
-\item{prop}{A vector of column names or indices identifying the columns containing the
+\item{prop}{A vector of column names identifying the columns containing the
 variable proportions (i.e., compositional columns) in the data.}
 
-\item{add_var}{A list specifying values for additional variables
+\item{add_var}{A list or data-frame specifying values for additional variables
 in the model other than the proportions (i.e. not part of the
 simplex design).
 This could be useful for comparing the predictions across
 different values for a non-compositional variable.
-One ternary plot will be generated for each unique combination
-of values specified here.}
+If specified as a list, it will be expanded to show a plot
+for each unique combination of values specified, while if specified
+as a data-frame, one plot would be generated for each row in the
+data.}
 
 \item{prediction}{A logical value indicating whether to pass the final data
 to the `\link{add_prediction}` function and append the
@@ -56,7 +58,7 @@ the regression coefficients from a model fit in some other
 language can be used to calculate predictions. However, the
 user would have to ensure there's an appropriate one-to-one
 positional mapping between the data columns and the
-coefficient values. Further, the would also have to provide
+coefficient values. Further, they would also have to provide
 a variance-covariance matrix of the coefficients in the `vcov`
 parameter if they want the associated CI for the prediction or
 it would not be possible to calculate confidence/prediction

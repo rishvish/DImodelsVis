@@ -6,6 +6,7 @@
 \usage{
 conditional_ternary_plot(
   data,
+  col_var = ".Pred",
   nlevels = 7,
   colours = NULL,
   lower_lim = NULL,
@@ -25,6 +26,9 @@ conditional_ternary_plot(
 \item{data}{A data-frame which is the output of the
 `\link{conditional_ternary_data}` function.}
 
+\item{col_var}{The column name containing the variable to be used for
+colouring the contours or points. The default is ".Pred".}
+
 \item{nlevels}{The number of levels to show on the contour map.}
 
 \item{colours}{A character vector or function specifying the colours for the
@@ -33,7 +37,7 @@ contour map or points. The number of colours should be same as
 The default colours scheme is the
 \code{\link[grDevices:terrain.colors]{terrain.colors()}} for
 continuous variables and an extended version of the Okabe-Ito
-colour scale for categoricl variables.}
+colour scale for categorical variables.}
 
 \item{lower_lim}{A number to set a custom lower limit for the contour
 (if `show = "contours"`). The default is minimum of the prediction.}
@@ -118,6 +122,7 @@ conditional_ternary_plot(data = plot_data)
 
 ## Create multiple plots for additional variables using `add_var`
 ## Fit model
+\donttest{
 mod <- glm(response ~ 0 + (p1 + p2 + p3 + p4 + p5 + p6)^2 + treatment,
            data = sim4)
 
@@ -131,4 +136,5 @@ plot_data <- conditional_ternary_data(prop = c("p1", "p2", "p3", "p4", "p5", "p6
 ## Create plot
 ## Use nrow to align plots
 conditional_ternary_plot(data = plot_data, nrow = 2)
+}
 }

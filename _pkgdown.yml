@@ -1,4 +1,7 @@
 url: https://rishvish.github.io/DImodelsVis/
 template:
   bootstrap: 5
+  params:
+    fig_width: 10
+    fig_height: 8
 

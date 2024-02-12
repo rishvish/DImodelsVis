@@ -2,7 +2,7 @@
 % Please edit documentation in R/PredictionContributions.R
 \name{prediction_contributions_plot}
 \alias{prediction_contributions_plot}
-\title{Model term contributions to predicted response}
+\title{Visualise model term contributions to predicted response}
 \usage{
 prediction_contributions_plot(
   data,
@@ -25,7 +25,7 @@ contributions of the different coefficients.
 If not specified, a default colour-scheme would be chosen,
 however it could be uninformative and it is recommended to
 manually choose contrasting colours for each coefficient
-group to render a more useful plot.}
+group to render a more informative plot.}
 
 \item{se}{A logical value indicating whether to show prediction intervals
 for predictions in the plot.}
@@ -50,9 +50,10 @@ A ggmultiplot (ggplot if single plot is returned) class object or data-frame (if
 \description{
 The plotting function to visualise the predicted response from a
 regression model as a stacked bar-chart showing the contributions
-(\eqn{\beta} * predictor value) of each model term to the total
-predicted value. Requires the output of the
-`\link{prediction_contributions_data}` as an input in the `data` parameter.
+(predictor coefficient * predictor value) of each model term to the total
+predicted value (represented by the total height of the bar).
+Requires the output of the `\link{prediction_contributions_data}` as an
+input in the `data` parameter.
 }
 \examples{
 library(DImodels)
@@ -60,9 +61,10 @@ library(dplyr)
 
 ## Load data
 data(sim2)
+sim2$AV <- DI_data_E_AV(data = sim2, prop = 3:6)$AV
 
 ## Fit model
-mod <- glm(response ~ 0 + (p1 + p2 + p3 + p4)^2, data = sim2)
+mod <- glm(response ~ 0 + (p1 + p2 + p3 + p4 + AV), data = sim2)
 
 ## Create data for plotting
 plot_data <- prediction_contributions_data(data = sim2[c(1,5,9,11,15,19,23), ],
@@ -71,8 +73,8 @@ plot_data <- prediction_contributions_data(data = sim2[c(1,5,9,11,15,19,23), ],
 prediction_contributions_plot(data = plot_data)
 
 ## Choose distinct colours for groups of coefficients for better visibility
-ID_cols <- get_colours(4)
-int_cols <- get_shades("#808080", 6)[[1]]
+ID_cols <- get_colours(4, FG = c("G", "G", "H", "H"))
+int_cols <- "#808080"
 cols <- c(ID_cols, int_cols)
 ## Specify colours using `cols`
 prediction_contributions_plot(data = plot_data, colours = cols)
@@ -91,9 +93,9 @@ prediction_contributions_plot(data = plot_data, colours = cols,
 
 ## If multiple plots are desired `add_var` can be specified during
 ## data preparation and the plots can be arranged using nrow and ncol
-sim2$block <- as.numeric(sim2$block)
+sim2$block <- as.character(sim2$block)
 new_mod <- update(mod, ~. + block, data = sim2)
-plot_data <- prediction_contributions_data(data = sim2[c(1,5,9,11,15,19,23), 3:6],
+plot_data <- prediction_contributions_data(data = sim2[c(1,5,9,11,15,19,23), c(3:6, 8)],
                                            model = new_mod,
                                            add_var = list("block" = c("1", "2")))
 ## Arrange in two columns

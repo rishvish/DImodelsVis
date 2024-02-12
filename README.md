@@ -14,9 +14,10 @@ stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://
 Statistical models fit to compositional data are often difficult to
 interpret due to the sum to one constraint on data variables.
 `DImodelsVis` provides novel visualisations tools to aid with the
-interpretation of models fit to compositional data. All visualisations
-in the package are created using the `ggplot2` plotting framework and
-can be extended like every other ggplot object.
+interpretation for models where the predictor space is compositional in
+nature. All visualisations in the package are created using the
+`ggplot2` plotting framework and can be extended like every other ggplot
+object.
 
 ## Installation
 
@@ -54,12 +55,13 @@ number of species present in a community). The DI method builds on top
 of this richness approach by taking the relative abundances of the
 species within in the community into account, thus the predictors in the
 model are compositional in nature. The DI approach can differentiate
-between communities with same set of species but with different relative
-proportions, thereby enabling us to better capture the relationship
-between diversity and ecosystem functions within an ecosystem. The
-[`DImodels`](https://cran.r-project.org/web/packages/DImodels/) and
-[`DImodelsMulti`](https://cran.r-project.org/web/packages/DImodelsMulti/)
-R packages are available to aid the user in fitting these models. The
+among different species identities as well as between communities with
+same set of species but with different relative proportions, thereby
+enabling us to better capture the relationship between diversity and
+ecosystem functions within an ecosystem. The
+[`DImodels`](https://cran.r-project.org/package=DImodels) and
+[`DImodelsMulti`](https://cran.r-project.org/package=DImodelsMulti) R
+packages are available to aid the user in fitting these models. The
 `DImodelsVis` (DI models Visualisation) package is a complimentary
 package for visualising and interpreting the results from these models.
 However, the package is versatile and can be used with any standard
@@ -81,54 +83,57 @@ functions present in the package along with a short description.
 
 #### Model selection and validation
 
-- [`model_diagnostics`](): Create diagnostics plots for a statistical
-  model with the additional ability to overlay the points with
-  [pie-glyphs](https://cran.r-project.org/web/packages/PieGlyph/)
-  showing the proportions of the compositional predictor variables.
-- [`model_selection`](): Show a visual comparison of selection criteria
-  of different models. Can also show the split of an information
-  criteria into deviance and penalty components to visualise why a
-  parsimonious model would be preferable over a complex one.
+- [`model_diagnostics`](coming_soon.html): Create diagnostics plots for
+  a statistical model with the additional ability to overlay the points
+  with [pie-glyphs](https://cran.r-project.org/package=PieGlyph) showing
+  the proportions of the compositional predictor variables.
+- [`model_selection`](coming_soon.html): Show a visual comparison of
+  selection criteria of different models. Can also show the split of an
+  information criteria into deviance and penalty components to visualise
+  why a parsimonious model would be preferable over a complex one.
 
 #### Model interpretation
 
-- [`prediction_contributions`](): The predicted response for
-  observations is visualised as a stacked bar-chart showing the
+- [`prediction_contributions`](coming_soon.html): The predicted response
+  for observations is visualised as a stacked bar-chart showing the
   contributions of each term in the regression model.
-- [`gradient_change`](): The predicted response for specific
-  observations are shown using pie-glyphs along with the average change
-  in the predicted response over the richness or evenness diversity
-  gradients.
-- [`conditional_ternary`](): Fix n-3 compositional variables to have
-  specific values and visualise the change in the predicted response
-  across the remaining three variables as a contour plot in a ternary
-  diagram.
-- [`visualise_effects`](): Visualise the effect of increasing or
-  decreasing a predictor variable (from a set of compositional predictor
-  variables) on the predicted response whilst keeping the ratio of the
-  other n-1 compositional predictor variables constant.
-- [`simplex_path`](): Visualise the change in the predicted response
-  along a straight line between two points in the simplex space.
+- [`gradient_change`](coming_soon.html): The predicted response for
+  specific observations are shown using pie-glyphs along with the
+  average change in the predicted response over the richness or evenness
+  diversity gradients.
+- [`conditional_ternary`](coming_soon.html): Assuming we have `n`
+  compositional variables, fix `n-3` variables to have specific values
+  and visualise the change in the predicted response across the
+  remaining three variables as a contour plot in a ternary diagram.
+- [`visualise_effects`](coming_soon.html): Visualise the effect of
+  increasing or decreasing a predictor variable (from a set of
+  compositional predictor variables) on the predicted response whilst
+  keeping the ratio of the other `n-1` compositional predictor variables
+  constant.
+- [`simplex_path`](coming_soon.html): Visualise the change in the
+  predicted response along a straight line between two points in the
+  simplex space.
 
 #### Other utility functions
 
-- [`add_prediction`](): A utility function to add prediction and
-  associated uncertainty to data using a statistical model object or raw
-  model coefficients.
-- [`get_equi_comms`](): Utility function to create all possible
-  combinations of equi-proportional communities at a given level of
-  richness from a set of n compositional variables.
-- [`custom_filter`](): A handy wrapper around the dplyr
-  [`filter()`](https://dplyr.tidyverse.org/reference/filter.html)
+- [`add_prediction`](coming_soon.html): A utility function to add
+  prediction and associated uncertainty to data using a statistical
+  model object or raw model coefficients.
+- [`get_equi_comms`](coming_soon.html): Utility function to create all
+  possible combinations of equi-proportional communities at a given
+  level of richness from a set of n compositional variables.
+- [`custom_filter`](coming_soon.html): A handy wrapper around the dplyr
+  [`filter(coming_soon.html)`](https://dplyr.tidyverse.org/reference/filter.html)
   function enabling the user to filter rows which satisfy specific
   conditions for compositional data like all equi-proportional
   communities, or communities with a given value of richness without
   having to make any changes to the data or adding any additional
   columns.
-- [`prop_to_tern_proj`]() and [`tern_to_prop_proj`](): Helper functions
-  for converting between 3-d compositional data and their 2-d
-  projection.  
-- [`ternary_data`]() and [`ternary_plot`](): Visualise the change in the
+- [`prop_to_tern_proj`](coming_soon.html) and
+  [`tern_to_prop_proj`](coming_soon.html): Helper functions for
+  converting between 3-d compositional data and their 2-d projection.  
+- [`ternary_data`](coming_soon.html) and
+  [`ternary_plot`](coming_soon.html): Visualise the change in the
   predicted response across a set of three compositional predictor
   variables as a contour map within a ternary diagram.
 
@@ -149,16 +154,18 @@ conducted in Switzerland as part of the “Agrodiversity Experiment”
 In this study, 68 grassland plots consisting of 1 to 4 species were
 established across a gradient of species diversity. The proportions of
 four species were varied across the plots: there were plots with 100% of
-a single species (called the mono-culture of a species), and 2- and
+a single species (called the monoculture of a species), and 2- and
 4-species mixtures with varying proportions (e.g., (0.5, 0.5, 0, 0) and
 (0.7, 0.1, 0.1, 0.1)). Nitrogen fertilizer (at 50 or 150 kg/ha/yr) and
 seeding density (low or high) treatments were also manipulated across
 the plots. The total annual yield per plot was recorded for the first
-year after establishment. An analysis of the this dataset can be found
-in [Kirwan et al 2009](https://doi.org/10.1890/08-1684.1). For our
-example we only consider the plots that received the 150 kg nitrogen
-treatment. The four species proportions form our compositional
-predictors while the annual yield is our continuous response.
+year after establishment. The data is available in the
+[`DImodels`](https://cran.r-project.org/package=DImodels) R package. An
+analysis of the this dataset can be found in [Kirwan et al
+2009](https://doi.org/10.1890/08-1684.1). For our example we only
+consider the plots that received the 150 kg nitrogen treatment. The four
+species proportions form our compositional predictors while the annual
+yield is our continuous response.
 
 ``` r
 data(Switzerland)
@@ -249,7 +256,8 @@ mod_FULL <- DI(y = "yield", prop = 4:7,
 We can visualise model selection by passing our models as a list to the
 `model_selection` function and visualising the best performing metric
 across different information criteria. Run `?model_selection` or see the
-associated [vignette]() for more information on customising the plot.
+associated [vignette](coming_soon.html) for more information on
+customising the plot.
 
 ``` r
 mods = list("ID" = mod_ID, "AV" = mod_AV, "FG" = mod_FG, 
@@ -296,8 +304,9 @@ summary(mod_FG)
 
 After choosing a model we can create diagnostics plot where the points
 are replaced by pie-glyphs showing the proportions of the compositional
-variables. Run `?model_diagnostics` or see the associated [vignette]()
-for more information on customising the plot.
+variables. Run `?model_diagnostics` or see the associated
+[vignette](coming_soon.html) for more information on customising the
+plot.
 
 ``` r
 model_diagnostics(model = mod_FG)
@@ -309,7 +318,7 @@ model_diagnostics(model = mod_FG)
 Replacing the points with pie-glyphs could help us to quickly identify
 any problematic observations in the model. For example, we can see here
 that the diagnostics plots look fine and no assumptions seem to be
-violated. However, we can quickly spot that the all mono-cultures
+violated. However, we can quickly spot that the all monocultures
 (communities with only 1 species) and certain communities with 2 species
 have high leverage values compared to all other communities in the data.
 
@@ -334,17 +343,17 @@ The coloured bars show the contributions of the different terms in the
 model. The contribution is defined as the product of the coefficient and
 value for each predictor variable. Thus, the contribution for a term
 would be zero if it’s value in an observation is zero regardless of it’s
-coefficient value (e.g. prediction bars for the mono-cultures at the
+coefficient value (e.g. prediction bars for the monocultures at the
 right of the graph).
 
 This plot would aid in understanding why certain observations have
-higher predictions. For e.g., we can see that higher predictions are
+higher predictions. For example, we can see that higher predictions are
 primarily driven by the `p3_ID` and `p4_ID` terms and hence the `p1` and
-`p2` mono-cultures have low predictions as the all the other terms have
-a value of zero here. Similarly, we can also see that mixtures dominated
+`p2` monocultures have low predictions as the all the other terms have a
+value of zero here. Similarly, we can also see that mixtures dominated
 by `p3` perform the best. Run `?prediction_contributions` or see the
-associated [vignette]() for more information on creating and customising
-the plot.
+associated [vignette](coming_soon.html) for more information on creating
+and customising the plot.
 
 #### Average change in respone over diversity gradient
 
@@ -368,8 +377,8 @@ gradient_change(mod_FG, data = plot_data)
 
 This shows that on average the predicted response increases as richness
 increases but at a saturating rate. Run `?gradient_change` or see the
-associated [vignette]() for more information on creating and customising
-the plot.
+associated [vignette](coming_soon.html) for more information on creating
+and customising the plot.
 
 #### Conditional ternary diagrams
 
@@ -391,7 +400,7 @@ proportions is 1.
 conditional_ternary(model = mod_FG, 
                     tern_vars = c("p1", "p3", "p4"),
                     conditional = data.frame("p2" = c(0.2, 0.5, 0.8)))
-#> Preparing data ■■■■■■■■■■■■■■■■■■■■■             67% | ETA:  1s                                                                ✔ Finished data preparation.
+#> Preparing data ■■■■■■■■■■■■■■■■■■■■■             67% | ETA:  2s                                                                ✔ Finished data preparation.
 #> ✔ Created plot.
 ```
 
@@ -399,8 +408,9 @@ conditional_ternary(model = mod_FG,
 
 This figure shows that the predicted response decreases as we increase
 the proportion of `p2` and is maximised as we increase the proportion of
-`p3`. Run `?conditional_ternary` or see the associated [vignette]() for
-more information on creating and customising the plot.
+`p3`. Run `?conditional_ternary` or see the associated
+[vignette](coming_soon.html) for more information on creating and
+customising the plot.
 
 #### Effects plots for models with compositional predictors
 
@@ -432,18 +442,21 @@ black line shows the average effect of increasing the proportion of a
 species on the predicted response. It can be seen that for all
 communities increasing `p2` results in a decrease in the predicted
 response while increasing `p3` has a positive effect on the predicted
-response. Run `?visualise_effects` or see the associated [vignette]()
-for more information on creating and customising the plot.
+response. Run `?visualise_effects` or see the associated
+[vignette](coming_soon.html) for more information on creating and
+customising the plot.
 
 #### Simplex path
 
 The concept used in `visualise_effects` can be extended to look at the
 change in the predicted response as we move in a straight line between
-any two points within the simplex space. We can even traverse a path
-comprising of multiple points within the simplex and see the change in
-the predicted response. In this example we show the change in the
-response as we move from the centroid mixture to the monoculture of each
-of the four species.
+any two points within the simplex space. The interpolation constant
+(shown on the X-axis) is a number between 0 and 1 identifying points
+along the straight line between the start and end points. We can even
+traverse a path comprising of multiple points within the simplex and see
+the change in the predicted response. In this example we show the change
+in the response as we move from the centroid mixture to the monoculture
+of each of the four species.
 
 ``` r
 simplex_path(model = mod_FG, 
@@ -458,23 +471,23 @@ simplex_path(model = mod_FG,
 We can see that moving from the centroid community to `p1`, `p2`, and
 `p4` decreases the predicted response, while moving towards a
 monoculture of `p3` increases the response. Run `?simplex_path` or see
-the associated [vignette]() for more information on creating and
-customising the plot.
+the associated [vignette](coming_soon.html) for more information on
+creating and customising the plot.
 
 ## See Also
 
 #### Useful links:
 
 - DI models website: <https://dimodels.com>
-- Package website}: To be updated
+- Package website: <https://rishvish.github.io/DImodelsVis/>
 - Github repo: <https://github.com/rishvish/DImodelsVis>
 - Report bugs: <https://github.com/rishvish/DImodelsVis/issues>
 
 #### Package family:
 
-- [DImodels](https://cran.r-project.org/web/packages/DImodels/)
-- [DImodelsMulti](https://cran.r-project.org/web/packages/DImodelsMulti/)
-- [PieGlyph](https://cran.r-project.org/web/packages/PieGlyph/)
+- [DImodels](https://cran.r-project.org/package=DImodels)
+- [DImodelsMulti](https://cran.r-project.org/package=DImodelsMulti)
+- [PieGlyph](https://cran.r-project.org/package=PieGlyph)
 
 ## References
 

@@ -6,7 +6,9 @@
 \usage{
 conditional_ternary_data(
   prop,
-  tern_vars,
+  FG = NULL,
+  values = NULL,
+  tern_vars = NULL,
   conditional = NULL,
   add_var = list(),
   resolution = 3,
@@ -19,27 +21,38 @@ conditional_ternary_data(
 corresponding to variable proportions. These variables should
 be compositional in nature (i.e., proportions should sum to 1).}
 
+\item{FG}{A character vector specifying the grouping of the variables
+specified in `prop`. Specifying this parameter would call the
+grouped_ternary_data function internally. See \code{\link{grouped_ternary}}
+or \code{\link{grouped_ternary_data}} for more information.}
+
+\item{values}{A numeric vector specifying the proportional split of the
+variables within a group. The default is to split the group
+proportion equally between each variable in the group.}
+
 \item{tern_vars}{A character vector giving the names of the three variables
 to be shown in the ternary diagram.}
 
-\item{conditional}{A data-frame describing the names of the variables
+\item{conditional}{A data-frame describing the names of the compositional variables
 and their respective values at which to slice the
 simplex space. The format should be, for example, as follows: \cr
 \code{data.frame("p1" = c(0, 0.5), "p2" = c(0.2, 0.1))} \cr
-Once figure would be created for row in `conditional` with
+One figure would be created for each row in `conditional` with
 the respective values of all specified variables. Any
 compositional variables not specified in `conditional` will
 be assumed to be 0.}
 
-\item{add_var}{A list specifying values for additional variables
+\item{add_var}{A list or data-frame specifying values for additional variables
 in the model other than the proportions (i.e. not part of the
 simplex design).
 This could be useful for comparing the predictions across
 different values for a non-compositional variable.
-One ternary plot will be generated for each unique combination
-of values specified here.}
+If specified as a list, it will be expanded to show a plot
+for each unique combination of values specified, while if specified
+as a data-frame, one plot would be generated for each row in the
+data.}
 
-\item{resolution}{A number between 1 and 5 describing the resolution of the
+\item{resolution}{A number between 1 and 10 describing the resolution of the
 resultant graph.
 A high value would result in a higher definition figure
 but at the cost of being computationally expensive.}
@@ -63,7 +76,7 @@ the regression coefficients from a model fit in some other
 language can be used to calculate predictions. However, the
 user would have to ensure there's an appropriate one-to-one
 positional mapping between the data columns and the
-coefficient values. Further, the would also have to provide
+coefficient values. Further, they would also have to provide
 a variance-covariance matrix of the coefficients in the `vcov`
 parameter if they want the associated CI for the prediction or
 it would not be possible to calculate confidence/prediction
@@ -120,9 +133,9 @@ A data-frame containing compositional columns with names specified
 \description{
 The helper function for preparing the underlying data for creating conditional
 ternary diagrams, where we fix \eqn{n-3} variables to have a constant value
-\eqn{x_1, x_2, x_3, ..., x_{n-3}} such that \eqn{x = x_1 + x_2 + x_3 + ... x_{n - 3}}
-and \eqn{0 \le x \le 1} and vary the proportion of the remaining three variables
-between \eqn{0} and \eqn{1-x} to visualise the change in the predicted response as a
+\eqn{p_1, p_2, p_3, ..., p_{n-3}} such that \eqn{P = p_1 + p_2 + p_3 + ... p_{n - 3}}
+and \eqn{0 \le P \le 1} and vary the proportion of the remaining three variables
+between \eqn{0} and \eqn{1-P} to visualise the change in the predicted response as a
 contour map within a ternary diagram. The output of this function can be passed to the
 \code{\link{conditional_ternary_plot}} function to plot the results. Viewing multiple
 2-d slices across multiple variables should allow to create an approximation of
@@ -138,7 +151,7 @@ data(sim4)
 mod <- glm(response ~ 0 + (p1 + p2 + p3 + p4 + p5 + p6)^2, data = sim4)
 
 ## Create data
-## Any species not specified in tern_vars or conditional will be assumed
+## Any species not specified in `tern_vars` or conditional will be assumed
 ## to be 0, for example p5 and p6 here.
 head(conditional_ternary_data(prop = c("p1", "p2", "p3", "p4", "p5", "p6"),
                               tern_vars = c("p1", "p2", "p3"),

@@ -28,7 +28,7 @@ the regression coefficients from a model fit in some other
 language can be used to calculate predictions. However, the
 user would have to ensure there's an appropriate one-to-one
 positional mapping between the data columns and the
-coefficient values. Further, the would also have to provide
+coefficient values. Further, they would also have to provide
 a variance-covariance matrix of the coefficients in the `vcov`
 parameter if they want the associated CI for the prediction or
 it would not be possible to calculate confidence/prediction
@@ -109,14 +109,15 @@ newdata$`p3:p4` = newdata$p3 * newdata$p4
 
 # If the coefficients are named then the function will try to
 # perform matching between data columns and the coefficients
-# Notice that confidence intervals
+# Notice that confidence intervals are not produced if we don't
+# specify a variance covariance matrix
 add_prediction(data = newdata, coefficients = coeffs)
 
 # However, if the coefficients are not named
-coeffs <- unname(coeffs)
-
 # The user would have to manually specify the subset
 # of data columns arranged according to the coefficients
+coeffs <- unname(coeffs)
+
 subset_data <- newdata[, c(3:6, 8,9)]
 subset_data # Notice now we have the exact columns in data as in coefficients
 add_prediction(data = subset_data, coefficients = coeffs)

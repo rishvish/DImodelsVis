@@ -6,6 +6,7 @@
 \usage{
 grouped_ternary_plot(
   data,
+  col_var = ".Pred",
   nlevels = 7,
   colours = NULL,
   lower_lim = NULL,
@@ -24,6 +25,9 @@ grouped_ternary_plot(
 \item{data}{A data-frame which is the output of the
 `\link{conditional_ternary_data}` function.}
 
+\item{col_var}{The column name containing the variable to be used for
+colouring the contours or points. The default is ".Pred".}
+
 \item{nlevels}{The number of levels to show on the contour map.}
 
 \item{colours}{A character vector or function specifying the colours for the
@@ -32,7 +36,7 @@ contour map or points. The number of colours should be same as
 The default colours scheme is the
 \code{\link[grDevices:terrain.colors]{terrain.colors()}} for
 continuous variables and an extended version of the Okabe-Ito
-colour scale for categoricl variables.}
+colour scale for categorical variables.}
 
 \item{lower_lim}{A number to set a custom lower limit for the contour
 (if `show = "contours"`). The default is minimum of the prediction.}
@@ -77,9 +81,9 @@ A ggmultiplot (ggplot if single plot is returned) class object or data-frame (if
 \description{
 The helper function for plotting grouped ternary diagrams. The output of
 the `\code{\link{grouped_ternary_data}}` with the compositional variables
-combined into groups should be passed here visualised on a 2-d ternary diagram.
+combined into groups should be passed here to be visualised on a 2-d ternary diagram.
 These are very useful when we have multiple compositional variables that can
-be grouped together by some hierarchical grouping structure. For e.g., grouping
+be grouped together by some hierarchical grouping structure. For example, grouping
 species in a ecosystem based on the functions they perform, or grouping
 political parties based on their national alliances.
 }
@@ -94,7 +98,7 @@ mod <- glm(response ~ 0 + (p1 + p2 + p3 + p4 + p5 + p6 + p7 + p8 + p9)^2,
            data = sim3)
 
 ## Create data
-## We have nine (p1 to p9) variables here and using \code{\link{conditional_ternary}}
+## We have nine (p1 to p9) variables here and using conditional_ternary
 ## to visualise the simplex space won't be very helpful as there are too
 ## variables to condition on
 ## Instead we group the nine-variables into three groups called "G", "L" and "H"

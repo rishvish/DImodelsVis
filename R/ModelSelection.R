@@ -20,7 +20,7 @@
 #' @param sort A boolean value indicating whether to sort the model from
 #'             highest to lowest value of chosen metric.
 #' @param breakup A boolean value indicating whether to breakup the metric value
-#'                into goodness of fit (defined as -2*loglikelihood) and
+#'                into deviance (defined as -2*loglikelihood) and
 #'                penalty components. Will work only if a single metric out of
 #'                "AIC", "AICc", "BIC", or "BICc" is chosen to plot.
 #' @param model_names A character string describing the names to display
@@ -29,7 +29,7 @@
 #' @param plot A boolean variable indicating whether to create the plot or return
 #'             the prepared data instead. The default `TRUE` creates the plot while
 #'             `FALSE` would return the prepared data for plotting. Could be useful
-#'             for if user wants to modify the data first and then call the plotting
+#'             if user wants to modify the data first and then call the plotting
 #'
 #' @return A ggplot object or data-frame (if `plot == FALSE`)
 #' @export
@@ -104,11 +104,11 @@
 #'                                 "AV theta", "Full theta", "FG theta"))
 #'
 #' ## Specify `plot = FALSE` to not create the plot but return the prepared data
-#' model_selection(models = list(mod_AV, mod_FULL, mod_FG,
-#'                               mod_AV_theta, mod_FULL_theta, mod_FG_theta),
-#'                 metric = c("AIC", "BIC"), sort = TRUE, plot = FALSE,
-#'                 model_names = c("AV model", "Full model", "FG model",
-#'                                 "AV theta", "Full theta", "FG theta"))
+#' head(model_selection(models = list(mod_AV, mod_FULL, mod_FG,
+#'                                    mod_AV_theta, mod_FULL_theta, mod_FG_theta),
+#'                      metric = c("AIC", "BIC"), sort = TRUE, plot = FALSE,
+#'                      model_names = c("AV model", "Full model", "FG model",
+#'                                      "AV theta", "Full theta", "FG theta")))
 model_selection <- function(models,
                             metric = c("AIC", "BIC", "AICc", "BICc", "deviance"),
                             sort = FALSE,
@@ -137,7 +137,7 @@ model_selection <- function(models,
   # being too similar
   if(!all(metric %in% c("AIC", "BIC", "AICc", "BICc", "deviance"))){
     cli_abort("{.var metric} should be one of
-              c(\"AIC\", \"BIC\", \"AICc\", \"BICc\", \"deviance\")")
+              {.val {c('AIC', 'BIC', 'AICc', 'BICc', 'deviance')}}")
   }
 
   # If user didn't choose anything then AIC is default
@@ -152,8 +152,10 @@ model_selection <- function(models,
     # If possible then use variables names as X-axis labels
     if(length(p_tree) > 1) {
       cli_bullets(c(">" = "The list of models specified in {.var models} is not named.",
-                    ">" = "The models are given the same names as the variables they were stored in.",
-                    ">" = "If this is not desirable consider providing names for the models in the {.var model_names} parameter."))
+                    ">" = "The models are given the same names as the variables they
+                    were stored in.",
+                    ">" = "If this is not desirable consider providing names for
+                    the models in the {.var model_names} parameter."))
       names(models) <- sapply(p_tree[-1], deparse)
       # Otherwise give a unique ID to models sequentially
     } else {
@@ -174,17 +176,19 @@ model_selection <- function(models,
   #                     several.ok = TRUE)
 
   if(length(metric) > 1 && breakup){
-    cli::cli_warn(c("!" = "Can't show the breakup into -2*log likelihood
-                  and penalty when multiple metrics are chosen.",
-                    "*" = "Choose one of {.val AIC}, {.val AICc},{.val BIC} or {.val BICc} in {.var metric} to show the breakup for.",
+    cli::cli_warn(c("!" = "Can't show the breakup into deviance
+                  and penalty components when multiple metrics are chosen.",
+                    "*" = "Choose one of {.val AIC}, {.val AICc},{.val BIC} or {.val BICc}
+                    in {.var metric} to show the breakup for.",
                     "*" = "Showing all metrics without the breakup."))
     breakup <- FALSE
   }
 
   if(length(metric) == 1 && metric == "deviance" && breakup){
-    cli::cli_warn(c("!" = "Can't show the breakup into -2*log likelihood
-                  and penalty for {.val deviance} metric.",
-                    "*" = "Choose one of {.val AIC}, {.val AICc},{.val BIC} or {.val BICc} in {.var metric} to show the breakup for.",
+    cli::cli_warn(c("!" = "Can't show the breakup into deviance
+                  and penalty components for {.val deviance} metric.",
+                    "*" = "Choose one of {.val AIC}, {.val AICc},{.val BIC} or {.val BICc}
+                    in {.var metric} to show the breakup for.",
                     "*" = "Showing deviance without the breakup."))
     breakup <- FALSE
   }

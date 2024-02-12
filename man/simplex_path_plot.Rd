@@ -113,6 +113,8 @@ plot_data <- simplex_path_data(starts = sim2[c(18), 3:6],
                        add_var = list("block" = c(1, 2)))
 
 simplex_path_plot(data = plot_data,
-                  prop = c("p1", "p2", "p3", "p4"), se = TRUE,
-                  pie_colours = c("steelblue1", "steelblue4", "orange1", "orange4"))
+                  prop = c("p1", "p2", "p3", "p4"),
+                  pie_colours = c("steelblue1", "steelblue4",
+                                  "orange1", "orange4"),
+                  nrow = 1, ncol = 2)
 }

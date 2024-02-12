@@ -25,19 +25,21 @@ gradient_change(
 \code{\link[DImodels:DImodels-package]{DImodels}} package.}
 
 \item{data}{A dataframe specifying communities of interest for which user
-wants to visualise the gradient. If left blank, the value specified
-in `communities` will be used to create data for the user.}
+wants to visualise the gradient. If left blank, the data used to
+fit the model will be used.}
 
 \item{gradient}{Diversity gradient to show on the X-axis, one of
 "richness" or "evenness". Defaults to "richness". See
 `Details` for more information.}
 
 \item{add_var}{A list specifying values for additional predictor variables
-in the model independent of the compositional predictor  variables.
-This would be useful to compare the predictions across
-different values for a categorical variable. One plot will
-be generated for each unique combination of values specified
-here and they will be arranged in a grid according to the
+in the model independent of the compositional predictor variables.
+This could be useful for comparing the predictions across
+different values for a non-compositional variable.
+If specified as a list, it will be expanded to show a plot
+for each unique combination of values specified, while if specified
+as a data-frame, one plot would be generated for each row in the
+data and they will be arranged in a grid according to the
 value specified in `nrow` and `ncol`.}
 
 \item{plot}{A boolean variable indicating whether to create the plot or return
@@ -48,12 +50,13 @@ function manually.}
 
 \item{average}{A boolean value indicating whether to plot a line indicating
 the average change in the predicted response with respect to
-the variable shown on the X-axis.}
+the variable shown on the X-axis. The average is calculated at the
+median value of any variables not specified.}
 
 \item{y_var}{A character string indicating the column name of the variable
 to be shown on the Y-axis. This could be useful for plotting
 raw data on the Y-axis. By default has a value of ".Pred"
-refering to the column containing model predictions.}
+referring to the column containing model predictions.}
 
 \item{pie_data}{Showing all points on the graph as pie-glyphs could be resource
 intensive. Hence a subset of data-frame specified in `data`,
@@ -80,8 +83,9 @@ A ggmultiplot (ggplot if single plot is returned) class object or data-frame (if
 A scatter-plot of the predicted response (or raw response) over a diversity
 gradient for specific observations is shown. The points can be overlaid with
 `\code{\link[PieGlyph:PieGlyph-package]{pie-glyphs}}` to show the relative
-proportions of the compositional variables. The average change in the
-(predicted) response over the chosen diversity gradient can also be shown.
+proportions of the compositional variables. The average change in any user-chosen
+variable over the chosen diversity gradient can also be shown using the `y_var`
+parameter. \cr
 This is a wrapper function specifically for statistical models fit using the
 \code{\link[DImodels:DI]{DI()}} function from the
 \code{\link[DImodels:DImodels-package]{DImodels}} R package and it implicitly
@@ -99,12 +103,12 @@ Currently two diversity gradients are supported
   \deqn{(2s/(s-1)) \sum_{i, j = 1; i < j}^{s}{p_i * p_j}} where \eqn{s} is the
   total number of compositional variables and \eqn{p_i} and \eqn{p_j} are the
   proportions of the variables \eqn{i} and \eqn{j}.
-  See \href{https://doi.org/10.1111/j.1365-2745.2007.01225.x}{Kirwan et al., 2007} and
-  \href{https://doi.org/10.1890/08-1684.1}{Kirwan et al., 2009} for more
+  See Kirwan et al., 2007 <\doi{doi:10.1890/08-1684.1}> and Kirwan et al., 2009
+  <\doi{doi:10.1890/08-1684.1}> for more
   information.}
 }
 
-Here's an small example of how these metrics are calculated for a few
+Here's a small example of how these metrics are calculated for a few
 observations. Suppose we have four compositional variables (i.e. \eqn{s = 4})
 and have the following three observations
 \itemize{
@@ -152,24 +156,16 @@ gradient_change(model = mod, data = sim4 \%>\% filter(richness <= 4))
 plot_data <- get_equi_comms(6, variables = paste0("p", 1:6))
 gradient_change(model = mod, data = plot_data)
 
-## Don't show line indicating the average change by using `average = FALSE`
-gradient_change(model = mod, data = plot_data, average = FALSE)
-
-## Can also plot average response across evenness
-gradient_change(model = mod, gradient = 'evenness')
-
-## Change colours of the pie-slices using `pie_colours`
-gradient_change(model = mod,
+## Can also plot average response across evenness and
+## change colours of the pie-slices using `pie_colours`
+gradient_change(model = mod, gradient = "evenness",
                 pie_colours = c("darkolivegreen1", "darkolivegreen4",
                                 "orange1", "orange4",
                                 "steelblue1", "steelblue4"))
 
 ## Manually specify only specific communities to be shown as pie-chart
-## glyphs using `pie_data`.
-gradient_change(model = mod,
-                pie_data = sim4 \%>\% filter(richness \%in\% c(1, 6)))
-
-## Use `facet_var` to facet the plot on an additional variable
+## glyphs using `pie_data` and `facet_var` to facet the plot on
+## an additional variable.
 gradient_change(model = mod,
                 pie_data = sim4 \%>\% filter(richness \%in\% c(1, 6)),
                 facet_var = "treatment")
@@ -177,14 +173,16 @@ gradient_change(model = mod,
 ## Use `add_var` to add additional variables independent of the compositions
 ## Multiple plots will be produced and can be arranged using nrow and ncol
 ## Create plot arranged in 2 rows
+\donttest{
 gradient_change(model = mod,
                 data = sim4[, -2],
                 add_var = list("treatment" = c(50, 250)),
                 pie_data = sim4[, -2] \%>\% filter(richness \%in\% c(1, 6)),
                 nrow = 2)
+}
 
 ## Specify `plot = FALSE` to not create the plot but return the prepared data
-gradient_change(model = mod, plot = FALSE,
-                pie_data = sim4 \%>\% filter(richness \%in\% c(1, 6)),
-                facet_var = "treatment")
+head(gradient_change(model = mod, plot = FALSE,
+                     pie_data = sim4 \%>\% filter(richness \%in\% c(1, 6)),
+                     facet_var = "treatment"))
 }

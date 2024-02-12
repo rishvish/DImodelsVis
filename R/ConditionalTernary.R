@@ -3,9 +3,9 @@
 #' @description
 #' The helper function for preparing the underlying data for creating conditional
 #' ternary diagrams, where we fix \eqn{n-3} variables to have a constant value
-#' \eqn{x_1, x_2, x_3, ..., x_{n-3}} such that \eqn{x = x_1 + x_2 + x_3 + ... x_{n - 3}}
-#' and \eqn{0 \le x \le 1} and vary the proportion of the remaining three variables
-#' between \eqn{0} and \eqn{1-x} to visualise the change in the predicted response as a
+#' \eqn{p_1, p_2, p_3, ..., p_{n-3}} such that \eqn{P = p_1 + p_2 + p_3 + ... p_{n - 3}}
+#' and \eqn{0 \le P \le 1} and vary the proportion of the remaining three variables
+#' between \eqn{0} and \eqn{1-P} to visualise the change in the predicted response as a
 #' contour map within a ternary diagram. The output of this function can be passed to the
 #' \code{\link{conditional_ternary_plot}} function to plot the results. Viewing multiple
 #' 2-d slices across multiple variables should allow to create an approximation of
@@ -14,13 +14,20 @@
 #' @param prop A character vector indicating the model coefficients
 #'             corresponding to variable proportions. These variables should
 #'             be compositional in nature (i.e., proportions should sum to 1).
+#' @param FG A character vector specifying the grouping of the variables
+#'           specified in `prop`. Specifying this parameter would call the
+#'           grouped_ternary_data function internally. See \code{\link{grouped_ternary}}
+#'           or \code{\link{grouped_ternary_data}} for more information.
+#' @param values A numeric vector specifying the proportional split of the
+#'               variables within a group. The default is to split the group
+#'               proportion equally between each variable in the group.
 #' @param tern_vars A character vector giving the names of the three variables
 #'                  to be shown in the ternary diagram.
-#' @param conditional A data-frame describing the names of the variables
+#' @param conditional A data-frame describing the names of the compositional variables
 #'                    and their respective values at which to slice the
 #'                    simplex space. The format should be, for example, as follows: \cr
 #'                    \code{data.frame("p1" = c(0, 0.5), "p2" = c(0.2, 0.1))} \cr
-#'                    Once figure would be created for row in `conditional` with
+#'                    One figure would be created for each row in `conditional` with
 #'                    the respective values of all specified variables. Any
 #'                    compositional variables not specified in `conditional` will
 #'                    be assumed to be 0.
@@ -66,7 +73,7 @@
 #' mod <- glm(response ~ 0 + (p1 + p2 + p3 + p4 + p5 + p6)^2, data = sim4)
 #'
 #' ## Create data
-#' ## Any species not specified in tern_vars or conditional will be assumed
+#' ## Any species not specified in `tern_vars` or conditional will be assumed
 #' ## to be 0, for example p5 and p6 here.
 #' head(conditional_ternary_data(prop = c("p1", "p2", "p3", "p4", "p5", "p6"),
 #'                               tern_vars = c("p1", "p2", "p3"),
@@ -108,7 +115,8 @@
 #' ## called manually using either the model object or model coefficients
 #' cond_data$treatment <- 50
 #' head(add_prediction(data = cond_data, model = mod))
-conditional_ternary_data <- function(prop, tern_vars,
+conditional_ternary_data <- function(prop, FG = NULL,
+                                     values = NULL, tern_vars = NULL,
                                      conditional = NULL,
                                      add_var = list(),
                                      resolution = 3, prediction = TRUE, ...){
@@ -121,6 +129,15 @@ conditional_ternary_data <- function(prop, tern_vars,
                             proportions."))
   }
 
+  # If FG is specified use grouped_ternary
+  if(!is.null(FG)){
+    cond_data <- grouped_ternary_data(prop = prop, FG = FG, values = values,
+                                      tern_vars = tern_vars,
+                                      conditional = conditional,
+                                      add_var = add_var, resolution = 3,
+                                      prediction = TRUE, ...)
+    return(cond_data)
+  }
   if (!inherits(prop, "character")){
     cli::cli_abort("{.var prop} should be a character vector containing the
                    names of the variables whose proportions sum to 1.",
@@ -131,15 +148,27 @@ conditional_ternary_data <- function(prop, tern_vars,
   if(length(prop) < 3){
     cli::cli_abort(c("Ternary diagrams can only be created for models with more
                       than or equal to 3 species.",
-                     "i" = "Currently only {length(prop)} are specified in
+                     "i" = "Currently only {length(prop)} variables are specified in
                             {.var prop}."))
   }
 
   # Species to be shown in the ternary diagram
-  if(missing(tern_vars)){
-    cli::cli_abort(c("{.var tern_vars} cannot be empty.",
-                     "i" = "Specify a character vector of length 3, indicating
-                     the three variables to be shown in the ternary diagram."))
+  if(is.null(tern_vars)){
+    cli::cli_warn(c("No values were specified in {.var tern_vars}.",
+                    "i" = "The first three values from {.var prop} which are not
+                    present in the {.var conditional} paramter would be chosen
+                    as variables to show in the ternary.",
+                    "i" = "If this is not desirable specify a character vector
+                    of length 3, indicating the three variables to be shown
+                    in the ternary diagram."))
+    tern_vars <- prop[!prop %in% names(conditional)][1:3]
+    if(any(is.na(tern_vars))){
+      cli::cli_abort(c("After accounting for all variables specified in
+                       {.var conditional}, only {length(tern_vars[!is.na(tern_vars)])}
+                       variable{?s} are left over to show in the ternary.",
+                       "i" = "Drop {3 - length(tern_vars[!is.na(tern_vars)])} variable{?s}
+                       from the {.var conditional} parameter."))
+    }
   }
 
   if (!inherits(tern_vars, "character")){
@@ -157,7 +186,7 @@ conditional_ternary_data <- function(prop, tern_vars,
   }
 
   if(length(tern_vars) != 3){
-    cli::cli_abort(c("{.var tern_vars} cannot have more than three elements.",
+    cli::cli_abort(c("{.var tern_vars} should have exactly three elements.",
                      "i" = "Currently {.val {length(tern_vars)}} elements are
                      specified in {.var tern_vars}."))
   }
@@ -339,6 +368,7 @@ conditional_ternary_data <- function(prop, tern_vars,
 #'
 #' ## Create multiple plots for additional variables using `add_var`
 #' ## Fit model
+#' \donttest{
 #' mod <- glm(response ~ 0 + (p1 + p2 + p3 + p4 + p5 + p6)^2 + treatment,
 #'            data = sim4)
 #'
@@ -352,7 +382,9 @@ conditional_ternary_data <- function(prop, tern_vars,
 #' ## Create plot
 #' ## Use nrow to align plots
 #' conditional_ternary_plot(data = plot_data, nrow = 2)
+#' }
 conditional_ternary_plot <- function(data,
+                                     col_var = ".Pred",
                                      nlevels = 7,
                                      colours = NULL,
                                      lower_lim = NULL,
@@ -366,13 +398,13 @@ conditional_ternary_plot <- function(data,
                                      vertex_label_size = 5,
                                      nrow = 0, ncol = 0){
   if(missing(data)){
-    cli::cli_abort(c("{.var data} cannot be missing.",
-                    "i" = "Specify the output of
-                          {.fn conditional_ternary_data} function."))
+    cli::cli_abort(c("{.var data} cannot be empty.",
+                     "i" = "Specify a data frame or tibble (preferably the
+                            output of {.help [{.fn {col_green(\"conditional_ternary_data\")}}](DImodelsVis::conditional_ternary_data)})."))
   }
   # Check data for important columns
   check_plot_data(data = data,
-                  cols_to_check = c(".Pred", ".x", ".y"),
+                  cols_to_check = c(col_var, ".x", ".y"),
                   calling_fun = "conditional_ternary")
 
   if(check_col_exists(data, ".add_str_ID")){
@@ -395,6 +427,7 @@ conditional_ternary_plot <- function(data,
                     function(i){
                       data_iter <- data %>% filter(.data$.add_str_ID == ids[i])
                       plot <- conditional_ternary_plot_internal(data = data_iter,
+                                                                col_var = col_var,
                                                                 nlevels = nlevels,
                                                                 colours = colours,
                                                                 tern_labels = tern_labels,
@@ -415,6 +448,7 @@ conditional_ternary_plot <- function(data,
     cli::cli_alert_success("Created all plots.")
   } else {
     plot <- conditional_ternary_plot_internal(data = data,
+                                              col_var = col_var,
                                               nlevels = nlevels,
                                               colours = colours,
                                               tern_labels = tern_labels,
@@ -434,9 +468,9 @@ conditional_ternary_plot <- function(data,
 #' @title Conditional ternary diagrams
 #'
 #' @description
-#' We fix \eqn{n-3} variables to have a constant value \eqn{x_1, x_2, x_3, ... x_{n-3}}
-#' such that \eqn{x = x_1 + x_2 + x_3 + ... x_{n - 3}} and \eqn{0 \le x \le 1} and
-#' vary the proportion of the remaining three variables between \eqn{0} and \eqn{1-x}
+#' We fix \eqn{n-3} variables to have a constant value \eqn{p_1, p_2, p_3, ... p_{n-3}}
+#' such that \eqn{P = p_1 + p_2 + p_3 + ... p_{n - 3}} and \eqn{0 \le P \le 1} and
+#' vary the proportion of the remaining three variables between \eqn{0} and \eqn{1-P}
 #' to visualise the change in the predicted response as a contour map within a
 #' ternary diagram. This is equivalent to taking multiple 2-d slices of the
 #' high dimensional simplex space. Taking multiple 2-d slices across multiple
@@ -486,27 +520,33 @@ conditional_ternary_plot <- function(data,
 #'          suppressWarnings()
 #'
 #' ## Conditioning on multiple variables
-#' cond <- data.frame(p4 = c(0, 0.2), p5 = c(0.5, 0.1), p6 = c(0, 0.3))
+#' cond <- data.frame(p4 = c(0, 0.2), p3 = c(0.5, 0.1), p6 = c(0, 0.3))
 #' conditional_ternary(model = m2, conditional = cond,
-#'                     resolution = 1)
+#'                     tern_vars = c("p1", "p2", "p5"), resolution = 1)
 #'
 #' ## Create separate plots for additional variables not a part of the simplex
 #' m3 <- DI(y = "response", prop = paste0("p", 1:6),
 #'          DImodel = "AV", data = sim4, treat = "treatment") %>%
 #'          suppressWarnings()
 #'
-#' ## Create plot and arrange it using nrow
+#' ## Create plot and arrange it using nrow and ncol
+#' \donttest{
 #' conditional_ternary(model = m3, conditional = cond[1, ],
+#'                     tern_vars = c("p1", "p2", "p5"),
 #'                     resolution = 1,
-#'                     add_var = list("treatment" = c(50, 150, 250)),
-#'                     nrow = 3)
+#'                     add_var = list("treatment" = c(50, 150)),
+#'                     nrow = 2, ncol = 1)
+#' }
 #'
 #' ## Specify `plot = FALSE` to not create the plot but return the prepared data
-#' conditional_ternary(model = m3, conditional = cond[1, ],
-#'                     resolution = 1, plot = FALSE,
-#'                     add_var = list("treatment" = c(50, 150, 250)))
+#' head(conditional_ternary(model = m3, conditional = cond[1, ],
+#'                          resolution = 1, plot = FALSE,
+#'                          tern_vars = c("p1", "p2", "p5"),
+#'                          add_var = list("treatment" = c(50, 150))))
 conditional_ternary <- function(model,
-                                tern_vars,
+                                FG = NULL,
+                                values = NULL,
+                                tern_vars = NULL,
                                 conditional = NULL,
                                 add_var = list(),
                                 resolution = 3,
@@ -531,18 +571,8 @@ conditional_ternary <- function(model,
   og_data <- model$original_data
 
   # Get all species in the model
-  if(inherits(model, "DI")){
-    species <- eval(model$DIcall$prop)
-  } else if(inherits(model, "DImulti")){
+  if(inherits(model, "DI") || inherits(model, "DImulti")){
     species <- attr(model, "prop")
-  }
-    if(is.numeric(species)){
-    species <- colnames(og_data)[species]
-  }
-
-  # Species to show in the ternary
-  if(missing(tern_vars)){
-    tern_vars <- species[1:3]
   }
 
   # If model object is of type DImulti add info about EFs and timepoints
@@ -552,6 +582,8 @@ conditional_ternary <- function(model,
 
   # Create data in appropriate format for plotting
   plot_data <- conditional_ternary_data(prop = species,
+                                        FG = FG,
+                                        values = values,
                                         tern_vars = tern_vars,
                                         model = model,
                                         conditional = conditional,
@@ -587,6 +619,7 @@ conditional_ternary <- function(model,
 #' @usage NULL
 NULL
 conditional_ternary_plot_internal <- function(data,
+                                              col_var = ".Pred",
                                               nlevels = 7,
                                               colours = NULL,
                                               lower_lim = NULL,
@@ -597,23 +630,10 @@ conditional_ternary_plot_internal <- function(data,
                                               show_axis_guides = FALSE,
                                               axis_label_size = 4,
                                               vertex_label_size = 5){
-  # If user messes up data attributes
-  if(any(sapply(list(attr(data, "x_proj"), attr(data, "y_proj"), attr(data, "tern_vars")), is.null))){
-    cli::cli_warn(c("!" = "Certain attributes of the data which are needed to prepare
-                    the plot are missing. This could happen if data manipulation
-                    performed by the user mess up the {.cls data.frame} attributes.",
-                    "i" = "The function will try to reconstruct the necessary attributes
-                    and create the plot but it might not always be possible.",
-                    "i" = "To avoid this, consider using dplyr versions of the respective
-                    base R functions as these preserve data-attributes. For example, use
-                    {.fn bind_cols} instead of {.fn cbind}."))
-    attr(data, "x_proj") <- ".x"
-    attr(data, "y_proj") <- ".y"
-    attr(data, "tern_vars") <- names(data)[1:3]
-  }
 
   # Create the simple ternary plot
   pl <- ternary_plot_internal(data = data,
+                              col_var = col_var,
                               nlevels = nlevels,
                               colours = colours,
                               tern_labels = tern_labels,
@@ -658,7 +678,7 @@ conditional_ternary_plot_internal <- function(data,
                             rev_label = rev(.data$label),
                             .Facet = paste0(cond_sp, " = ", cond_vals,
                                             collapse = "; \t"),
-                            .Pred = 0)
+                            !! sym(col_var) := 0)
       }) %>% bind_rows()
 
     pl <- pl +
@@ -677,10 +697,11 @@ conditional_ternary_plot_internal <- function(data,
 }
 
 
-check_conditional_parameter <- function(conditional, prop, tern_vars){
+check_conditional_parameter <- function(conditional, prop, tern_vars,
+                                        cond_FGs = NULL, FG_flag = FALSE){
   if(! is.null(conditional) && !(inherits(conditional, "data.frame"))){
     cli::cli_abort("{.var conditional} should be a data-frame containing
-                   the names and conditioning values for the variables at which
+                   the names and values for the variables at which
                    the simplex space should be sliced.",
                    "i" = "{.var conditional} was specified as a
                           {.cls {conditional}}.",
@@ -708,10 +729,32 @@ check_conditional_parameter <- function(conditional, prop, tern_vars){
   # From now on conditional will be a data.frame
   cond_names <- colnames(conditional)
   if(!all(cond_names %in% prop)){
-    cli::cli_abort(c("All variables specified in {.var conditional} should be present
+    if(FG_flag){
+      if(length(cond_FGs) < 2){
+        if(length(cond_FGs) == 1){
+          code_str <- glue::glue("data.frame({dQuote(cond_FGs[1])} = c(0.1, 0.3))")
+        } else {
+          code_str <- glue::glue("data.frame({dQuote(\"FG1\")} = c(0.1, 0.3),
+                                  {dQuote(\"FG2\")} = c(0.2, 0.1))")
+        }
+
+      } else {
+        code_str <- glue::glue("data.frame({dQuote({cond_FGs[1]})} = c(0.1, 0.3),
+                                {dQuote({cond_FGs[2]})} = c(0.2, 0.1))")
+      }
+      cli::cli_abort(c("If specifying the {.var FG} parameter, {.var conditional}
+                     should have names as values specified in {.var FG}.",
+                       "i" = "Use values from {.val {cond_FGs}} as column name{?s} in
+                    {.var conditional}.",
+                       "i" = "For example specify {.var conditional} as
+
+                       {.code {code_str}}"))
+    } else {
+      cli::cli_abort(c("All variables specified in {.var conditional} should be present
                     in {.var prop}.",
-                    "i" = "{.val {cond_names[! cond_names %in% prop]}} {?is/are}
+                       "i" = "{.val {cond_names[! cond_names %in% prop]}} {?is/are}
                             not specified in {.var prop}."))
+    }
   }
 
   if(any(cond_names %in% tern_vars)){
@@ -744,7 +787,8 @@ check_conditional_parameter <- function(conditional, prop, tern_vars){
     cli::cli_abort(c("The values specified for conditioning a particular slice
                     should have a sum less than 1 describing the values at which to condition
                      the n-dimensional simplex space.",
-                    "i" = "The values specified for slice{?/s} {.val {as.data.frame(t(conditional[over1, ]))}} do not sum to 1."))
+                    "i" = "The values specified for slice{?/s} {.val {as.data.frame(t(conditional[over1, ]))}}
+                    sum over 1."))
   }
 
   return(conditional)

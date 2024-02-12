@@ -3,7 +3,7 @@
 #' informative error messages if anything is wrong
 #'
 #' @importFrom insight is_regression_model get_data
-#' @importFrom cli cli_abort cli_warn cli_alert
+#' @importFrom cli cli_abort cli_warn cli_alert col_green
 #' @importFrom rlang caller_env
 #' @importFrom dplyr near
 #'
@@ -16,13 +16,6 @@ sanity_checks <- function(data = NULL, prop = NULL, responses = NULL,
                           characters = NULL, unit_lengths = NULL,
                           call = caller_env()){
 
-  # Ensure atleast one of data or model are specified
-  # if(is.null(data) & is.null(model)){
-  #   cli::cli_abort(c("x" = "Both {.var data} and {.var model} cannot be NULL.",
-  #                    "i" = "Specify either one of {.var data} or {.var model}"),
-  #                  call = call)
-  # }
-
   # Sanity checks for data
   if(!is.null(data)){
     if(!inherits(data, "data.frame")){
@@ -34,8 +27,11 @@ sanity_checks <- function(data = NULL, prop = NULL, responses = NULL,
 
   # Ensure model is a DImodel object
   if(!is.null(DImodel)){
-    if (!inherits(DImodel, 'DI')){
-      cli::cli_abort(c("{.var model} should be a object creating using the {.help [{.fun DI}](DImodels::DI)} function from the {.help [{.pkg DImodels}](DImodels::DImodels)} package or extending the {.cls DI} class.",
+    if (!inherits(DImodel, "DI") && !inherits(DImodel, "DImulti")){
+      cli::cli_abort(c("{.var model} should be an object creating using the
+                        {.help [{.fun DI}](DImodels::DI)} function from the
+                       {.help [{.pkg DImodels}](DImodels::DImodels)} package or
+                       an object extending the {.cls DI} class.",
                        "x" = "You specified a model of class {.cls {class(DImodel)}}."),
                      call = call)
     }
@@ -60,7 +56,9 @@ sanity_checks <- function(data = NULL, prop = NULL, responses = NULL,
   if(!is.null(prop)){
     # Ensure prop is numeric or character
     if(!all(is.character(prop)) & !all(is.numeric(prop))){
-      cli::cli_abort(c("{.var prop} should either numeric, character string, or a vector of either type.",
+      cli::cli_abort(c("{.var prop} should be a numeric or character vector specifying
+                       the column indices or names of columns containing the compositonal
+                       variables.",
                        "x" = "You specified an object of class {.cls {class(prop)}}"),
                      call = call)
     }
@@ -68,8 +66,11 @@ sanity_checks <- function(data = NULL, prop = NULL, responses = NULL,
     if(is.numeric(prop)){
       # Ensure valid indices are specified
       if(!all(prop %in% 1:length(data_col_names))){
-        cli::cli_abort(c("The indices specified in {.var prop} should be valid indices for extracting columns from the data:",
-                         "x" = "Can't extract columns using {.var {as.character(prop[!(prop %in% seq_along(data_col_names))])}} as column ind{?ex/ices}."),
+        cli::cli_abort(c("The indices specified in {.var prop} should be valid
+                         indices for extracting columns from the data.",
+                         "x" = "Can't extract columns using
+                         {.var {as.character(prop[!(prop %in% seq_along(data_col_names))])}}
+                         as column ind{?ex/ices}."),
                        call = call)
       } else {
         prop <- data_col_names[prop]
@@ -78,21 +79,23 @@ sanity_checks <- function(data = NULL, prop = NULL, responses = NULL,
 
     # Ensure all prop present in the data
     if(!all(prop %in% data_col_names)){
-      cli::cli_abort(c("All values specified in {.var prop} should be present in the data:",
-                       "x" = "{.var {prop[!(prop %in% data_col_names)]}} {?is/are} not present in the data."),
+      cli::cli_abort(c("All values specified in {.var prop} should be present
+                       in the data.",
+                       "x" = "{.var {prop[!(prop %in% data_col_names)]}} {?is/are}
+                       not present in the data."),
                      call = call)
     }
 
     # Ensure all prop columns are numeric
     if(!all(sapply(data[, prop], is.numeric))){
-      cli::cli_abort(c("All columns specified in {.var prop} should be numeric:",
+      cli::cli_abort(c("All columns specified in {.var prop} should be numeric.",
                        "x" = "The column{?s} {.var {prop[!sapply(data[, prop], is.numeric)]}} {?is/are} are not numeric."),
                      call = call)
     }
 
     # Ensure prop is between 0 and 1
     if(!all(sapply(data[, prop], function(x) all(between(x, 0, 1))))){
-      cli::cli_abort(c("All columns specified in {.var prop} should have values between 0 and 1:",
+      cli::cli_abort(c("All columns specified in {.var prop} should have values between 0 and 1.",
                        "x" = "The column{?s} {.var {prop[!sapply(data[, prop], function(x) all(between(x, 0, 1)))]}}
                        {?do/does} not have values between 0 and 1."),
                      call = call)
@@ -102,12 +105,18 @@ sanity_checks <- function(data = NULL, prop = NULL, responses = NULL,
     comm_sum <- get_comm_sum(data, prop)
     if(!all(dplyr::near(comm_sum, 1, tol = .Machine$double.eps^0.25))){
       if(any(comm_sum < 1)){
-        cli::cli_abort(c("!" = "The columns containing the variable proportions should sum to 1 for each community:",
-                         "i" = "Certain communities sum less than 1 currently. Do you want to specify any additional columns from the design?"),
+        cli::cli_abort(c("!" = "The columns containing the variable proportions
+                         should sum to 1 for each row.",
+                         "i" = "Certain rows sum less than 1 currently.
+                         Do you want to specify any additional columns from the
+                         design?"),
                        call = call)
       } else {
-        cli::cli_abort(c("!" = "The columns containing the variables proportions should sum to 1 for each community:",
-                         "i" = "Certain communities sum more than 1 currently. Have you specified any additional columns not from the design?"),
+        cli::cli_abort(c("!" = "The columns containing the variables proportions
+                         should sum to 1 for each row.",
+                         "i" = "Certain ros sum more than 1 currently.
+                         Have you specified any additional columns not from the
+                         design?"),
                        call = call)
       }
 
@@ -118,15 +127,19 @@ sanity_checks <- function(data = NULL, prop = NULL, responses = NULL,
   if(!is.null(facet)){
     # Ensure facet is numeric or character
     if(!all(is.character(facet)) & !all(is.numeric(facet))){
-      cli::cli_abort(c("{.var facet} should either be numeric, character string, or a vector of either type.",
+      cli::cli_abort(c("{.var facet} should be of type numeric or character specifying
+                       the column indices or names of columns containing the variable(s)
+                       to facet the plot on.",
                        "x" = "You specified an object of class {.cls {class(facet)}}"),
                      call = call)
     }
 
     # Can't facet for more than two variables
     if(length(facet) > 2){
-      cli::cli_abort(c("x" = "{.var facet} cannot contain more than two variables, as facetting is not possible for more than two variables.",
-                       "i" = "Drop elements from {.var facet} to ensure the length is two or less."),
+      cli::cli_abort(c("x" = "{.var facet} cannot contain more than two variables,
+                       as facetting is not possible for more than two variables.",
+                       "i" = "Drop elements from {.var facet} to ensure the
+                       length is one or two."),
                      call = call)
     }
 
@@ -134,8 +147,11 @@ sanity_checks <- function(data = NULL, prop = NULL, responses = NULL,
     if(is.numeric(facet)){
       # Ensure valid indices are specified
       if(!all(facet %in% 1:length(data_col_names))){
-        cli::cli_abort(c("The indices specified in {.var facet} should be valid indices for extracting columns from the data:",
-                         "x" = "Can't extract columns using {.var {as.character(facet[!(facet %in%  seq_along(data_col_names))])}} as column ind{?ex/ices}."),
+        cli::cli_abort(c("The indices specified in {.var facet} should be valid
+                         indices for extracting columns from the data.",
+                         "x" = "Can't extract columns using
+                         {.var {as.character(facet[!(facet %in%  seq_along(data_col_names))])}}
+                         as column ind{?ex/ices}."),
                        call = call)
       } else {
         facet <- data_col_names[facet]
@@ -144,8 +160,9 @@ sanity_checks <- function(data = NULL, prop = NULL, responses = NULL,
 
     # Ensure values specified in facet are present in the data
     if(!all(facet %in% data_col_names)){
-      cli::cli_abort(c("All values specified in {.var facet} should be present in the data:",
-                       "x" = "{.var {facet[!(facet %in% data_col_names)]}} {?is/are} not present in the data."),
+      cli::cli_abort(c("All values specified in {.var facet} should be present in the data.",
+                       "x" = "{.var {facet[!(facet %in% data_col_names)]}} {?is/are} not
+                       present in the data."),
                      call = call)
     }
   }
@@ -154,7 +171,8 @@ sanity_checks <- function(data = NULL, prop = NULL, responses = NULL,
   if(!is.null(responses)){
     # Ensure responses is numeric or character
     if(!all(is.character(responses)) & !all(is.numeric(responses))){
-      cli::cli_abort(c("{.var responses} should either numeric, character string, or a vector of either type.",
+      cli::cli_abort(c("{.var responses} should be of type numeric or character specifying
+                       the column indices or names of the columns containing the responses.",
                        "x" = "You specified an object of class {.cls {class(responses)}}"),
                      call = call)
     }
@@ -163,8 +181,11 @@ sanity_checks <- function(data = NULL, prop = NULL, responses = NULL,
     if(is.numeric(responses)){
       # Ensure valid indices are specified
       if(!all(responses %in% 1:length(data_col_names))){
-        cli::cli_abort(c("The indices specified in {.var responses} should be valid indices for extracting columns from the data:",
-                         "x" = "Can't extract columns using {.var {as.character(responses[!(responses %in%  seq_along(data_col_names))])}} as column ind{?ex/ices}."),
+        cli::cli_abort(c("The indices specified in {.var responses} should be valid
+                         indices for extracting columns from the data.",
+                         "x" = "Can't extract columns using
+                         {.var {as.character(responses[!(responses %in% seq_along(data_col_names))])}}
+                         as column ind{?ex/ices}."),
                        call = call)
       } else {
         responses <- data_col_names[responses]
@@ -173,15 +194,19 @@ sanity_checks <- function(data = NULL, prop = NULL, responses = NULL,
 
     # Ensure values specified in responses are present in the data
     if(!all(responses %in% data_col_names)){
-      cli::cli_abort(c("All values specified in {.var responses} should be present in the data:",
-                       "x" = "{.var {responses[!(responses %in% data_col_names)]}} {?is/are} not present in the data."),
+      cli::cli_abort(c("All values specified in {.var responses} should be present
+                       in the data.",
+                       "x" = "{.var {responses[!(responses %in% data_col_names)]}}
+                       {?is/are} not present in the data."),
                      call = call)
     }
 
     # Ensure all responses columns are numeric
     if(!all(sapply(data[, responses], is.numeric))){
-      cli::cli_abort(c("All columns specified in {.var responses} should be numeric:",
-                       "x" = "The column{?s} {.var {responses[!sapply(data[, responses], is.numeric)]}} {?is/are} not numeric."),
+      cli::cli_abort(c("All columns specified in {.var responses} should be numeric.",
+                       "x" = "The column{?s}
+                       {.var {responses[!sapply(data[, responses], is.numeric)]}}
+                       {?is/are} not numeric."),
                      call = call)
     }
   }
@@ -190,7 +215,8 @@ sanity_checks <- function(data = NULL, prop = NULL, responses = NULL,
   if(!is.null(treatments)){
     # Ensure treatments is numeric or character
     if(!all(is.character(treatments)) & !all(is.numeric(treatments))){
-      cli::cli_abort(c("{.var treatments} should either be numeric, character string, or a vector of either type.",
+      cli::cli_abort(c("{.var treatments} should be of type numeric or character specifying
+                       the column indices or names of the columns containing the treatments.",
                        "x" = "You specified an object of class {.cls {class(treatments)}}"),
                      call = call)
     }
@@ -199,8 +225,11 @@ sanity_checks <- function(data = NULL, prop = NULL, responses = NULL,
     if(is.numeric(treatments)){
       # Ensure valid indices are specified
       if(!all(treatments %in% 1:length(data_col_names))){
-        cli::cli_abort(c("The indices specified in {.var treatments} should be valid indices for extracting columns from the data:",
-                         "x" = "Can't extract columns using {.var {as.character(treatments[!(treatments %in%  seq_along(data_col_names))])}} as column ind{?ex/ices}."),
+        cli::cli_abort(c("The indices specified in {.var treatments} should be valid
+                         indices for extracting columns from the data.",
+                         "x" = "Can't extract columns using
+                         {.var {as.character(treatments[!(treatments %in% seq_along(data_col_names))])}}
+                         as column ind{?ex/ices}."),
                        call = call)
       } else {
         treatments <- data_col_names[treatments]
@@ -209,8 +238,9 @@ sanity_checks <- function(data = NULL, prop = NULL, responses = NULL,
 
     # Ensure values specified in treatments are present in the data
     if(!all(treatments %in% data_col_names)){
-      cli::cli_abort(c("All values specified in {.var treatments} should be present in the data:",
-                       "x" = "{.var {treatments[!(treatments %in% data_col_names)]}} {?is/are} not present in the data."),
+      cli::cli_abort(c("All values specified in {.var treatments} should be present in the data.",
+                       "x" = "{.var {treatments[!(treatments %in% data_col_names)]}}
+                       {?is/are} not present in the data."),
                      call = call)
     }
   }
@@ -218,7 +248,8 @@ sanity_checks <- function(data = NULL, prop = NULL, responses = NULL,
   # Checks if colours specified are proper
   if(!is.null(colours)){
     if(!all(sapply(colours, areColours))){
-      cli::cli_abort(c("x" = "The value{?s} of {.var {colours[!sapply(colours, areColours)]}} {?is/are} not {?a/} valid colour{?s}."),
+      cli::cli_abort(c("x" = "The value{?s} of {.var {colours[!sapply(colours, areColours)]}}
+                       {?is/are} not {?a/} valid colour{?s}."),
                      call = call)
     }
   }
@@ -226,7 +257,9 @@ sanity_checks <- function(data = NULL, prop = NULL, responses = NULL,
   # Check if booleans specified are proper
   if(!is.null(booleans)){
     if(!all(sapply(booleans, is.logical))){
-      cli::cli_abort(c("x" = "The value{?s} specified in {.var {names(booleans)[!sapply(booleans, is.logical)]}} {?is/are} not {?a/} boolean."),
+      cli::cli_abort(c("x" = "The value{?s} specified in
+                       {.var {names(booleans)[!sapply(booleans, is.logical)]}}
+                       {?is/are} not {?a/} boolean."),
                      call = call)
     }
   }
@@ -234,7 +267,9 @@ sanity_checks <- function(data = NULL, prop = NULL, responses = NULL,
   # Check if strings specified are proper
   if(!is.null(characters)){
     if(!all(sapply(characters, is.character))){
-      cli::cli_abort(c("x" = "The value{?s} specified in {.var {names(characters)[!sapply(characters, is.character)]}} {?is/are} not {?a/} valid character{?s}."),
+      cli::cli_abort(c("x" = "The value{?s} specified in
+                       {.var {names(characters)[!sapply(characters, is.character)]}}
+                       {?is/are} not {?a/} valid character{?s}."),
                      call = call)
     }
   }
@@ -242,7 +277,9 @@ sanity_checks <- function(data = NULL, prop = NULL, responses = NULL,
   # Check if numerics specified are proper
   if(!is.null(numerics)){
     if(!all(sapply(numerics, is.numeric))){
-      cli::cli_abort(c("x" = "The value{?s} specified in {.var {names(numerics)[!sapply(numerics, is.numeric)]}} {?is/are} not {?a/} valid number{?s}."),
+      cli::cli_abort(c("x" = "The value{?s} specified in
+                       {.var {names(numerics)[!sapply(numerics, is.numeric)]}}
+                       {?is/are} not {?a/} numeric."),
                      call = call)
     }
   }
@@ -250,7 +287,9 @@ sanity_checks <- function(data = NULL, prop = NULL, responses = NULL,
   # Check if parameters have a unit length
   if(!is.null(unit_lengths)){
     if(!all(sapply(unit_lengths, function(x) ifelse(length(x) == 1, TRUE, FALSE)))){
-      cli::cli_abort(c("x" = "The value{?s} specified in {.var {names(unit_lengths)[!sapply(unit_lengths, function(x) ifelse(length(x) == 1, TRUE, FALSE))]}} cannot be {?a/} vector{?s} {?it/they} should be of length 1."),
+      cli::cli_abort(c("x" = "The value{?s} specified in
+                       {.var {names(unit_lengths)[!sapply(unit_lengths, function(x) ifelse(length(x) == 1, TRUE, FALSE))]}}
+                       cannot be {?a/} vector{?s} {?it/they} should be of length 1."),
                      call = call)
     }
   }
@@ -264,18 +303,19 @@ sanity_checks <- function(data = NULL, prop = NULL, responses = NULL,
 #' @keywords internal
 #' @usage NULL
 NULL
-check_data_functions <- function(model, coefficients, prop = NULL,
+check_data_functions <- function(model, coefficients,
                                  call = caller_env()){
   # One of model or coefficients should be specified
   if(is.null(model) && is.null(coefficients)){
     cli::cli_abort(c("Both {.var model} and {.var coefficients} cannot be empty.",
-                     "i" = "Specify either a regression model object fit using {.fn lm},
+                     "i" = "Specify a regression model object fit using {.fn lm},
                      {.fn glm}, {.fn gls}, {.fn lmer}, etc. functions or a matrix with
                      regression coefficients for calculating the predictions.",
                      "i" = "If this error is encountered when calling any of the
-                     data preparation functions, then use {.var prediction = FALSE} and
-                     manually call the
-                     {.help [{.fn add_prediction}](DImodelsVis::add_prediction)} function."),
+                     data preparation (i.e., *_data) functions, then use
+                     {.var prediction = FALSE} and manually call the
+                     {.help [{.fn add_prediction}](DImodelsVis::add_prediction)}
+                     function later to add the predictions."),
                    call = call)
   }
 
@@ -296,12 +336,6 @@ check_data_functions <- function(model, coefficients, prop = NULL,
     }
   }
 
-  # Ensure identifiers for columns in communities giving prop proportions are specified
-  if(!is.null(prop)){
-    cli::cli_abort(c("{.var prop} cannot be empty.",
-                     "i" = "Specify either a character or numeric vector indicating the columns containg the prop proportions in {.var prop}."),
-                   call = call)
-  }
   return(TRUE)
 }
 
@@ -313,9 +347,12 @@ check_data_functions <- function(model, coefficients, prop = NULL,
 NULL
 check_add_var <- function(model = NULL, add_var = NULL, call = caller_env()){
   if(!is.null(add_var) && !is.list(add_var)){
-    cli::cli_abort(c("{.var add_var} should be a list containing the names and values for experimental structures in the DI model.",
-                     "i" = "An example list could be as follows list(\"add_var1\" = c(\"value1\", \"value2\"),
-                                                                     \"add_var2\" = c(\"value1\"))"),
+    cli::cli_abort(c("{.var add_var} should be a list containing the names and
+                     values for any additional variables other than compositional
+                     variables in the model.",
+                     "i" = "An example list could be as follows \n
+                     {.code list(\"add_var1\" = c(\"value1\", \"value2\"),
+                                 \"add_var2\" = c(\"value3\"))}"),
                    call = call)
   }
 
@@ -336,8 +373,11 @@ check_add_var <- function(model = NULL, add_var = NULL, call = caller_env()){
     exp_names <- names(add_var)
 
     if(!all(exp_names %in% colnames(model_data))){
-      cli::cli_warn(c("The names for the experimental structures specified in {.var add_var} should be same as the names used when fitting the model.",
-                      "x" = "{.var {exp_names[!(exp_names %in% data_col_names)]}} {?is/are} not present in the data and will be ignored."),
+      cli::cli_warn(c("The names for the additional variables specified in
+                      {.var add_var} should be same as the names used when
+                      fitting the model.",
+                      "x" = "{.var {exp_names[!(exp_names %in% data_col_names)]}}
+                      {?is/are} not present in the data and will be ignored."),
                     call = call)
       add_var <- add_var[exp_names != exp_names[!(exp_names %in% data_col_names)]]
     }
@@ -373,7 +413,8 @@ check_add_var <- function(model = NULL, add_var = NULL, call = caller_env()){
         cli::cli_warn(c("{.var {x}} was of type {.cls {class(model_var)}} in the
                       data used to fit the model but was specified as
                       {.cls {class(add_var[[x]])}} in {.var add_var}.",
-                        "i" = "Converting {.var {x}}  in {.var add_var} to {.cls {class(model_var)}}."),
+                        "i" = "Converting {.var {x}} in {.var add_var} to
+                        {.cls {class(model_var)}}."),
                       call = call)
 
         if(is.character(model_var) || is.factor(model_var)){
@@ -406,11 +447,15 @@ check_add_var <- function(model = NULL, add_var = NULL, call = caller_env()){
     }, simplify = FALSE)
 
     if(!all(sapply(check_values, is.logical))){
-      cli::cli_warn(c("The values for categorical experimental structures specified in {.var add_var} cannot accept values not present in the original data.",
-                      "x" = "The values specified for {.var {names(check_values)[!sapply(check_values, is.logical)]}} are not present in the data and will be ignored."),
+      cli::cli_warn(c("The values for categorical additional variable specified in
+                      {.var add_var} cannot accept values not present in the data
+                      used when fitting the model.",
+                      "x" = "The values specified for
+                      {.var {names(check_values)[!sapply(check_values, is.logical)]}}
+                      are not present in the data and will be ignored."),
                     call = call)
       glue::glue("The following values are dropped from `add_var`,
-               {paste(names(check_values), check_values, sep = \": \", collapse = \"\\n\")}")
+               {paste(paste(\"\u2022\", names(check_values)), check_values, sep = \": \", collapse = \"\\n\")}")
 
       add_var <- sapply(names(add_var), function(x){
         add_var[[x]][!add_var[[x]] %in% check_values[[x]]]
@@ -429,15 +474,17 @@ check_coeff_groupings <- function(coefficients, groups, call = caller_env()){
   if(length(groups) > 0){
     # Ensure groups are specified as a list
     if(!is.list(groups)){
-      cli::cli_abort(c("x" = "The coefficients groupings in {.var groups} should be specified as a list.",
+      cli::cli_abort(c("x" = "The coefficients groupings in {.var groups} should
+                       be specified as a list.",
                        "i" = "{.var groups} is specified as {.cls {class(groups)}}."),
                      call = call)
     }
 
     # Warn if the coefficient groups are not named
     if(is.null(names(groups))){
-      cli::cli_warn(c("The coefficient groups should be given names",
-                      "i" = "Naming the group{?s} {paste0(\"Group\", 1:length(groups))} {?respectively}.",
+      cli::cli_warn(c("The coefficient groups should be given names.",
+                      "i" = "Naming the group{?s} {paste0(\"Group\", 1:length(groups))}
+                      {?respectively}.",
                       "i" = "Provide a named list in {.var groups} to add custom names."),
                     call = call)
     }
@@ -467,7 +514,8 @@ check_coeff_groupings <- function(coefficients, groups, call = caller_env()){
     } else {
       if(any(!(elements %in% names(coefficients)))){
         cli::cli_abort(c("Can't group coefficients that don't exist.",
-                         "i" = "Coefficient{?s} {.var {elements[!(elements %in% names(coefficients))]}} do{?es/}n't exist."),
+                         "i" = "Coefficient{?s} {.var {elements[!(elements %in% names(coefficients))]}}
+                         do{?es/}n't exist."),
                        call = call)
       }
     }

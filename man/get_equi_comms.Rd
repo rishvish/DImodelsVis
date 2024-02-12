@@ -8,24 +8,22 @@ get_equi_comms(
   nvars,
   richness_lvl = 1:nvars,
   variables = paste0("Var", 1:nvars),
-  threshold = round(1e+06/nvars)
+  threshold = 1e+06
 )
 }
 \arguments{
 \item{nvars}{Number of variables in the design}
 
-\item{richness_lvl}{The richness (number of non-zero compositional variables
-in a community) levels at which to return the equi-proportional
-communities.
-Defaults to each richness level from 1 up to `nvars`
-(both inclusive).}
+\item{richness_lvl}{The richness levels (number of non-zero compositional variables
+in a community) at which to return the equi-proportional communities.
+Defaults to each richness level from 1 up to `nvars` (both inclusive).}
 
 \item{variables}{Names for the variables. Will be used as column names for the
 final result. Default is "Var" followed by column number.}
 
 \item{threshold}{The maximum number of communities to select for each level
 of richness for situations when there are too many
-equi-proportional communities. \cr
+equi-proportional communities. Default value is a million. \cr
 Note: if threshold < `number of possible equi-proportional communities`
 at a given level of richness, a random selection of communities
 equal to the number specified in threshold would be returned.}
@@ -42,7 +40,7 @@ Get all equi-proportional communities at specific levels of richness
 data10 <- get_equi_comms(10)
 head(data10, 12)
 
-## Change species names
+## Change variable names
 data4 <- get_equi_comms(4, variables = c("Lollium perenne", "Chichorum intybus",
                                          "Trifolium repens", "Trifolium pratense"))
 head(data4)
@@ -60,4 +58,10 @@ data4_13
 ## levels
 data4_13_2 <- get_equi_comms(nvars = 4, richness = c(1, 3), threshold = 2)
 data4_13_2
+
+## Set threshold to a very high positive number to ensure
+## random selection is never performed
+data_no_random <- get_equi_comms(nvars = 15,
+                                 threshold = .Machine$integer.max)
+head(data_no_random)
 }

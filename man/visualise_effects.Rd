@@ -60,8 +60,9 @@ intervals. Default is 0.95.}
 \item{se}{A boolean variable indicating whether to plot confidence intervals associated with
 the effect of species increase or decrease}
 
-\item{average}{A boolean variable indicating whether to add a line describing the "average"
-effect of species increase or decrease}
+\item{average}{A boolean value indicating whether to add a line describing the "average"
+effect of variable increase or decrease. The average is calculated at the
+median value of any variables not specified.}
 
 \item{pie_colours}{A character vector indicating the colours for the slices
 in the pie-glyphs. \cr
@@ -159,17 +160,8 @@ visualise_effects(model = mod, effect = "both",
                                     "p4" = 0),
                   var_interest = c("p1", "p3"))
 
-## Specify `plot = FALSE` to not create the plot but return the prepared data
-visualise_effects(model = mod, effect = "both",
-                  average = FALSE, plot = FALSE,
-                  pie_colours = c("steelblue1", "steelblue4", "orange1", "orange4"),
-                  data = data.frame("p1" = c(0.7, 0.1),
-                                    "p2" = c(0.3, 0.5),
-                                    "p3" = c(0,   0.4),
-                                    "p4" = 0),
-                  var_interest = c("p1", "p3"))
-
 # Add additional variables and create a separate plot for each
+\donttest{
 visualise_effects(model = mod, effect = "both",
                   average = FALSE,
                   pie_colours = c("steelblue1", "steelblue4", "orange1", "orange4"),
@@ -180,4 +172,16 @@ visualise_effects(model = mod, effect = "both",
                   var_interest = c("p1", "p3"),
                   add_var = list("block" = factor(c(1, 2),
                                                   levels = c(1, 2, 3, 4))))
+}
+
+## Specify `plot = FALSE` to not create the plot but return the prepared data
+head(visualise_effects(model = mod, effect = "both",
+                       average = FALSE, plot = FALSE,
+                       pie_colours = c("steelblue1", "steelblue4",
+                                       "orange1", "orange4"),
+                       data = data.frame("p1" = c(0.7, 0.1),
+                                         "p2" = c(0.3, 0.5),
+                                         "p3" = c(0,   0.4),
+                                         "p4" = 0),
+                       var_interest = c("p1", "p3")))
 }

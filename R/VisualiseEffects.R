@@ -1,4 +1,4 @@
-#' @title Effects plots for compositional data
+#' @title Prepare data for effects plots for compositional data
 #'
 #' @description
 #' The helper function to create the underlying data for visualising the effect
@@ -8,12 +8,12 @@
 #' monoculture (i.e. variable of interest = 1, while all others equal 0) of the
 #' variable of interest (when increasing the proportion) or a community without
 #' the variable of interest (when decreasing the proportion). The observations
-#' specified in `data` are connected to the respective communities with a straight
-#' line across the simplex, this has the effect of changing the proportion of
+#' specified in `data` are connected to the respective communities (monoculture of
+#' the variable of interest or the community without the variable of interest) by a
+#' straight line across the simplex; This has the effect of changing the proportion of
 #' the variable of interest whilst adjusting the proportion of the other variables
 #' but keeping the ratio of their relative proportions unchanged, thereby preserving
-#' the compositional nature of the data. This enables us to visualise the effect of
-#' changing the proportion of a variable of interest. See examples for more information.
+#' the compositional nature of the data. See examples for more information.
 #' The output of this function can be passed to the
 #' \code{\link{visualise_effects_plot}} function to visualise the results.
 #'
@@ -71,7 +71,7 @@
 #'                     the species of interest.}
 #'    \item{.Threshold}{A numeric value indicating the maximum proportion of
 #'                      the species of interest within a particular community
-#'                      which results in a positive marginal effect on the response.}
+#'                      which has a positive marginal effect on the response.}
 #'    \item{.MarEffect}{A character string entailing whether the increase/decrease
 #'                      of the species of interest from the particular community
 #'                      would result in a positive or negative marginal effect
@@ -370,7 +370,7 @@ visualise_effects_data <- function(data, prop, var_interest = NULL,
 #'
 #' @param data A data frame created using the \code{\link{visualise_effects_data}} function.
 #' @param prop A vector of column names or indices identifying the columns containing the
-#'             species proportions in the data. Will be inferred from the data if
+#'             compositional variables in the data. Will be inferred from the data if
 #'             it is created using the `\code{\link{visualise_effects_data}}`
 #'             function, but the user also has the flexibility of manually
 #'             specifying the values.
@@ -380,8 +380,9 @@ visualise_effects_data <- function(data, prop, var_interest = NULL,
 #'                    for the pie-glyph slices.
 #' @param se A boolean variable indicating whether to plot confidence intervals associated with
 #'           the effect of species increase or decrease
-#' @param average A boolean variable indicating whether to add a line describing the "average"
-#'                effect of species increase or decrease
+#' @param average A boolean value indicating whether to add a line describing the "average"
+#'                effect of variable increase or decrease. The average is calculated at the
+#'                median value of any variables not specified.
 #' @inheritParams prediction_contributions
 #'
 #' @inherit prediction_contributions return
@@ -440,9 +441,8 @@ visualise_effects_plot <- function(data, prop, pie_colours = NULL,
                                    nrow = 0, ncol = 0){
   if(missing(data)){
     cli::cli_abort(c("{.var data} cannot be empty.",
-                     "i" = "Specify a data-frame or tibble
-                     preferably the output of {.fn visualise_effects_data} or
-                     a data-frame with a similar structure and column names."))
+                     "i" = "Specify a data frame or tibble (preferably the
+                            output of {.help [{.fn {col_green(\"visualise_effects_data\")}}](DImodelsVis::visualise_effects_data)})."))
   }
 
   # Ensure identifiers for columns in data giving species proportions are specified
@@ -452,8 +452,8 @@ visualise_effects_plot <- function(data, prop, pie_colours = NULL,
 
     if(is.null(prop)){
       cli::cli_abort(c("{.var prop} is empty and cannot be inferred from data.",
-                       "i" = "Specify either a character or numeric vector giving
-                     names/indicies of the columns containing the
+                       "i" = "Specify a character vector giving
+                     names of the columns containing the
                      compositional variables in {.var data}."))
     }
   }
@@ -593,17 +593,8 @@ visualise_effects_plot <- function(data, prop, pie_colours = NULL,
 #'                                     "p4" = 0),
 #'                   var_interest = c("p1", "p3"))
 #'
-#' ## Specify `plot = FALSE` to not create the plot but return the prepared data
-#' visualise_effects(model = mod, effect = "both",
-#'                   average = FALSE, plot = FALSE,
-#'                   pie_colours = c("steelblue1", "steelblue4", "orange1", "orange4"),
-#'                   data = data.frame("p1" = c(0.7, 0.1),
-#'                                     "p2" = c(0.3, 0.5),
-#'                                     "p3" = c(0,   0.4),
-#'                                     "p4" = 0),
-#'                   var_interest = c("p1", "p3"))
-#'
 #' # Add additional variables and create a separate plot for each
+#' \donttest{
 #' visualise_effects(model = mod, effect = "both",
 #'                   average = FALSE,
 #'                   pie_colours = c("steelblue1", "steelblue4", "orange1", "orange4"),
@@ -614,6 +605,18 @@ visualise_effects_plot <- function(data, prop, pie_colours = NULL,
 #'                   var_interest = c("p1", "p3"),
 #'                   add_var = list("block" = factor(c(1, 2),
 #'                                                   levels = c(1, 2, 3, 4))))
+#' }
+#'
+#' ## Specify `plot = FALSE` to not create the plot but return the prepared data
+#' head(visualise_effects(model = mod, effect = "both",
+#'                        average = FALSE, plot = FALSE,
+#'                        pie_colours = c("steelblue1", "steelblue4",
+#'                                        "orange1", "orange4"),
+#'                        data = data.frame("p1" = c(0.7, 0.1),
+#'                                          "p2" = c(0.3, 0.5),
+#'                                          "p3" = c(0,   0.4),
+#'                                          "p4" = 0),
+#'                        var_interest = c("p1", "p3")))
 visualise_effects <- function(model, data = NULL, var_interest = NULL,
                               effect = c("increase", "decrease", "both"),
                               add_var = list(),
@@ -673,7 +676,7 @@ visualise_effects <- function(model, data = NULL, var_interest = NULL,
       # If the column names of the data dataframe not match the species present in the
       # model then notify user asking them to change the column names
       if(all(sp_abs)){
-        cli::cli_abort(c("The column names of the data data frame should be same as
+        cli::cli_abort(c("The column names of the data frame should be same as
                          the names of the variables specified when fitting the model.",
                          "i" = "Update the column names in {.var data} to ensure they match
                                {.val {model_species}}"))

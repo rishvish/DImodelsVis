@@ -10,9 +10,11 @@ add_interaction_terms(data, model)
 \item{data}{A data-frame with species proportions that sum to 1 to create
 the appropriate interaction structures.}
 
-\item{model}{A Diversity Interactions model object fit by using the
-\code{\link[DImodels:DI]{DI()}} function from the
-\code{\link[DImodels:DImodels-package]{DImodels}} package.}
+\item{model}{A Diversity Interactions model object fit using the
+\code{\link[DImodels:DI]{DI()}} or \code{\link[DImodels:autoDI]{autoDI()}}
+functions from the \code{\link[DImodels:DImodels-package]{DImodels}}
+or \code{\link[DImodelsMulti:DImulti]{DImulti()}} from the
+\code{\link[DImodelsMulti:DImodelsMulti]{DImodelsMulti}} R packages.}
 }
 \value{
 The original data-frame with additional columns appended at the end

@@ -64,7 +64,8 @@ pie-glyphs.}
 within the pie-glyphs.}
 
 \item{only_extremes}{A logical value indicating whether to show pie-glyphs
-only for extreme observations.}
+only for extreme observations (points with the highest
+absolute residuals or hat values).}
 
 \item{label_size}{A numeric value specifying the size of the labels
 identifying extreme observations.}
@@ -75,7 +76,7 @@ pie-glyphs not shown) shown in the plots.}
 \item{plot}{A boolean variable indicating whether to create the plot or return
 the prepared data instead. The default \code{TRUE} creates the plot while
 \code{FALSE} would return the prepared data for plotting. Could be useful
-for if user wants to modify the data first and then call the plotting.}
+if user wants to modify the data first and then create the plot.}
 
 \item{nrow}{Number of rows in which to arrange the final plot.}
 
@@ -109,8 +110,10 @@ print(diagnostics[[1]])
 print(diagnostics[[4]])
 
 ## Change plot arrangement
+\donttest{
 model_diagnostics(mod1, prop = c("p1", "p2", "p3", "p4"),
                   which = c(1, 3), nrow = 2, ncol = 1)
+}
 
 ## Show only extreme points as pie-glyphs to avoid overplotting
 model_diagnostics(mod1, prop = c("p1", "p2", "p3", "p4"),
@@ -122,13 +125,5 @@ DI_mod <- DI(y = "response", prop = c("p1", "p2", "p3", "p4"),
 model_diagnostics(DI_mod, which = 1)
 
 ## Specify `plot = FALSE` to not create the plot but return the prepared data
-model_diagnostics(DI_mod, which = 1, plot  = FALSE)
-
-## If the specified model object does not inherit the lm class, then
-## only residual vs fitted and normal qqplot will be produced
-library(DImodelsMulti)
-data(simMV)
-#                    unit_IDs = 1, prop = paste0("p", 1:6),
-#                    data = simMV, DImodel = "ID", method = "ML")
-#model_diagnostics(model = MVmodel)
+head(model_diagnostics(DI_mod, which = 1, plot  = FALSE))
 }

@@ -17,15 +17,17 @@ ternary_data(
 variables whose proportions to manipulate. Default is ".P1", ".P2",
 and ".P3".}
 
-\item{add_var}{A list specifying values for additional variables
+\item{add_var}{A list or data-frame specifying values for additional variables
 in the model other than the proportions (i.e. not part of the
 simplex design).
 This could be useful for comparing the predictions across
 different values for a non-compositional variable.
-One ternary plot will be generated for each unique combination
-of values specified here.}
+If specified as a list, it will be expanded to show a plot
+for each unique combination of values specified, while if specified
+as a data-frame, one plot would be generated for each row in the
+data.}
 
-\item{resolution}{A number between 1 and 5 describing the resolution of the
+\item{resolution}{A number between 1 and 10 describing the resolution of the
 resultant graph.
 A high value would result in a higher definition figure
 but at the cost of being computationally expensive.}
@@ -49,7 +51,7 @@ the regression coefficients from a model fit in some other
 language can be used to calculate predictions. However, the
 user would have to ensure there's an appropriate one-to-one
 positional mapping between the data columns and the
-coefficient values. Further, the would also have to provide
+coefficient values. Further, they would also have to provide
 a variance-covariance matrix of the coefficients in the `vcov`
 parameter if they want the associated CI for the prediction or
 it would not be possible to calculate confidence/prediction
@@ -117,7 +119,7 @@ data(sim0)
 ## Fit model
 mod <- lm(response ~ 0 + (p1 + p2 + p3)^2, data = sim0)
 
-## Preapre data for creating a contour map of predicted response over
+## Prepare data for creating a contour map of predicted response over
 ## the ternary surface
 ## Remember to specify prop with the same character values as the names
 ## of the variables in the model containing the prop.
@@ -134,7 +136,9 @@ plot_data <- ternary_data(prop = c("p1", "p2", "p3"),
                           add_var = list("treatment" = c("A", "B")),
                           resolution = 1, model = new_mod)
 ## Plot to compare between additional variables
+\donttest{
 ternary_plot(plot_data)
+}
 
 ## It could be desirable to take the output of this function and add
 ## additional variables to the data before making predictions
@@ -148,7 +152,7 @@ head(contour_data)
 ## Manually add the treatment variable
 contour_data$treatment <- "A"
 ## Make predictions
-head(add_prediction(data = contour_data, model = new_mod))#'
+head(add_prediction(data = contour_data, model = new_mod))
 
 ## Manually add the interaction terms
 contour_data <- contour_data \%>\%
@@ -170,6 +174,8 @@ contour_data <- add_prediction(data = contour_data,
                                interval = "confidence")
 head(contour_data)
 ## Show plot
+\donttest{
 ternary_plot(contour_data)
+}
 ## See `?ternary_plot` for options to customise the ternary_plot
 }

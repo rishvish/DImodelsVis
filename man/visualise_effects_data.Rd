@@ -2,7 +2,7 @@
 % Please edit documentation in R/VisualiseEffects.R
 \name{visualise_effects_data}
 \alias{visualise_effects_data}
-\title{Effects plots for compositional data}
+\title{Prepare data for effects plots for compositional data}
 \usage{
 visualise_effects_data(
   data,
@@ -62,7 +62,7 @@ the regression coefficients from a model fit in some other
 language can be used to calculate predictions. However, the
 user would have to ensure there's an appropriate one-to-one
 positional mapping between the data columns and the
-coefficient values. Further, the would also have to provide
+coefficient values. Further, they would also have to provide
 a variance-covariance matrix of the coefficients in the `vcov`
 parameter if they want the associated CI for the prediction or
 it would not be possible to calculate confidence/prediction
@@ -108,7 +108,7 @@ A data frame with the following columns appended at the end
                     the species of interest.}
    \item{.Threshold}{A numeric value indicating the maximum proportion of
                      the species of interest within a particular community
-                     which results in a positive marginal effect on the response.}
+                     which has a positive marginal effect on the response.}
    \item{.MarEffect}{A character string entailing whether the increase/decrease
                      of the species of interest from the particular community
                      would result in a positive or negative marginal effect
@@ -125,12 +125,12 @@ set of compositional variables. This is a special case of the
 monoculture (i.e. variable of interest = 1, while all others equal 0) of the
 variable of interest (when increasing the proportion) or a community without
 the variable of interest (when decreasing the proportion). The observations
-specified in `data` are connected to the respective communities with a straight
-line across the simplex, this has the effect of changing the proportion of
+specified in `data` are connected to the respective communities (monoculture of
+the variable of interest or the community without the variable of interest) by a
+straight line across the simplex; This has the effect of changing the proportion of
 the variable of interest whilst adjusting the proportion of the other variables
 but keeping the ratio of their relative proportions unchanged, thereby preserving
-the compositional nature of the data. This enables us to visualise the effect of
-changing the proportion of a variable of interest. See examples for more information.
+the compositional nature of the data. See examples for more information.
 The output of this function can be passed to the
 \code{\link{visualise_effects_plot}} function to visualise the results.
 }

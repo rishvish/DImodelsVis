@@ -31,7 +31,7 @@ grouped_ternary(
 \code{\link[DImodels:DI]{DI()}} function from the
 \code{\link[DImodels:DImodels-package]{DImodels}} package.}
 
-\item{FG}{A character vector specifying the grouping of the variables specified in `prop`.}
+\item{FG}{A character vector specifying the groupings of the variables specified in `prop`.}
 
 \item{values}{A numeric vector specifying the proportional split of the variables within a group.
 The default is to split the group proportion equally between
@@ -40,24 +40,26 @@ each variable in the group.}
 \item{tern_vars}{A character vector giving the names of the three variables
 to be shown in the ternary diagram.}
 
-\item{conditional}{A data-frame describing the names of the variables
+\item{conditional}{A data-frame describing the names of the compositional variables
 and their respective values at which to slice the
 simplex space. The format should be, for example, as follows: \cr
 \code{data.frame("p1" = c(0, 0.5), "p2" = c(0.2, 0.1))} \cr
-Once figure would be created for row in `conditional` with
+One figure would be created for each row in `conditional` with
 the respective values of all specified variables. Any
 compositional variables not specified in `conditional` will
 be assumed to be 0.}
 
-\item{add_var}{A list specifying values for additional variables
+\item{add_var}{A list or data-frame specifying values for additional variables
 in the model other than the proportions (i.e. not part of the
 simplex design).
 This could be useful for comparing the predictions across
 different values for a non-compositional variable.
-One ternary plot will be generated for each unique combination
-of values specified here.}
+If specified as a list, it will be expanded to show a plot
+for each unique combination of values specified, while if specified
+as a data-frame, one plot would be generated for each row in the
+data.}
 
-\item{resolution}{A number between 1 and 5 describing the resolution of the
+\item{resolution}{A number between 1 and 10 describing the resolution of the
 resultant graph.
 A high value would result in a higher definition figure
 but at the cost of being computationally expensive.}
@@ -65,7 +67,7 @@ but at the cost of being computationally expensive.}
 \item{plot}{A boolean variable indicating whether to create the plot or return
 the prepared data instead. The default \code{TRUE} creates the plot while
 \code{FALSE} would return the prepared data for plotting. Could be useful
-for if user wants to modify the data first and then call the plotting.}
+if user wants to modify the data first and then create the plot.}
 
 \item{nlevels}{The number of levels to show on the contour map.}
 
@@ -75,7 +77,7 @@ contour map or points. The number of colours should be same as
 The default colours scheme is the
 \code{\link[grDevices:terrain.colors]{terrain.colors()}} for
 continuous variables and an extended version of the Okabe-Ito
-colour scale for categoricl variables.}
+colour scale for categorical variables.}
 
 \item{lower_lim}{A number to set a custom lower limit for the contour
 (if `show = "contours"`). The default is minimum of the prediction.}
@@ -115,12 +117,12 @@ Grouped ternary diagrams are created by combining the proportions of the
 compositional variables into groups and visualising these groups on a 2-d
 ternary diagram. These are very useful when we have multiple compositional
 variables that can be grouped together by some hierarchical grouping structure.
-For e.g., grouping species in a ecosystem based on the functions they perform,
+For example, grouping species in a ecosystem based on the functions they perform,
 or grouping political parties based on their national alliances. Grouping
 variables this way allows us to reduce the dimensionality of the compositional
 data and visualise it. This is akin to looking at a 2-d slice of the high
 dimensional simplex. The relative proportions of each variable within a group
-can be adjust to look at "different" slices of the simplex. Looking at multiple
+can be adjusted to look at different slices of the simplex. Looking at multiple
 such slices would enable us to create an approximation of how the response varies
 across the original n-dimensional simplex.
 This is a wrapper function specifically for statistical models fit using the
@@ -138,7 +140,7 @@ m1 <- DI(y = "response", prop = paste0("p", 1:9),
          DImodel = "AV", data = sim3) \%>\%
          suppressWarnings()
 
-## We have nine (p1 to p9) variables here and using \code{\link{conditional_ternary}}
+## We have nine (p1 to p9) variables here and using `conditional_ternary`
 ## to visualise the simplex space won't be very helpful as there are too
 ## variables to condition on
 ## Instead we group the nine-variables into three groups called "G", "L" and "H"
@@ -153,7 +155,7 @@ grouped_ternary(model = m1, FG = c("G","G","G","G","G","L","L","H","H"),
 ## also extend to points along the edges and interior of the ternary.
 
 ## We can also manually specify the split of the species within a group
-## This would mean we're looking at a different slice of the simplex
+## This would mean we are looking at a different slice of the simplex
 ## For example this would mean the groups "L" group is made up of 100\% of
 ## p7 and doesn't contain any p6, while "H" group contains 30\% of p8 and
 ## 70\% of p9, while "G" group still contains 20\% of each p1 to p5.
@@ -167,7 +169,7 @@ grouped_ternary(m1, FG = c("G","G","G","G","G","L","L","H","H"),
 ## to have a fixed value while three groups are manipulated within a ternary
 ## The group "G" is now split into two groups "G1" and "G2"
 ## We can create conditional ternary diagram at the grouped level as well
-## Just notice the values going in `tern_vars` and `conditional` are names
+## Notice the values going in `tern_vars` and `conditional` are names
 ## of the groups and not the original compositional variables
 grouped_ternary(m1, FG = c("G1","G1","G2","G2","G2","L","L","H","H"),
                 resolution = 1,
@@ -175,10 +177,10 @@ grouped_ternary(m1, FG = c("G1","G1","G2","G2","G2","L","L","H","H"),
                 conditional = data.frame("G2" = c(0, 0.25, 0.5)))
 
 ## Specify `plot = FALSE` to not create the plot but return the prepared data
-grouped_ternary(m1, FG = c("G1","G1","G2","G2","G2","L","L","H","H"),
-                resolution = 1, plot = FALSE,
-                tern_vars = c("G1", "L", "H"),
-                conditional = data.frame("G2" = c(0, 0.25, 0.5)))
+head(grouped_ternary(m1, FG = c("G1","G1","G2","G2","G2","L","L","H","H"),
+                     resolution = 1, plot = FALSE,
+                     tern_vars = c("G1", "L", "H"),
+                     conditional = data.frame("G2" = c(0, 0.25, 0.5))))
 
 ## All other functionality from \code{\link{condtional_ternary_plot}} is
 ## available in this function too.

@@ -27,18 +27,19 @@ prediction_contributions(
 \code{\link[DImodels:DI]{DI()}} function from the
 \code{\link[DImodels:DImodels-package]{DImodels}} package.}
 
-\item{data}{A user-defined data-frame containing compositional variables
-specifying values for predictor variables (fitted within the
-model object) that the user wished to predict for. If left blank,
-a selection of observations (2 from each level of richness) from
-the original data used to fit the model would be selected.}
+\item{data}{A user-defined data-frame containing values for compositional variables
+along with any additional variables that the user wishes to predict for.
+If left blank, a selection of observations (2 from each level of
+richness) from the original data used to fit the model would be selected.}
 
 \item{add_var}{A list specifying values for additional predictor variables
-in the model independent of the compositional predictor  variables.
-This would be useful to compare the predictions across
-different values for a categorical variable. One plot will
-be generated for each unique combination of values specified
-here and they will be arranged in a grid according to the
+in the model independent of the compositional predictor variables.
+This could be useful for comparing the predictions across
+different values for a non-compositional variable.
+If specified as a list, it will be expanded to show a plot
+for each unique combination of values specified, while if specified
+as a data-frame, one plot would be generated for each row in the
+data and they will be arranged in a grid according to the
 value specified in `nrow` and `ncol`.}
 
 \item{groups}{A list specifying groupings to arrange coefficients into.
@@ -114,7 +115,7 @@ A stacked bar_chart is shown where the individual contributions
 on top of another. The total height of the stacked bar gives the value of the
 predicted response. The uncertainty around the predicted response can also be shown
 on the plot.
-This is a wrapper function specifically for statistical models fit using the
+This is a wrapper function specifically designed for statistical models fit using the
 \code{\link[DImodels:DI]{DI()}} function from the
 \code{\link[DImodels:DImodels-package]{DImodels}} R package and it implicitly
 calls \code{\link{prediction_contributions_data}} followed by
@@ -165,13 +166,6 @@ prediction_contributions(model1, data = my_comms, facet_var = "richness",
                          groups = list("Interactions" = c("`p1:p2`", "`p1:p3`",
                                                           "`p1:p4`", "`p2:p3`",
                                                           "`p2:p4`", "`p3:p4`")))
-## Specify `plot = FALSE` to not create the plot but return the prepared data
-prediction_contributions(model1, data = my_comms, plot = FALSE,
-                         facet_var = "richness",
-                         bar_orientation = "horizontal",
-                         groups = list("Interactions" = c("`p1:p2`", "`p1:p3`",
-                                                          "`p1:p4`", "`p2:p3`",
-                                                          "`p2:p4`", "`p3:p4`")))
 
 ## Can also add additional variables independent of the simplex design
 ## to get a separate plot for unique combination of the variables
@@ -196,4 +190,9 @@ prediction_contributions(model1, data = my_comms,
                          groups = list("Interactions" = c("`p1:p2`", "`p1:p3`",
                                                           "`p1:p4`", "`p2:p3`",
                                                           "`p2:p4`", "`p3:p4`")))
+
+## Specify `plot = FALSE` to not create the plot but return the prepared data
+head(prediction_contributions(model1, data = my_comms, plot = FALSE,
+                              facet_var = "richness",
+                              bar_orientation = "horizontal"))
 }
