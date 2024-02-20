@@ -129,11 +129,11 @@ plot_data <- gradient_change_data(data = sim4[c(seq(1, 18, 3), 19:47), -2],
                                            "p4", "p5", "p6"),
                                   model = new_mod,
                                   add_var = list("treatment" = c(50, 250)))
-## Create plot arranged in 2 rows
+## Create plot arranged in 2 columns
 gradient_change_plot(data = plot_data,
                      prop = c("p1", "p2", "p3", "p4", "p5", "p6"),
                      pie_data = plot_data \%>\% filter(.Richness \%in\% c(1, 6)),
-                     nrow = 2)
+                     ncol = 2)
 
 ## Create plot for raw data instead of predictions
 ## Create the data for plotting by specifying `prediction = FALSE`

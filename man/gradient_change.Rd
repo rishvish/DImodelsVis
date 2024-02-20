@@ -172,13 +172,13 @@ gradient_change(model = mod,
 
 ## Use `add_var` to add additional variables independent of the compositions
 ## Multiple plots will be produced and can be arranged using nrow and ncol
-## Create plot arranged in 2 rows
+## Create plot arranged in 2 columns
 \donttest{
 gradient_change(model = mod,
                 data = sim4[, -2],
                 add_var = list("treatment" = c(50, 250)),
                 pie_data = sim4[, -2] \%>\% filter(richness \%in\% c(1, 6)),
-                nrow = 2)
+                ncol = 2)
 }
 
 ## Specify `plot = FALSE` to not create the plot but return the prepared data

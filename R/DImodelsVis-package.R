@@ -36,7 +36,7 @@
 #'
 #' ## **Package Map:**
 #' \if{html}{
-#'   \out{<div style="text-align: center">}\figure{DImodelsVis_workflow_package.png}{options: style="width:750px;max-width:75\%;"}\out{</div>}
+#'   \figure{DImodelsVis_workflow_package.png}{options: style="width:750px;max-width:75\%;"}
 #' }
 #' \if{latex}{
 #'   \out{\begin{center}}\figure{DImodelsVis_workflow_package.png}\out{\end{center}}

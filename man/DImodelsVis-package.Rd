@@ -44,7 +44,7 @@ space is compositional in nature.
 \subsection{\strong{Package Map:}}{
 
 \if{html}{
-  \out{<div style="text-align: center">}\figure{DImodelsVis_workflow_package.png}{options: style="width:750px;max-width:75\%;"}\out{</div>}
+  \figure{DImodelsVis_workflow_package.png}{options: style="width:750px;max-width:75\%;"}
 }
 \if{latex}{
   \out{\begin{center}}\figure{DImodelsVis_workflow_package.png}\out{\end{center}}
@@ -134,7 +134,9 @@ mod <- DI(y = "response", prop = 3:6,
 ## Model diagnostics plots but points are replaced by
 ## pie-glyphs showing the proportions of the compositional variables
 ## See `?model_diagnostics` for more information
+\donttest{
 model_diagnostics(model = mod, which = c(1, 2))
+}
 
 ## Visualise the predicted response variable as contributions
 ## (predictor coefficient * predictor value) from the individual
@@ -186,11 +188,12 @@ simplex_path(model = mod,
 ## in the response across the n-dimensional simplex.
 ## For example the response is maximised where p1 is 0.2
 ## See `?conditional_ternary` for more information
+\donttest{
 conditional_ternary(model = mod, tern_vars = c("p2", "p3", "p4"),
                     conditional = data.frame("p1" = c(0, 0.2, 0.5)),
                     contour_text = FALSE,
                     resolution = 1)
-
+}
 
 }
 \references{

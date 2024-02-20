@@ -446,7 +446,7 @@ check_equi <- function(comm){
 }
 
 #' @keywords internal
-#' @importFrom stats AIC BIC logLik fitted residuals
+#' @importFrom stats AIC BIC logLik fitted residuals median model.frame terms
 #' @importFrom insight n_obs n_parameters
 #' @usage NULL
 NULL
@@ -702,7 +702,7 @@ add_interaction_terms <- function(data, model){
 
   # Ensure model is a DImodels object
   sanity_checks(DImodel = model, data = data)
-
+  data <- as.data.frame(data)
   DImodel_tag <- attr(model, "DImodel")
   if (is.null(DImodel_tag)) {
     DImodel_tag <- "CUSTOM"
@@ -1246,7 +1246,7 @@ custom_filter <- function(data, prop = NULL, special = NULL, ...){
 
     data <- data %>% mutate(.richness = get_richness(.data, prop),
                             .evenness = get_evenness(.data, prop),
-                            .monos = ifelse(.data$richness == 1, TRUE, FALSE),
+                            .monos = ifelse(.data$.richness == 1, TRUE, FALSE),
                             .equi = apply(data[, prop], 1, check_equi))
 
     # Replace special term with "." variant
@@ -1421,7 +1421,7 @@ tern_to_prop_proj <- function(data, x, y,
   data <- data %>%
     mutate(!! prop[1] := !!sym(y) * 2/sqrt(3),
            !! prop[3] := !!sym(x) - !!sym(y)/sqrt(3),
-           !! prop[2] := 1 - (!! sym(prop[1]) - !!sym(prop[3]))) %>%
+           !! prop[2] := 1 - (!! sym(prop[1]) + !!sym(prop[3]))) %>%
     select(x, y, all_of(prop), everything())
   return(data)
 }
@@ -1498,6 +1498,86 @@ group_prop <- function(data, prop, FG = NULL){
   }
   return(data)
 }
+
+#' Copy attributes from one object to another
+#'
+#' @description
+#' This function copies over any additional attributes from `source`
+#' into `target`. Any attributes already present in `target` would be
+#' left untouched. This function is useful after manipulating the data
+#' from the \code{*_data} preparation functions to ensure any attributes
+#' necessary for creating the plot aren't lost.
+#'
+#' @param target The object to which attributes should be added.
+#' @param source The object whose attributes to copy.
+#'
+#' @return
+#' The object specified in `target` with all additional attributes in
+#' `source` object.
+#'
+#' @export
+#'
+#' @examples
+#'
+#' ## Simple example
+#' a <- data.frame(Var1 = runif(1:10), Var2 = runif(1:10))
+#' b <- data.frame(Var3 = runif(1:10), Var4 = runif(1:10))
+#' attr(b, "attr1") <- "Lorem"
+#' attr(b, "attr2") <- "ipsum"
+#'
+#' print(attributes(a))
+#' print(attributes(b))
+#'
+#' ## Copy over attributes of `b` into `a`
+#' print(copy_attributes(target = a, source = b))
+#' ## Note the attributes already present in `a` are left untouched
+#'
+#' ## Can also be used in the dplyr pipeline
+#' library(dplyr)
+#'
+#' iris_sub <- iris[1:10, ]
+#' attr(iris_sub, "attr1") <- "Lorem"
+#' attr(iris_sub, "attr2") <- "ipsum"
+#' attributes(iris_sub)
+#'
+#' ## Grouping can drop attributes we set
+#' iris_sub %>%
+#'    group_by(Species) %>%
+#'    summarise(mean(Sepal.Length)) %>%
+#'    attributes()
+#'
+#' ## Use copy_attributes with `iris_sub` object as source
+#' ##  to add the attributes again
+#' iris_sub %>%
+#'    group_by(Species) %>%
+#'    summarise(mean(Sepal.Length)) %>%
+#'    copy_attributes(source = iris_sub) %>%
+#'    attributes()
+copy_attributes <- function(target, source){
+
+  if(missing(target)){
+    cli::cli_abort(c("{.var target} cannot be empty.",
+                     "i" = "Specify an object to which the
+                     attributes should be copied."))
+  }
+
+  if(missing(source)){
+    cli::cli_abort(c("{.var source} cannot be empty.",
+                     "i" = "Specify an object with attributes
+                     to copy over."))
+  }
+
+  # Copy any non-existing attributes from source in target
+  src_attr <- names(attributes(source))
+  tar_attr <- names(attributes(target))
+  for (attribute in src_attr){
+    if(!attribute %in% tar_attr){
+      attr(target, attribute) <- attr(source, attribute)
+    }
+  }
+  return(target)
+}
+
 
 # Function to print generic message if model is not DI
 #' @keywords internal
@@ -1627,82 +1707,137 @@ predict_from_DImulti <- function(model, newdata = model$original_data, ...){
   return(rowSums(preds[, -1]))
 }
 
+#' @keywords internal
+#' Utility function to add experimental structures from a DImodels object to data
+#'
+#' @usage NULL
+NULL
+add_exp_str <- function(model, data){
+  original_data <- model$original_data
+  # Checking for experimental structures
+  treat <- eval(model$DIcall$treat)
+  density <- eval(model$DIcall$density)
+  block <- eval(model$DIcall$block)
 
-#' Copy attributes from one object to another
-#'
-#' @description
-#' This function copies over any additional attributes from `source`
-#' into `target`. Any attributes already present in `target` would be
-#' left untouched. This function is useful after manipulating the data
-#' from the \code{*_data} preparation functions to ensure any attributes
-#' necessary for creating the plot aren't lost.
-#'
-#' @param target The object to which attributes should be added.
-#' @param source The object whose attributes to copy.
-#'
-#' @return
-#' The object specified in `target` with all additional attributes in
-#' `source` object.
-#'
-#' @export
-#'
-#' @examples
-#'
-#' ## Simple example
-#' a <- data.frame(Var1 = runif(1:10), Var2 = runif(1:10))
-#' b <- data.frame(Var3 = runif(1:10), Var4 = runif(1:10))
-#' attr(b, "attr1") <- "Lorem"
-#' attr(b, "attr2") <- "ipsum"
-#'
-#' print(attributes(a))
-#' print(attributes(b))
-#'
-#' ## Copy over attributes of `b` into `a`
-#' print(copy_attributes(target = a, source = b))
-#' ## Note the attributes already present in `a` are left untouched
-#'
-#' ## Can also be used in the dplyr pipeline
-#' library(dplyr)
-#'
-#' iris_sub <- iris[1:10, ]
-#' attr(iris_sub, "attr1") <- "Lorem"
-#' attr(iris_sub, "attr2") <- "ipsum"
-#' attributes(iris_sub)
-#'
-#' ## Grouping can drop attributes we set
-#' iris_sub %>%
-#'    group_by(Species) %>%
-#'    summarise(mean(Sepal.Length)) %>%
-#'    attributes()
-#'
-#' ## Use copy_attributes with `iris_sub` object as source
-#' ##  to add the attributes again
-#' iris_sub %>%
-#'    group_by(Species) %>%
-#'    summarise(mean(Sepal.Length)) %>%
-#'    copy_attributes(source = iris_sub) %>%
-#'    attributes()
-copy_attributes <- function(target, source){
+  structures <- list('treatment' = treat,
+                     'density' = density,
+                     'block' = block)
 
-  if(missing(target)){
-    cli::cli_abort(c("{.var target} cannot be empty.",
-                     "i" = "Specify an object to which the
-                     attributes should be copied."))
-  }
+  updated_newdata <- as.data.frame(data)
 
-  if(missing(source)){
-    cli::cli_abort(c("{.var source} cannot be empty.",
-                     "i" = "Specify an object with attributes
-                     to copy over."))
-  }
+  for (covariate in structures){
+    if (!is.null(covariate)  && !is.na(covariate)){
+      # If covariate was supplied as numeric in function call, getting its value
+      if (is.numeric(covariate)){
+        covariate <- colnames(original_data)[covariate]
+      }
 
-  # Copy any non-existing attributes from source in target
-  src_attr <- names(attributes(source))
-  tar_attr <- names(attributes(target))
-  for (attribute in src_attr){
-    if(!attribute %in% tar_attr){
-      attr(target, attribute) <- attr(source, attribute)
+      if (is.numeric(original_data[, covariate])){
+        if ( !(covariate %in% colnames(updated_newdata))){
+          updated_newdata[, covariate] <- median(original_data[, covariate])
+        }
+      } else {
+        # Levels of factor covariate in original data
+        covariate_levels <- as.factor(unique(original_data[, covariate]))
+        # If covariate isn't present in data, estimating for base level
+        if ( !(covariate %in% colnames(updated_newdata))){
+          updated_newdata[, covariate] <- levels(covariate_levels)[1]
+        }
+
+        # If levels of covariate in data not matching ones in original data, stop prediction
+        if (! (all(unique(updated_newdata[, covariate]) %in% covariate_levels, na.rm = TRUE))){
+          cli::cli_abort(c("Values given for {.val {covariate}} were not present in
+                           training data used for fitting.",
+                           "i" = "Predictions can not be made for these values."))
+        }
+
+        # If covariate is supplied as character or numeric, converting to factor
+        if (!is.factor(updated_newdata[, covariate])){
+          updated_newdata[, covariate] <- factor(updated_newdata[, covariate],
+                                                 levels = levels(covariate_levels))
+        }
+      }
     }
   }
-  return(target)
+
+
+  # Handling extra formula
+  extra_formula <- eval(model$DIcall$extra_formula)
+
+  if (! is.null(extra_formula)){
+    # If any column from extra_formula is missing in updated_newdata
+    e <- try(model.frame(terms(extra_formula), updated_newdata), silent = TRUE)
+    if(inherits(e, "try-error")){
+      extra_vars <- model.frame(terms(extra_formula), original_data)
+      for (covariate in colnames(extra_vars)){
+        if(!covariate %in% colnames(updated_newdata)){
+          if(is.numeric(extra_vars[, covariate])){
+            updated_newdata[, covariate] <- median(extra_vars[, covariate])
+          } else {
+            # Levels of factor covariate in original data
+            covariate_levels <- as.factor(unique(extra_vars[, covariate]))
+            # If covariate isn't present in data, estimating for base level
+            if ( !(covariate %in% colnames(updated_newdata))){
+              updated_newdata[, covariate] <- levels(covariate_levels)[1]
+            }
+
+            # If covariate is supplied as character or numeric, converting to factor
+            if (!is.factor(updated_newdata[, covariate])){
+              updated_newdata[, covariate] <- factor(updated_newdata[, covariate],
+                                                     levels = levels(covariate_levels))
+            }
+          }
+        }
+      }
+    }
+
+    extra_data <- model.frame(terms(extra_formula), updated_newdata)
+
+
+    # Matching factors in extra_formula to ones in original_data
+    og_factors <- original_data[, sapply(original_data, function(x){is.factor(x) | is.character(x)})]
+    common_factors <- intersect(colnames(extra_data), colnames(og_factors))
+
+    if (length(common_factors)!=0){
+
+      # Levels of all factors in extra_formula
+      xlevels <- lapply(common_factors, function(x){
+        if(is.factor(original_data[, x])){
+          return(levels(original_data[,x]))
+        } else {
+          return(levels(as.factor(original_data[,x])))
+        }
+      })
+      names(xlevels) <- common_factors
+
+      for (i in common_factors){
+
+        # If levels of factors in extra_formula in data not matching ones in original data, stop prediction
+        if (! (all(unique(updated_newdata[, i]) %in% xlevels[[i]], na.rm = TRUE))){
+          stop(paste0('Values for ', covariate,' given were not present in raw data used for fitting. Predictions can\'t be made for these values.'))
+        }
+
+        # If factors in extra_formula is supplied as character or numeric, converting to factor
+        if (!is.factor(updated_newdata[, i])){
+          updated_newdata[, i] <- factor(updated_newdata[,i], levels = xlevels[[i]])
+        }
+      }
+    }
+
+    # Having certain functions in extra_formula like poly, ns, bs, etc.
+    # cause problems in estimating model.matrix for data
+
+    # So my solution is to simply refit the model with glm when
+    # such functions are used and then make the prediction
+  }
+
+  fmla <-  eval(model$DIcheck_formula)
+
+  mod_mat <- model.matrix(fmla[-2], data = updated_newdata)
+
+  new_vars <- colnames(mod_mat)[!colnames(mod_mat) %in% colnames(updated_newdata)]
+  updated_newdata <- cbind(updated_newdata, mod_mat[, new_vars])
+  return(updated_newdata)
 }
+
+

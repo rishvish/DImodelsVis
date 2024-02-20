@@ -176,8 +176,10 @@ prediction_contributions_data <- function(data, model = NULL, coefficients = NUL
   if(!is.null(model)){
     form <- formula(model)
     form[2] <- NULL
-    X_matrix <- model.matrix(form, data)
-    coefficients <- coef(model)
+    if(!(inherits(model, "DI") && (attr(model, "DImodel") == "ADD"))){
+      X_matrix <- model.matrix(form, data)
+      coefficients <- coef(model)
+    }
   }
   # Branch here if regression coefficients are specified
   else if(!is.null(coefficients)){
@@ -215,7 +217,12 @@ prediction_contributions_data <- function(data, model = NULL, coefficients = NUL
   }
 
   # Express the prediction into contribution from each coefficient in the model
-  if(!is.null(model) && inherits(model, "lm") && (is.null(eval(model$DIcall$FG)))) {
+  if (!is.null(attr(model, "DImodel")) && attr(model, "DImodel") == "FG"){
+    nonFG_flag <- FALSE
+  } else {
+    nonFG_flag <- TRUE
+  }
+  if(!is.null(model) && inherits(model, "lm") && (nonFG_flag)) {
     contr_data <- as.data.frame(suppressWarnings(predict(model, newdata = data, type = "terms")))
   } else {
     contr_data <- as.data.frame(sweep(X_matrix, MARGIN = 2, coefficients, `*`))
@@ -628,6 +635,13 @@ prediction_contributions <- function(model, data = NULL,
   data <- add_interaction_terms(model = model, data = data)
   new <- ncol(data)
 
+  ## Add any experimental structures or missing terms
+  data <- add_exp_str(model = model, data = data)
+
+  ## Drop any _add columns
+  if(attr(model, "DImodel") == "ADD"){
+    data <- data %>% select(-all_of(paste0(model_species, "_add")))
+  }
 
   # Split the predicted response into respective contributions
   plot_data <- prediction_contributions_data(data = data, model = model,

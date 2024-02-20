@@ -203,12 +203,6 @@ model_selection <- function(models,
                          "AICc" = AICc_vec(models) %>% round(2),
                          "BICc" = BICc_vec(models) %>% round(2)) %>%
     mutate(model_name = forcats::fct_inorder(.data$model_name))
-  # Sort models
-  if(sort){
-    plot_data <- plot_data %>%
-      arrange((!!sym(metric[1]))) %>%
-      mutate(model_name = forcats::fct_inorder(.data$model_name))
-  }
 
   # Dashed lines for rule of 2
   if(length(metric) == 1){
@@ -218,6 +212,13 @@ model_selection <- function(models,
 
   # Show without breakup
   if(! breakup){
+    # Sort models
+    if(sort){
+      plot_data <- plot_data %>%
+        arrange((!!sym(metric[1]))) %>%
+        mutate(model_name = forcats::fct_inorder(.data$model_name))
+    }
+
     plot_data <- plot_data %>%
       pivot_longer(cols = all_of(metric), values_to = "Value",
                    names_to = "Metric") %>%
@@ -258,6 +259,12 @@ model_selection <- function(models,
                             round(2)) %>%
       pivot_longer(cols = c("Goodness of fit", "Penalty"),
                    names_to = "Component", values_to = "Value")
+    # Sort models
+    if(sort){
+      plot_data <- plot_data %>%
+        arrange((!!sym(metric[1]))) %>%
+        mutate(model_name = forcats::fct_inorder(.data$model_name))
+    }
 
     pl <- ggplot(plot_data, aes(x = .data$model_name,
                                 y = .data$Value,
@@ -271,7 +278,8 @@ model_selection <- function(models,
              fill = guide_legend(order = 2))+
       theme_DI()+
       theme(legend.position = 'top')+
-      scale_fill_manual(values = c("#0072B2", "#f59424"))
+      scale_fill_manual(values = c("#0072B2", "#f59424"),
+                        labels = c("Deviance", "Penalty"))
   }
 
   if(isTRUE(plot)){

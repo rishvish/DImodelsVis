@@ -281,11 +281,11 @@ gradient_change_data <- function(data, prop, add_var = list(),
 #'                                            "p4", "p5", "p6"),
 #'                                   model = new_mod,
 #'                                   add_var = list("treatment" = c(50, 250)))
-#' ## Create plot arranged in 2 rows
+#' ## Create plot arranged in 2 columns
 #' gradient_change_plot(data = plot_data,
 #'                      prop = c("p1", "p2", "p3", "p4", "p5", "p6"),
 #'                      pie_data = plot_data %>% filter(.Richness %in% c(1, 6)),
-#'                      nrow = 2)
+#'                      ncol = 2)
 #'
 #' ## Create plot for raw data instead of predictions
 #' ## Create the data for plotting by specifying `prediction = FALSE`
@@ -483,13 +483,13 @@ gradient_change_plot <- function(data, prop = NULL,
 #'
 #' ## Use `add_var` to add additional variables independent of the compositions
 #' ## Multiple plots will be produced and can be arranged using nrow and ncol
-#' ## Create plot arranged in 2 rows
+#' ## Create plot arranged in 2 columns
 #' \donttest{
 #' gradient_change(model = mod,
 #'                 data = sim4[, -2],
 #'                 add_var = list("treatment" = c(50, 250)),
 #'                 pie_data = sim4[, -2] %>% filter(richness %in% c(1, 6)),
-#'                 nrow = 2)
+#'                 ncol = 2)
 #' }
 #'
 #' ## Specify `plot = FALSE` to not create the plot but return the prepared data
@@ -535,7 +535,7 @@ gradient_change <- function(model, data = NULL,
 
   # Sanity checks for colours and data
   sanity_checks(data = data, colours = pie_colours)
-
+  data <- as.data.frame(data)
   # Ensure experimental structure are specified correctly
   add_var <- check_add_var(model = model, add_var = add_var)
   # If model object is of type DImulti add info about EFs and timepoints
@@ -561,6 +561,7 @@ gradient_change <- function(model, data = NULL,
                                   rlang::abort("The following error was encountered while preparing `data` for plotting.",
                                                parent = cnd))
   if(!is.null(pie_data)){
+    pie_data <- as.data.frame(pie_data)
     pie_data <- rlang::try_fetch(suppressMessages(gradient_change_data(
                                                       data = pie_data,
                                                       model = model,

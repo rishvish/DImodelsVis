@@ -83,57 +83,54 @@ functions present in the package along with a short description.
 
 #### Model selection and validation
 
-- [`model_diagnostics`](coming_soon.html): Create diagnostics plots for
-  a statistical model with the additional ability to overlay the points
-  with [pie-glyphs](https://cran.r-project.org/package=PieGlyph) showing
-  the proportions of the compositional predictor variables.
-- [`model_selection`](coming_soon.html): Show a visual comparison of
-  selection criteria of different models. Can also show the split of an
-  information criteria into deviance and penalty components to visualise
-  why a parsimonious model would be preferable over a complex one.
+- **`model_diagnostics`**: Create diagnostics plots for a statistical
+  model with the additional ability to overlay the points with
+  [pie-glyphs](https://cran.r-project.org/package=PieGlyph) showing the
+  proportions of the compositional predictor variables.
+- **`model_selection`**: Show a visual comparison of selection criteria
+  of different models. Can also show the split of an information
+  criteria into deviance and penalty components to visualise why a
+  parsimonious model would be preferable over a complex one.
 
 #### Model interpretation
 
-- [`prediction_contributions`](coming_soon.html): The predicted response
-  for observations is visualised as a stacked bar-chart showing the
+- **`prediction_contributions`**: The predicted response for
+  observations is visualised as a stacked bar-chart showing the
   contributions of each term in the regression model.
-- [`gradient_change`](coming_soon.html): The predicted response for
-  specific observations are shown using pie-glyphs along with the
-  average change in the predicted response over the richness or evenness
-  diversity gradients.
-- [`conditional_ternary`](coming_soon.html): Assuming we have `n`
-  compositional variables, fix `n-3` variables to have specific values
-  and visualise the change in the predicted response across the
-  remaining three variables as a contour plot in a ternary diagram.
-- [`visualise_effects`](coming_soon.html): Visualise the effect of
-  increasing or decreasing a predictor variable (from a set of
-  compositional predictor variables) on the predicted response whilst
-  keeping the ratio of the other `n-1` compositional predictor variables
-  constant.
-- [`simplex_path`](coming_soon.html): Visualise the change in the
-  predicted response along a straight line between two points in the
-  simplex space.
+- **`gradient_change`**: The predicted response for specific
+  observations are shown using pie-glyphs along with the average change
+  in the predicted response over the richness or evenness diversity
+  gradients.
+- **`conditional_ternary`**: Assuming we have `n` compositional
+  variables, fix `n-3` variables to have specific values and visualise
+  the change in the predicted response across the remaining three
+  variables as a contour plot in a ternary diagram.
+- **`visualise_effects`**: Visualise the effect of increasing or
+  decreasing a predictor variable (from a set of compositional predictor
+  variables) on the predicted response whilst keeping the ratio of the
+  other `n-1` compositional predictor variables constant.
+- **`simplex_path`**: Visualise the change in the predicted response
+  along a straight line between two points in the simplex space.
 
 #### Other utility functions
 
-- [`add_prediction`](coming_soon.html): A utility function to add
-  prediction and associated uncertainty to data using a statistical
-  model object or raw model coefficients.
-- [`get_equi_comms`](coming_soon.html): Utility function to create all
-  possible combinations of equi-proportional communities at a given
-  level of richness from a set of n compositional variables.
-- [`custom_filter`](coming_soon.html): A handy wrapper around the dplyr
-  [`filter(coming_soon.html)`](https://dplyr.tidyverse.org/reference/filter.html)
+- **`add_prediction`**: A utility function to add prediction and
+  associated uncertainty to data using a statistical model object or raw
+  model coefficients.
+- **`get_equi_comms`**: Utility function to create all possible
+  combinations of equi-proportional communities at a given level of
+  richness from a set of n compositional variables.
+- **`custom_filter`**: A handy wrapper around the dplyr
+  [`filter()`](https://dplyr.tidyverse.org/reference/filter.html)
   function enabling the user to filter rows which satisfy specific
   conditions for compositional data like all equi-proportional
   communities, or communities with a given value of richness without
   having to make any changes to the data or adding any additional
   columns.
-- [`prop_to_tern_proj`](coming_soon.html) and
-  [`tern_to_prop_proj`](coming_soon.html): Helper functions for
-  converting between 3-d compositional data and their 2-d projection.  
-- [`ternary_data`](coming_soon.html) and
-  [`ternary_plot`](coming_soon.html): Visualise the change in the
+- **`prop_to_tern_proj`** and **`tern_to_prop_proj`**: Helper functions
+  for converting between 3-d compositional data and their 2-d
+  projection.  
+- **`ternary_data`** and **`ternary_plot`**: Visualise the change in the
   predicted response across a set of three compositional predictor
   variables as a contour map within a ternary diagram.
 
@@ -256,8 +253,9 @@ mod_FULL <- DI(y = "yield", prop = 4:7,
 We can visualise model selection by passing our models as a list to the
 `model_selection` function and visualising the best performing metric
 across different information criteria. Run `?model_selection` or see the
-associated [vignette](coming_soon.html) for more information on
-customising the plot.
+associated
+[vignette](https://htmlpreview.github.io/?https://github.com/rishvish/DImodelsVis/blob/main/pkgdown/assets/coming_soon.html)
+for more information on customising the plot.
 
 ``` r
 mods = list("ID" = mod_ID, "AV" = mod_AV, "FG" = mod_FG, 
@@ -305,8 +303,8 @@ summary(mod_FG)
 After choosing a model we can create diagnostics plot where the points
 are replaced by pie-glyphs showing the proportions of the compositional
 variables. Run `?model_diagnostics` or see the associated
-[vignette](coming_soon.html) for more information on customising the
-plot.
+[vignette](https://htmlpreview.github.io/?https://github.com/rishvish/DImodelsVis/blob/main/pkgdown/assets/coming_soon.html)
+for more information on customising the plot.
 
 ``` r
 model_diagnostics(model = mod_FG)
@@ -352,8 +350,9 @@ primarily driven by the `p3_ID` and `p4_ID` terms and hence the `p1` and
 `p2` monocultures have low predictions as the all the other terms have a
 value of zero here. Similarly, we can also see that mixtures dominated
 by `p3` perform the best. Run `?prediction_contributions` or see the
-associated [vignette](coming_soon.html) for more information on creating
-and customising the plot.
+associated
+[vignette](https://htmlpreview.github.io/?https://github.com/rishvish/DImodelsVis/blob/main/pkgdown/assets/coming_soon.html)
+for more information on creating and customising the plot.
 
 #### Average change in respone over diversity gradient
 
@@ -377,8 +376,9 @@ gradient_change(mod_FG, data = plot_data)
 
 This shows that on average the predicted response increases as richness
 increases but at a saturating rate. Run `?gradient_change` or see the
-associated [vignette](coming_soon.html) for more information on creating
-and customising the plot.
+associated
+[vignette](https://htmlpreview.github.io/?https://github.com/rishvish/DImodelsVis/blob/main/pkgdown/assets/coming_soon.html)
+for more information on creating and customising the plot.
 
 #### Conditional ternary diagrams
 
@@ -400,7 +400,7 @@ proportions is 1.
 conditional_ternary(model = mod_FG, 
                     tern_vars = c("p1", "p3", "p4"),
                     conditional = data.frame("p2" = c(0.2, 0.5, 0.8)))
-#> Preparing data ■■■■■■■■■■■■■■■■■■■■■             67% | ETA:  2s                                                                ✔ Finished data preparation.
+#> ✔ Finished data preparation.
 #> ✔ Created plot.
 ```
 
@@ -409,8 +409,8 @@ conditional_ternary(model = mod_FG,
 This figure shows that the predicted response decreases as we increase
 the proportion of `p2` and is maximised as we increase the proportion of
 `p3`. Run `?conditional_ternary` or see the associated
-[vignette](coming_soon.html) for more information on creating and
-customising the plot.
+[vignette](https://htmlpreview.github.io/?https://github.com/rishvish/DImodelsVis/blob/main/pkgdown/assets/coming_soon.html)
+for more information on creating and customising the plot.
 
 #### Effects plots for models with compositional predictors
 
@@ -443,8 +443,8 @@ species on the predicted response. It can be seen that for all
 communities increasing `p2` results in a decrease in the predicted
 response while increasing `p3` has a positive effect on the predicted
 response. Run `?visualise_effects` or see the associated
-[vignette](coming_soon.html) for more information on creating and
-customising the plot.
+[vignette](https://htmlpreview.github.io/?https://github.com/rishvish/DImodelsVis/blob/main/pkgdown/assets/coming_soon.html)
+for more information on creating and customising the plot.
 
 #### Simplex path
 
@@ -471,8 +471,9 @@ simplex_path(model = mod_FG,
 We can see that moving from the centroid community to `p1`, `p2`, and
 `p4` decreases the predicted response, while moving towards a
 monoculture of `p3` increases the response. Run `?simplex_path` or see
-the associated [vignette](coming_soon.html) for more information on
-creating and customising the plot.
+the associated
+[vignette](https://htmlpreview.github.io/?https://github.com/rishvish/DImodelsVis/blob/main/pkgdown/assets/coming_soon.html)
+for more information on creating and customising the plot.
 
 ## See Also
 

@@ -174,8 +174,18 @@ visualise_effects_data <- function(data, prop, var_interest = NULL,
                      a variable in {.var data}."))
   }
 
+  #Sanity Checks
+  if(missing(prop)){
+    cli::cli_abort(c("{.var prop} cannot be empty.",
+                     "i" = "Specify the column-names of the columns
+                           containing the variable proportions in {.var data}."))
+  }
+
   sanity_checks(data = data, prop = prop,
                 booleans = list("prediction" = prediction))
+
+  # Convert to data.frame
+  data <- as.data.frame(data)
 
   # Get names of columns containing species proportions
   species_names <- data %>% select(all_of(prop)) %>% colnames()

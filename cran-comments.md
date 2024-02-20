@@ -1,3 +1,77 @@
+## Resubmission 3
+This is a resubmission. Thanks for your feedback.
+
+```
+Please always write package names, software names and API (application
+programming interface) names in *single* quotes in title and description.
+e.g: --> 'DImodelsVis', not "DImodelsVis"
+Otherwise they will get marked as misspelled on our side.
+Please note that package names are case sensitive.
+```
+- I have replaced the double-quotation marks with single-quotes.
+
+## Resubmission 2
+This is a resubmission. Thank you very much for reviewing the package and providing feedback. I got the following comments, I have addressed them as follows:
+
+```
+Please use only undirected quotation marks in the description text.
+e.g. `DImodelsVis` --> 'DImodelsVis', etc...
+```
+- I have replaced the backticks with quotation marks
+
+```
+If there are references describing the methods in your package, please
+add these in the description field of your DESCRIPTION file in the form
+authors (year) <doi:...>
+authors (year) <arXiv:...>
+authors (year, ISBN:...)
+or if those are not available: <https:...>
+with no space after 'doi:', 'arXiv:', 'https:' and angle brackets for
+auto-linking. (If you want to add a title as well please put it in
+quotes: "Title")
+```
+- This is not valid for our package, as there aren't any references describing the methods.
+
+- Additionally, I realised there were a few bugs in the code, after I submitted. I have fixed those and re-ran all the CRAN checks across several different testing environments and didn't get any errors or warnings.
+
+- Thanks again for taking the time to review the package.
+
+## Resubmission 1
+This is a resubmission. These are the notes I got as feedback for the previous version followed by the steps taken to address them.
+```
+ Possibly misspelled words in DESCRIPTION:
+    DImodelsVis (11:143)
+    ggplot (11:317, 11:383)
+```
+- These are package names and have been surrounded by backticks
+
+```
+Found the following HTML validation problems:
+DImodelsVis-package.html:71:1 (DImodelsVis-package.Rd:52): Warning: inserting implicit <p>
+```
+- I think this was because I had used a div tag to center my image. I have removed the div tag and don't get this NOTE now.
+
+```
+Found the following (possibly) invalid file URI:
+    URI: coming_soon.html
+      From: README.md
+```
+- I have removed the link from the README file where possible and replaced it with the absolute link where needed.
+
+
+```
+Found the following (possibly) invalid URLs:
+  URL: https://dimodels.com
+    From: man/DImodelsVis-package.Rd
+          README.md
+    Status: Error
+    Message: server certificate verification failed. CAfile: none CRLfile: none
+      	(Status without verification: OK)
+```
+- I have cross checked and https://dimodels.com is a functional link
+
+
+
 ## Test environments
 
 - local Windows install, R 4.3.2

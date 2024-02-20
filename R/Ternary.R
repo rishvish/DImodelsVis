@@ -489,31 +489,37 @@ ternary_plot_internal <- function(data, prop,
                   colours = colours)
     show <- match.arg(show)
 
-    # Calculate x-y projection if it's not present in data
-    x <- attr(data, "x_proj")
-    y <- attr(data, "y_proj")
-    if(is.null(x) || is.null(y)){
-      x <- ".x"
-      y <- ".y"
-      data <- prop_to_tern_proj(data, prop = prop, x = x, y = y)
-    }
-
     if(show == "contours"){
       # If user messes up data attributes
       if(any(sapply(list(attr(data, "x_proj"), attr(data, "y_proj"), attr(data, "tern_vars")), is.null))){
-        cli::cli_warn(c("!" = "Certain attributes of the data which are needed to prepare
-                    the plot are missing. This could happen if any data manipulation
-                    performed by the user messes up the {.cls data.frame} attributes.",
-                        "i" = "The function will try to reconstruct the necessary attributes
-                    and create the plot but it might not always be possible.",
-                        "i" = "To avoid this, consider using the
-                    {.help [{.fun copy_attributes}](DImodelsVis::copy_attributes)}
-                    function to ensure the specified data has the necessary attributes
-                    after performing any data manipulation."))
         attr(data, "x_proj") <- ".x"
         attr(data, "y_proj") <- ".y"
         attr(data, "tern_vars") <- names(data)[1:3]
+
+        if(check_col_exists(data, ".x") && check_col_exists(data,".y")){
+          cli::cli_warn(c("!" = "Certain attributes of the data which are needed to prepare
+                    the plot are missing. This could happen if any data manipulation
+                    performed by the user messes up the {.cls data.frame} attributes.",
+                          "i" = "The function will try to reconstruct the necessary attributes
+                    and create the plot but it might not always be possible.",
+                          "i" = "To avoid this, consider using the
+                    {.help [{.fun copy_attributes}](DImodelsVis::copy_attributes)}
+                    function to ensure the specified data has the necessary attributes
+                    after performing any data manipulation."))
+        } else {
+          cli::cli_abort(c("x" = "Certain attributes of the data which are needed to prepare
+                    the plot are missing. This could happen if any data manipulation
+                    performed by the user messes up the {.cls data.frame} attributes.",
+                          "i" = "Use the
+                    {.help [{.fun copy_attributes}](DImodelsVis::copy_attributes)}
+                    function to ensure the specified data has the necessary attributes
+                    after performing any data manipulation."))
+        }
+
       }
+
+      x <- attr(data, "x_proj")
+      y <- attr(data, "y_proj")
 
       # Ensure column containing col_var is present in data
       check_presence(data = data, col = col_var,
@@ -533,6 +539,14 @@ ternary_plot_internal <- function(data, prop,
         upper_lim <- round(max(data[, col_var]), 2)
       }
     } else {
+      # Calculate x-y projection if it's not present in data
+      x <- attr(data, "x_proj")
+      y <- attr(data, "y_proj")
+      if(is.null(x) || is.null(y)){
+        x <- ".x"
+        y <- ".y"
+        data <- prop_to_tern_proj(data, prop = prop, x = x, y = y)
+      }
       lower_lim <- upper_lim <- 0
     }
 
