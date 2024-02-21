@@ -37,6 +37,7 @@ Suggests:
     knitr,
     rmarkdown,
     spelling
-URL: https://rishvish.github.io/DImodelsVis/
+URL: https://rishvish.github.io/DImodelsVis/, https://github.com/rishvish/DImodelsVis
+BugReports: https://github.com/rishvish/DImodelsVis/issues
 VignetteBuilder: knitr
 Language: en-US
