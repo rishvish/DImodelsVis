@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="index.html">DImodelsVis</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -162,58 +162,14 @@
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">Switzerland</span><span class="op">)</span></span>
 <span><span class="va">my_data</span> <span class="op">&lt;-</span> <span class="va">Switzerland</span><span class="op">[</span><span class="va">Switzerland</span><span class="op">$</span><span class="va">nitrogen</span> <span class="op">==</span> <span class="fl">150</span>, <span class="op">]</span></span>
-<span><span class="va">my_data</span></span>
-<span><span class="co">#&gt;    plot nitrogen density         p1         p2         p3         p4     yield</span></span>
-<span><span class="co">#&gt; 1     1      150    high 0.70000000 0.10000000 0.10000000 0.10000000 13.518226</span></span>
-<span><span class="co">#&gt; 2     2      150    high 0.10000000 0.70000000 0.10000000 0.10000000 13.165491</span></span>
-<span><span class="co">#&gt; 3     3      150    high 0.10000000 0.10000000 0.70000000 0.10000000 19.956815</span></span>
-<span><span class="co">#&gt; 4     4      150    high 0.10000000 0.10000000 0.10000000 0.70000000 17.939759</span></span>
-<span><span class="co">#&gt; 5     5      150    high 0.25000000 0.25000000 0.25000000 0.25000000 13.747188</span></span>
-<span><span class="co">#&gt; 6     6      150    high 0.40000000 0.40000000 0.10000000 0.10000000 15.118993</span></span>
-<span><span class="co">#&gt; 7     7      150    high 0.40000000 0.10000000 0.40000000 0.10000000 15.043933</span></span>
-<span><span class="co">#&gt; 8     8      150    high 0.40000000 0.10000000 0.10000000 0.40000000 13.945801</span></span>
-<span><span class="co">#&gt; 9     9      150    high 0.10000000 0.40000000 0.40000000 0.10000000 17.106227</span></span>
-<span><span class="co">#&gt; 10   10      150    high 0.10000000 0.40000000 0.10000000 0.40000000 16.027143</span></span>
-<span><span class="co">#&gt; 11   11      150    high 0.10000000 0.10000000 0.40000000 0.40000000 16.023593</span></span>
-<span><span class="co">#&gt; 12   12      150    high 1.00000000 0.00000000 0.00000000 0.00000000  7.557189</span></span>
-<span><span class="co">#&gt; 13   13      150    high 0.00000000 1.00000000 0.00000000 0.00000000  8.939131</span></span>
-<span><span class="co">#&gt; 14   14      150    high 0.00000000 0.00000000 1.00000000 0.00000000 14.914930</span></span>
-<span><span class="co">#&gt; 15   15      150    high 0.00000000 0.00000000 0.00000000 1.00000000 11.656958</span></span>
-<span><span class="co">#&gt; 16   16      150     low 0.70000000 0.10000000 0.10000000 0.10000000 13.134471</span></span>
-<span><span class="co">#&gt; 17   17      150     low 0.10000000 0.70000000 0.10000000 0.10000000 14.105120</span></span>
-<span><span class="co">#&gt; 18   18      150     low 0.10000000 0.10000000 0.70000000 0.10000000 18.765197</span></span>
-<span><span class="co">#&gt; 19   19      150     low 0.10000000 0.10000000 0.10000000 0.70000000 14.604967</span></span>
-<span><span class="co">#&gt; 20   20      150     low 0.25000000 0.25000000 0.25000000 0.25000000 15.035616</span></span>
-<span><span class="co">#&gt; 21   21      150     low 0.40000000 0.40000000 0.10000000 0.10000000 14.964529</span></span>
-<span><span class="co">#&gt; 22   22      150     low 0.40000000 0.10000000 0.40000000 0.10000000 15.769347</span></span>
-<span><span class="co">#&gt; 23   23      150     low 0.40000000 0.10000000 0.10000000 0.40000000 14.691042</span></span>
-<span><span class="co">#&gt; 24   24      150     low 0.10000000 0.40000000 0.40000000 0.10000000 17.248476</span></span>
-<span><span class="co">#&gt; 25   25      150     low 0.10000000 0.40000000 0.10000000 0.40000000 15.116861</span></span>
-<span><span class="co">#&gt; 26   26      150     low 0.10000000 0.10000000 0.40000000 0.40000000 15.456562</span></span>
-<span><span class="co">#&gt; 27   27      150     low 1.00000000 0.00000000 0.00000000 0.00000000  8.165878</span></span>
-<span><span class="co">#&gt; 28   28      150     low 0.00000000 1.00000000 0.00000000 0.00000000  7.724708</span></span>
-<span><span class="co">#&gt; 29   29      150     low 0.00000000 0.00000000 1.00000000 0.00000000 13.216234</span></span>
-<span><span class="co">#&gt; 30   30      150     low 0.00000000 0.00000000 0.00000000 1.00000000 10.945496</span></span>
-<span><span class="co">#&gt; 31   31      150    high 0.50000000 0.50000000 0.00000000 0.00000000  9.351909</span></span>
-<span><span class="co">#&gt; 32   32      150    high 0.50000000 0.00000000 0.50000000 0.00000000 18.517219</span></span>
-<span><span class="co">#&gt; 33   33      150    high 0.50000000 0.00000000 0.00000000 0.50000000 12.604805</span></span>
-<span><span class="co">#&gt; 34   34      150    high 0.00000000 0.50000000 0.50000000 0.00000000 18.157540</span></span>
-<span><span class="co">#&gt; 35   35      150    high 0.00000000 0.50000000 0.00000000 0.50000000 11.700099</span></span>
-<span><span class="co">#&gt; 36   36      150    high 0.00000000 0.00000000 0.50000000 0.50000000 13.004998</span></span>
-<span><span class="co">#&gt; 37   37      150     low 0.50000000 0.50000000 0.00000000 0.00000000 10.400162</span></span>
-<span><span class="co">#&gt; 38   38      150     low 0.50000000 0.00000000 0.50000000 0.00000000 17.964517</span></span>
-<span><span class="co">#&gt; 39   39      150     low 0.50000000 0.00000000 0.00000000 0.50000000 14.863247</span></span>
-<span><span class="co">#&gt; 40   40      150     low 0.00000000 0.50000000 0.50000000 0.00000000 15.516316</span></span>
-<span><span class="co">#&gt; 41   41      150     low 0.00000000 0.50000000 0.00000000 0.50000000 13.633705</span></span>
-<span><span class="co">#&gt; 42   42      150     low 0.00000000 0.00000000 0.50000000 0.50000000 14.313228</span></span>
-<span><span class="co">#&gt; 43   43      150    high 0.90000000 0.03333333 0.03333333 0.03333333 10.221588</span></span>
-<span><span class="co">#&gt; 44   44      150    high 0.03333333 0.90000000 0.03333333 0.03333333 11.446586</span></span>
-<span><span class="co">#&gt; 45   45      150    high 0.03333333 0.03333333 0.90000000 0.03333333 17.963409</span></span>
-<span><span class="co">#&gt; 46   46      150    high 0.03333333 0.03333333 0.03333333 0.90000000 12.741563</span></span>
-<span><span class="co">#&gt; 47   47      150     low 0.90000000 0.03333333 0.03333333 0.03333333 11.740538</span></span>
-<span><span class="co">#&gt; 48   48      150     low 0.03333333 0.90000000 0.03333333 0.03333333 11.383062</span></span>
-<span><span class="co">#&gt; 49   49      150     low 0.03333333 0.03333333 0.90000000 0.03333333 15.950515</span></span>
-<span><span class="co">#&gt; 50   50      150     low 0.03333333 0.03333333 0.03333333 0.90000000 16.935109</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">my_data</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   plot nitrogen density   p1   p2   p3   p4    yield</span></span>
+<span><span class="co">#&gt; 1    1      150    high 0.70 0.10 0.10 0.10 13.51823</span></span>
+<span><span class="co">#&gt; 2    2      150    high 0.10 0.70 0.10 0.10 13.16549</span></span>
+<span><span class="co">#&gt; 3    3      150    high 0.10 0.10 0.70 0.10 19.95682</span></span>
+<span><span class="co">#&gt; 4    4      150    high 0.10 0.10 0.10 0.70 17.93976</span></span>
+<span><span class="co">#&gt; 5    5      150    high 0.25 0.25 0.25 0.25 13.74719</span></span>
+<span><span class="co">#&gt; 6    6      150    high 0.40 0.40 0.10 0.10 15.11899</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="fit-model-with-compositional-data">Fit model with compositional data<a class="anchor" aria-label="anchor" href="#fit-model-with-compositional-data"></a>
@@ -437,6 +393,7 @@
 <ul class="list-unstyled">
 <li><a href="https://CRAN.R-project.org/package=DImodelsVis" class="external-link"><img src="https://www.r-pkg.org/badges/version/DImodelsVis" alt="CRAN status"></a></li>
 <li><a href="https://lifecycle.r-lib.org/articles/stages.html#stable" class="external-link"><img src="https://img.shields.io/badge/lifecycle-stable-brightgreen.svg" alt="Lifecycle: stable"></a></li>
+<li><a href="https://github.com/rishvish/DImodelsVis/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/rishvish/DImodelsVis/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
 </ul>
 </div>
 

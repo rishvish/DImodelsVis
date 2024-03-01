@@ -42,7 +42,7 @@ DImodels, consider calling these functions manually."><meta property="og:image" 
     
     <a class="navbar-brand me-2" href="../index.html">DImodelsVis</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -109,6 +109,7 @@ DImodels, consider calling these functions manually.</p>
 <span>  se <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  pie_positions <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.5</span>, <span class="fl">1</span><span class="op">)</span>,</span>
 <span>  pie_colours <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  pie_radius <span class="op">=</span> <span class="fl">0.3</span>,</span>
 <span>  FG <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  facet_var <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  plot <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -193,6 +194,11 @@ of each curve.</p></dd>
 in the pie-glyphs. <br>
 If left NULL, the colour blind friendly colours will be
 for the pie-glyph slices.</p></dd>
+
+
+<dt>pie_radius</dt>
+<dd><p>A numeric value specifying the radius (in cm) for the
+pie-glyphs. Default is 0.3 cm.</p></dd>
 
 
 <dt>FG</dt>

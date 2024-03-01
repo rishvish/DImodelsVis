@@ -26,7 +26,7 @@ straight line between the two points."><meta property="og:image" content="https:
     
     <a class="navbar-brand me-2" href="../index.html">DImodelsVis</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -79,6 +79,7 @@ straight line between the two points.</p>
 <span>  <span class="va">data</span>,</span>
 <span>  prop <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  pie_positions <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.5</span>, <span class="fl">1</span><span class="op">)</span>,</span>
+<span>  pie_radius <span class="op">=</span> <span class="fl">0.3</span>,</span>
 <span>  pie_colours <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  se <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  facet_var <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -107,6 +108,11 @@ indicating the positions along the X-axis at which to
 show pie-glyphs for each curve. Default is c(0, 0.5, 1) meaning
 that pie-glyphs with be shown at the start, midpoint and end
 of each curve.</p></dd>
+
+
+<dt>pie_radius</dt>
+<dd><p>A numeric value specifying the radius (in cm) for the
+pie-glyphs. Default is 0.3 cm.</p></dd>
 
 
 <dt>pie_colours</dt>
@@ -160,32 +166,32 @@ panels.</p></dd>
 <span class="r-in"><span>                               prop <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"p1"</span>, <span class="st">"p2"</span>, <span class="st">"p3"</span>, <span class="st">"p4"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>                               model <span class="op">=</span> <span class="va">mod</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Finished data preparation.</span>
-<span class="r-in"><span><span class="fu">simplex_path_plot</span><span class="op">(</span>data <span class="op">=</span> <span class="va">plot_data</span>, prop <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"p1"</span>, <span class="st">"p2"</span>, <span class="st">"p3"</span>, <span class="st">"p4"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co">## prop will be inferred from data</span></span></span>
+<span class="r-in"><span><span class="fu">simplex_path_plot</span><span class="op">(</span>data <span class="op">=</span> <span class="va">plot_data</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Created plot.</span>
 <span class="r-plt img"><img src="simplex_path_plot-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Show specific curves</span></span></span>
-<span class="r-in"><span><span class="fu">simplex_path_plot</span><span class="op">(</span>data <span class="op">=</span> <span class="va">plot_data</span><span class="op">[</span><span class="va">plot_data</span><span class="op">$</span><span class="va">.Group</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">4</span><span class="op">)</span>, <span class="op">]</span>,</span></span>
-<span class="r-in"><span>                  prop <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"p1"</span>, <span class="st">"p2"</span>, <span class="st">"p3"</span>, <span class="st">"p4"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">simplex_path_plot</span><span class="op">(</span>data <span class="op">=</span> <span class="va">plot_data</span><span class="op">[</span><span class="va">plot_data</span><span class="op">$</span><span class="va">.Group</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">4</span><span class="op">)</span>, <span class="op">]</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Created plot.</span>
 <span class="r-plt img"><img src="simplex_path_plot-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Show uncertainty using `se = TRUE`</span></span></span>
 <span class="r-in"><span><span class="fu">simplex_path_plot</span><span class="op">(</span>data <span class="op">=</span> <span class="va">plot_data</span><span class="op">[</span><span class="va">plot_data</span><span class="op">$</span><span class="va">.Group</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">4</span><span class="op">)</span>, <span class="op">]</span>,</span></span>
-<span class="r-in"><span>                  prop <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"p1"</span>, <span class="st">"p2"</span>, <span class="st">"p3"</span>, <span class="st">"p4"</span><span class="op">)</span>, se <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span>                  se <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Created plot.</span>
 <span class="r-plt img"><img src="simplex_path_plot-3.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Change colours of pie-glyphs using `pie_colours`</span></span></span>
 <span class="r-in"><span><span class="fu">simplex_path_plot</span><span class="op">(</span>data <span class="op">=</span> <span class="va">plot_data</span><span class="op">[</span><span class="va">plot_data</span><span class="op">$</span><span class="va">.Group</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">4</span><span class="op">)</span>, <span class="op">]</span>,</span></span>
-<span class="r-in"><span>                  prop <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"p1"</span>, <span class="st">"p2"</span>, <span class="st">"p3"</span>, <span class="st">"p4"</span><span class="op">)</span>, se <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>                  se <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>                  pie_colours <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"steelblue1"</span>, <span class="st">"steelblue4"</span>, <span class="st">"orange1"</span>, <span class="st">"orange4"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Created plot.</span>
 <span class="r-plt img"><img src="simplex_path_plot-4.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Show pie-glyphs at different points along the curve using `pie_positions`</span></span></span>
 <span class="r-in"><span><span class="fu">simplex_path_plot</span><span class="op">(</span>data <span class="op">=</span> <span class="va">plot_data</span><span class="op">[</span><span class="va">plot_data</span><span class="op">$</span><span class="va">.Group</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">4</span><span class="op">)</span>, <span class="op">]</span>,</span></span>
-<span class="r-in"><span>                  prop <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"p1"</span>, <span class="st">"p2"</span>, <span class="st">"p3"</span>, <span class="st">"p4"</span><span class="op">)</span>, se <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>                  se <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>                  pie_positions <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.25</span>, <span class="fl">0.5</span>, <span class="fl">0.75</span>, <span class="fl">1</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>                  pie_colours <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"steelblue1"</span>, <span class="st">"steelblue4"</span>, <span class="st">"orange1"</span>, <span class="st">"orange4"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Created plot.</span>
@@ -193,7 +199,7 @@ panels.</p></dd>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Facet plot based on specific variables</span></span></span>
 <span class="r-in"><span><span class="fu">simplex_path_plot</span><span class="op">(</span>data <span class="op">=</span> <span class="va">plot_data</span>,</span></span>
-<span class="r-in"><span>                  prop <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"p1"</span>, <span class="st">"p2"</span>, <span class="st">"p3"</span>, <span class="st">"p4"</span><span class="op">)</span>, se <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>                  se <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
 <span class="r-in"><span>                  facet_var <span class="op">=</span> <span class="st">"block"</span>,</span></span>
 <span class="r-in"><span>                  pie_colours <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"steelblue1"</span>, <span class="st">"steelblue4"</span>, <span class="st">"orange1"</span>, <span class="st">"orange4"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Created plot.</span>
@@ -210,7 +216,6 @@ panels.</p></dd>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Finished data preparation.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">simplex_path_plot</span><span class="op">(</span>data <span class="op">=</span> <span class="va">plot_data</span>,</span></span>
-<span class="r-in"><span>                  prop <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"p1"</span>, <span class="st">"p2"</span>, <span class="st">"p3"</span>, <span class="st">"p4"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>                  pie_colours <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"steelblue1"</span>, <span class="st">"steelblue4"</span>,</span></span>
 <span class="r-in"><span>                                  <span class="st">"orange1"</span>, <span class="st">"orange4"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>                  nrow <span class="op">=</span> <span class="fl">1</span>, ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>

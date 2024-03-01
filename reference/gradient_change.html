@@ -32,7 +32,7 @@ DImodels, the associated data and plot functions can instead be called manually.
     
     <a class="navbar-brand me-2" href="../index.html">DImodelsVis</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -94,6 +94,8 @@ DImodels, the associated data and plot functions can instead be called manually.
 <span>  y_var <span class="op">=</span> <span class="st">".Pred"</span>,</span>
 <span>  pie_data <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  pie_colours <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  pie_radius <span class="op">=</span> <span class="fl">0.25</span>,</span>
+<span>  points_size <span class="op">=</span> <span class="fl">3</span>,</span>
 <span>  facet_var <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  nrow <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  ncol <span class="op">=</span> <span class="fl">0</span></span>
@@ -164,6 +166,16 @@ pie-glyphs.</p></dd>
 <dt>pie_colours</dt>
 <dd><p>A character vector specifying the colours for the slices
 within the pie-glyphs.</p></dd>
+
+
+<dt>pie_radius</dt>
+<dd><p>A numeric value specifying the radius (in cm) for the
+pie-glyphs.</p></dd>
+
+
+<dt>points_size</dt>
+<dd><p>A numeric value specifying the size of points (when
+pie-glyphs not shown) shown in the plots.</p></dd>
 
 
 <dt>facet_var</dt>

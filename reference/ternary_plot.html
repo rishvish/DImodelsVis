@@ -16,7 +16,7 @@ ternary_data function."><meta property="og:image" content="https://rishvish.gith
     
     <a class="navbar-brand me-2" href="../index.html">DImodelsVis</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -214,26 +214,22 @@ the contour lines showing their values
 <span class="r-plt img"><img src="ternary_plot-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Categorical variables can also be shown</span></span></span>
+<span class="r-in"><span><span class="co">## Also show axis guides using `show_axis_guides`</span></span></span>
 <span class="r-in"><span><span class="va">sim0</span><span class="op">$</span><span class="va">richness</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">sim0</span><span class="op">$</span><span class="va">richness</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">ternary_plot</span><span class="op">(</span>data <span class="op">=</span> <span class="va">sim0</span>, prop <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"p1"</span>, <span class="st">"p2"</span>, <span class="st">"p3"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>             col_var <span class="op">=</span> <span class="st">"richness"</span>, show <span class="op">=</span> <span class="st">"points"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>             col_var <span class="op">=</span> <span class="st">"richness"</span>, show <span class="op">=</span> <span class="st">"points"</span>,</span></span>
+<span class="r-in"><span>             show_axis_guides <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Created plot.</span>
 <span class="r-plt img"><img src="ternary_plot-3.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Change colours by using `colours` argument</span></span></span>
+<span class="r-in"><span><span class="co">## and increase points size using `points_size`</span></span></span>
 <span class="r-in"><span><span class="fu">ternary_plot</span><span class="op">(</span>data <span class="op">=</span> <span class="va">sim0</span>, prop <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"p1"</span>, <span class="st">"p2"</span>, <span class="st">"p3"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>             col_var <span class="op">=</span> <span class="st">"richness"</span>, show <span class="op">=</span> <span class="st">"points"</span>,</span></span>
-<span class="r-in"><span>             colours <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"tomato"</span>, <span class="st">"steelblue"</span>, <span class="st">"orange"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>             colours <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"tomato"</span>, <span class="st">"steelblue"</span>, <span class="st">"orange"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>             points_size <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Created plot.</span>
 <span class="r-plt img"><img src="ternary_plot-4.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co">## Show axis guides and increase points size</span></span></span>
-<span class="r-in"><span><span class="fu">ternary_plot</span><span class="op">(</span>data <span class="op">=</span> <span class="va">sim0</span>, prop <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"p1"</span>, <span class="st">"p2"</span>, <span class="st">"p3"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>             show <span class="op">=</span> <span class="st">"points"</span>, col_var <span class="op">=</span> <span class="st">"richness"</span>,</span></span>
-<span class="r-in"><span>             show_axis_guides <span class="op">=</span> <span class="cn">TRUE</span>, points_size <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Created plot.</span>
-<span class="r-plt img"><img src="ternary_plot-5.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">### Show contours of response</span></span></span>
 <span class="r-in"><span><span class="co">## Fit model</span></span></span>
@@ -248,34 +244,29 @@ the contour lines showing their values
 <span class="r-in"><span><span class="co">## Create a contour plot of response across the ternary space</span></span></span>
 <span class="r-in"><span><span class="fu">ternary_plot</span><span class="op">(</span><span class="va">plot_data</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Created plot.</span>
-<span class="r-plt img"><img src="ternary_plot-6.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="ternary_plot-5.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Change colour scheme</span></span></span>
 <span class="r-in"><span><span class="va">cols</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">hcl.colors</a></span><span class="op">(</span><span class="fl">7</span><span class="op">)</span> <span class="co"># because there are 7 contour levels by default</span></span></span>
 <span class="r-in"><span><span class="fu">ternary_plot</span><span class="op">(</span><span class="va">plot_data</span>, colours <span class="op">=</span> <span class="va">cols</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Created plot.</span>
-<span class="r-plt img"><img src="ternary_plot-7.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="ternary_plot-6.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co">## Change number of contours and set custom upper and lower</span></span></span>
-<span class="r-in"><span><span class="co">## limits for the scale</span></span></span>
+<span class="r-in"><span><span class="co"># \donttest{</span></span></span>
+<span class="r-in"><span><span class="co">## Change number of contours using `nlevels`</span></span></span>
+<span class="r-in"><span><span class="co">## and set custom upper and lower limits for the scale</span></span></span>
 <span class="r-in"><span><span class="fu">ternary_plot</span><span class="op">(</span><span class="va">plot_data</span>, nlevels <span class="op">=</span> <span class="fl">10</span>, colours <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">hcl.colors</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>             lower_lim <span class="op">=</span> <span class="fl">10</span>, upper_lim <span class="op">=</span> <span class="fl">35</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Created plot.</span>
-<span class="r-plt img"><img src="ternary_plot-8.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co">## Add axis guides</span></span></span>
-<span class="r-in"><span><span class="fu">ternary_plot</span><span class="op">(</span><span class="va">plot_data</span>, show_axis_guides <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Created plot.</span>
-<span class="r-plt img"><img src="ternary_plot-9.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="ternary_plot-7.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Change ternary labels along with their font-size</span></span></span>
 <span class="r-in"><span><span class="fu">ternary_plot</span><span class="op">(</span><span class="va">plot_data</span>, tern_labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Sp1"</span>, <span class="st">"Sp2"</span>, <span class="st">"Sp3"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>             vertex_label_size <span class="op">=</span> <span class="fl">6</span>, axis_label_size <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Created plot.</span>
-<span class="r-plt img"><img src="ternary_plot-10.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="ternary_plot-8.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## Add additional variables and create a separate plot for each</span></span></span>
-<span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="va">sim0</span><span class="op">$</span><span class="va">treatment</span> <span class="op">&lt;-</span>  <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span>, <span class="st">"B"</span>, <span class="st">"C"</span>, <span class="st">"D"</span><span class="op">)</span>, each <span class="op">=</span> <span class="fl">16</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">new_mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span><span class="va">mod</span>, <span class="op">~</span><span class="va">.</span> <span class="op">+</span> <span class="va">treatment</span>, data <span class="op">=</span> <span class="va">sim0</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">tern_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="ternary_data.html">ternary_data</a></span><span class="op">(</span>resolution <span class="op">=</span> <span class="fl">1</span>, model <span class="op">=</span> <span class="va">new_mod</span>,</span></span>
@@ -284,7 +275,7 @@ the contour lines showing their values
 <span class="r-in"><span><span class="co">## Arrange plot in 2 columns</span></span></span>
 <span class="r-in"><span><span class="fu">ternary_plot</span><span class="op">(</span>data <span class="op">=</span> <span class="va">tern_data</span>, ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Created all plots.</span>
-<span class="r-plt img"><img src="ternary_plot-11.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="ternary_plot-9.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
