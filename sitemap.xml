@@ -1,135 +1,51 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://rishvish.github.io/DImodelsVis/404.html</loc>
-  </url>
-  <url>
-    <loc>https://rishvish.github.io/DImodelsVis/LICENSE.html</loc>
-  </url>
-  <url>
-    <loc>https://rishvish.github.io/DImodelsVis/articles/DImodelsVis-with-complex-models.html</loc>
-  </url>
-  <url>
-    <loc>https://rishvish.github.io/DImodelsVis/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>https://rishvish.github.io/DImodelsVis/authors.html</loc>
-  </url>
-  <url>
-    <loc>https://rishvish.github.io/DImodelsVis/coming_soon.html</loc>
-  </url>
-  <url>
-    <loc>https://rishvish.github.io/DImodelsVis/index.html</loc>
-  </url>
-  <url>
-    <loc>https://rishvish.github.io/DImodelsVis/news/index.html</loc>
-  </url>
-  <url>
-    <loc>https://rishvish.github.io/DImodelsVis/reference/DImodelsVis-package.html</loc>
-  </url>
-  <url>
-    <loc>https://rishvish.github.io/DImodelsVis/reference/Simplex_projection.html</loc>
-  </url>
-  <url>
-    <loc>https://rishvish.github.io/DImodelsVis/reference/add_ID_terms.html</loc>
-  </url>
-  <url>
-    <loc>https://rishvish.github.io/DImodelsVis/reference/add_add_var.html</loc>
-  </url>
-  <url>
-    <loc>https://rishvish.github.io/DImodelsVis/reference/add_interaction_terms.html</loc>
-  </url>
-  <url>
-    <loc>https://rishvish.github.io/DImodelsVis/reference/add_prediction.html</loc>
-  </url>
-  <url>
-    <loc>https://rishvish.github.io/DImodelsVis/reference/conditional_ternary.html</loc>
-  </url>
-  <url>
-    <loc>https://rishvish.github.io/DImodelsVis/reference/conditional_ternary_data.html</loc>
-  </url>
-  <url>
-    <loc>https://rishvish.github.io/DImodelsVis/reference/conditional_ternary_plot.html</loc>
-  </url>
-  <url>
-    <loc>https://rishvish.github.io/DImodelsVis/reference/copy_attributes.html</loc>
-  </url>
-  <url>
-    <loc>https://rishvish.github.io/DImodelsVis/reference/custom_filter.html</loc>
-  </url>
-  <url>
-    <loc>https://rishvish.github.io/DImodelsVis/reference/get_colours.html</loc>
-  </url>
-  <url>
-    <loc>https://rishvish.github.io/DImodelsVis/reference/get_equi_comms.html</loc>
-  </url>
-  <url>
-    <loc>https://rishvish.github.io/DImodelsVis/reference/get_shades.html</loc>
-  </url>
-  <url>
-    <loc>https://rishvish.github.io/DImodelsVis/reference/gradient_change.html</loc>
-  </url>
-  <url>
-    <loc>https://rishvish.github.io/DImodelsVis/reference/gradient_change_data.html</loc>
-  </url>
-  <url>
-    <loc>https://rishvish.github.io/DImodelsVis/reference/gradient_change_plot.html</loc>
-  </url>
-  <url>
-    <loc>https://rishvish.github.io/DImodelsVis/reference/group_prop.html</loc>
-  </url>
-  <url>
-    <loc>https://rishvish.github.io/DImodelsVis/reference/grouped_ternary.html</loc>
-  </url>
-  <url>
-    <loc>https://rishvish.github.io/DImodelsVis/reference/grouped_ternary_data.html</loc>
-  </url>
-  <url>
-    <loc>https://rishvish.github.io/DImodelsVis/reference/grouped_ternary_plot.html</loc>
-  </url>
-  <url>
-    <loc>https://rishvish.github.io/DImodelsVis/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>https://rishvish.github.io/DImodelsVis/reference/model_diagnostics.html</loc>
-  </url>
-  <url>
-    <loc>https://rishvish.github.io/DImodelsVis/reference/model_selection.html</loc>
-  </url>
-  <url>
-    <loc>https://rishvish.github.io/DImodelsVis/reference/prediction_contributions.html</loc>
-  </url>
-  <url>
-    <loc>https://rishvish.github.io/DImodelsVis/reference/prediction_contributions_data.html</loc>
-  </url>
-  <url>
-    <loc>https://rishvish.github.io/DImodelsVis/reference/prediction_contributions_plot.html</loc>
-  </url>
-  <url>
-    <loc>https://rishvish.github.io/DImodelsVis/reference/simplex_path.html</loc>
-  </url>
-  <url>
-    <loc>https://rishvish.github.io/DImodelsVis/reference/simplex_path_data.html</loc>
-  </url>
-  <url>
-    <loc>https://rishvish.github.io/DImodelsVis/reference/simplex_path_plot.html</loc>
-  </url>
-  <url>
-    <loc>https://rishvish.github.io/DImodelsVis/reference/ternary_data.html</loc>
-  </url>
-  <url>
-    <loc>https://rishvish.github.io/DImodelsVis/reference/ternary_plot.html</loc>
-  </url>
-  <url>
-    <loc>https://rishvish.github.io/DImodelsVis/reference/theme_DI.html</loc>
-  </url>
-  <url>
-    <loc>https://rishvish.github.io/DImodelsVis/reference/visualise_effects.html</loc>
-  </url>
-  <url>
-    <loc>https://rishvish.github.io/DImodelsVis/reference/visualise_effects_data.html</loc>
-  </url>
-  <url>
-    <loc>https://rishvish.github.io/DImodelsVis/reference/visualise_effects_plot.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://rishvish.github.io/DImodelsVis/404.html</loc></url>
+<url><loc>https://rishvish.github.io/DImodelsVis/LICENSE.html</loc></url>
+<url><loc>https://rishvish.github.io/DImodelsVis/articles/DImodelsVis-with-complex-models.html</loc></url>
+<url><loc>https://rishvish.github.io/DImodelsVis/articles/index.html</loc></url>
+<url><loc>https://rishvish.github.io/DImodelsVis/authors.html</loc></url>
+<url><loc>https://rishvish.github.io/DImodelsVis/coming_soon.html</loc></url>
+<url><loc>https://rishvish.github.io/DImodelsVis/index.html</loc></url>
+<url><loc>https://rishvish.github.io/DImodelsVis/news/index.html</loc></url>
+<url><loc>https://rishvish.github.io/DImodelsVis/reference/DImodelsVis-package.html</loc></url>
+<url><loc>https://rishvish.github.io/DImodelsVis/reference/Simplex_projection.html</loc></url>
+<url><loc>https://rishvish.github.io/DImodelsVis/reference/add_ID_terms.html</loc></url>
+<url><loc>https://rishvish.github.io/DImodelsVis/reference/add_add_var.html</loc></url>
+<url><loc>https://rishvish.github.io/DImodelsVis/reference/add_interaction_terms.html</loc></url>
+<url><loc>https://rishvish.github.io/DImodelsVis/reference/add_prediction.html</loc></url>
+<url><loc>https://rishvish.github.io/DImodelsVis/reference/conditional_ternary.html</loc></url>
+<url><loc>https://rishvish.github.io/DImodelsVis/reference/conditional_ternary_data.html</loc></url>
+<url><loc>https://rishvish.github.io/DImodelsVis/reference/conditional_ternary_plot.html</loc></url>
+<url><loc>https://rishvish.github.io/DImodelsVis/reference/copy_attributes.html</loc></url>
+<url><loc>https://rishvish.github.io/DImodelsVis/reference/custom_filter.html</loc></url>
+<url><loc>https://rishvish.github.io/DImodelsVis/reference/get_colours.html</loc></url>
+<url><loc>https://rishvish.github.io/DImodelsVis/reference/get_equi_comms.html</loc></url>
+<url><loc>https://rishvish.github.io/DImodelsVis/reference/get_shades.html</loc></url>
+<url><loc>https://rishvish.github.io/DImodelsVis/reference/gradient_change.html</loc></url>
+<url><loc>https://rishvish.github.io/DImodelsVis/reference/gradient_change_data.html</loc></url>
+<url><loc>https://rishvish.github.io/DImodelsVis/reference/gradient_change_plot.html</loc></url>
+<url><loc>https://rishvish.github.io/DImodelsVis/reference/group_prop.html</loc></url>
+<url><loc>https://rishvish.github.io/DImodelsVis/reference/grouped_ternary.html</loc></url>
+<url><loc>https://rishvish.github.io/DImodelsVis/reference/grouped_ternary_data.html</loc></url>
+<url><loc>https://rishvish.github.io/DImodelsVis/reference/grouped_ternary_plot.html</loc></url>
+<url><loc>https://rishvish.github.io/DImodelsVis/reference/index.html</loc></url>
+<url><loc>https://rishvish.github.io/DImodelsVis/reference/model_diagnostics.html</loc></url>
+<url><loc>https://rishvish.github.io/DImodelsVis/reference/model_diagnostics_data.html</loc></url>
+<url><loc>https://rishvish.github.io/DImodelsVis/reference/model_diagnostics_plot.html</loc></url>
+<url><loc>https://rishvish.github.io/DImodelsVis/reference/model_selection.html</loc></url>
+<url><loc>https://rishvish.github.io/DImodelsVis/reference/model_selection_data.html</loc></url>
+<url><loc>https://rishvish.github.io/DImodelsVis/reference/model_selection_plot.html</loc></url>
+<url><loc>https://rishvish.github.io/DImodelsVis/reference/prediction_contributions.html</loc></url>
+<url><loc>https://rishvish.github.io/DImodelsVis/reference/prediction_contributions_data.html</loc></url>
+<url><loc>https://rishvish.github.io/DImodelsVis/reference/prediction_contributions_plot.html</loc></url>
+<url><loc>https://rishvish.github.io/DImodelsVis/reference/simplex_path.html</loc></url>
+<url><loc>https://rishvish.github.io/DImodelsVis/reference/simplex_path_data.html</loc></url>
+<url><loc>https://rishvish.github.io/DImodelsVis/reference/simplex_path_plot.html</loc></url>
+<url><loc>https://rishvish.github.io/DImodelsVis/reference/ternary_data.html</loc></url>
+<url><loc>https://rishvish.github.io/DImodelsVis/reference/ternary_plot.html</loc></url>
+<url><loc>https://rishvish.github.io/DImodelsVis/reference/theme_DI.html</loc></url>
+<url><loc>https://rishvish.github.io/DImodelsVis/reference/visualise_effects.html</loc></url>
+<url><loc>https://rishvish.github.io/DImodelsVis/reference/visualise_effects_data.html</loc></url>
+<url><loc>https://rishvish.github.io/DImodelsVis/reference/visualise_effects_plot.html</loc></url>
 </urlset>
+
