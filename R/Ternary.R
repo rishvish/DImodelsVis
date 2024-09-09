@@ -351,7 +351,7 @@ ternary_plot <- function(data, prop = NULL,
                          ncol = 0){
   if(missing(data)){
     cli::cli_abort(c("{.var data} cannot be empty.",
-                     "i" = "Specify a data-frame or tibble
+                     "i" = "Specify a data-frame or tibble containing compositional variables,
                      preferably the output of
                      {.help [{.fn {col_green('ternary_data')}}](DImodelsVis::ternary_data)} or
                      a data-frame with a similar structure and column names."))
@@ -624,19 +624,19 @@ ternary_plot_internal <- function(data, prop,
               legend.position = 'bottom')
     }
 
+    # Labels for the ternary axes
+    axis_labels <- tibble(x1 = seq(0.2,0.8,0.2),
+                          y1 = c(0,0,0,0),
+                          x2 = .data$x1/2,
+                          y2 = .data$x1*sqrt(3)/2,
+                          x3 = (1-.data$x1)*0.5+.data$x1,
+                          y3 = sqrt(3)/2-.data$x1*sqrt(3)/2,
+                          label = .data$x1,
+                          rev_label = rev(.data$label),
+                          !! col_var := 0)
+
     # Showing axis labels
     if(show_axis_labels){
-      # Labels for the ternary axes
-      axis_labels <- tibble(x1 = seq(0.2,0.8,0.2),
-                            y1 = c(0,0,0,0),
-                            x2 = .data$x1/2,
-                            y2 = .data$x1*sqrt(3)/2,
-                            x3 = (1-.data$x1)*0.5+.data$x1,
-                            y3 = sqrt(3)/2-.data$x1*sqrt(3)/2,
-                            label = .data$x1,
-                            rev_label = rev(.data$label),
-                            !! col_var := 0)
-
       pl <- pl +
         geom_text(data = axis_labels,
                   aes(x=.data$x1, y=.data$y1, label=.data$label),

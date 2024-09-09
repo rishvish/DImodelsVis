@@ -468,7 +468,7 @@ simplex_path <- function(model, starts, ends, add_var = list(),
   # Ensure model is a DImodels object
   # Ensure specified model is fit using the DI function
   if(missing(model) || (!inherits(model, "DI") && !inherits(model, "DImulti"))){
-    model_not_DI(call_fn = "visualise_effects")
+    model_not_DI(call_fn = "simplex_path")
   }
 
   if(missing(starts)){
@@ -616,7 +616,7 @@ simplex_path_plot_internal <- function(data, prop, pie_colours = NULL,
   # Adjust plot aesthetics
   plot <- plot +
     labs(fill = "Variable",
-         x = "Interpolation constant",
+         x = "Interpolation factor",
          y = "Predicted Response")+
          # caption = "The pie-glyphs on the left show the starting compositions
          # while those on the right show the ending compositions.
