@@ -21,6 +21,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 [![CRAN status](https://www.r-pkg.org/badges/version/DImodelsVis)](https://CRAN.R-project.org/package=DImodelsVis)
 [![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
+[![R-CMD-check](https://github.com/rishvish/DImodelsVis/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/rishvish/DImodelsVis/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 
@@ -115,7 +116,7 @@ This dataset originates from a grassland biodiversity experiment conducted in Sw
 ```{r}
 data(Switzerland)
 my_data <- Switzerland[Switzerland$nitrogen == 150, ]
-my_data
+head(my_data)
 ```
 
 ### Fit model with compositional data

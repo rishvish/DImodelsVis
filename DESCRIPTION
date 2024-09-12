@@ -1,6 +1,6 @@
 Package: DImodelsVis
 Title: Visualising and Interpreting Statistical Models Fit to Compositional Data
-Version: 1.0.0
+Version: 1.0.1
 Authors@R: 
     c(person("Rishabh", "Vishwakarma", email = "vishwakr@tcd.ie", role = c("aut", "cre"),
              comment = c(ORCID = "0000-0002-4847-3494")),
@@ -36,8 +36,10 @@ Suggests:
     DImodelsMulti (>= 1.0.0),
     knitr,
     rmarkdown,
-    spelling
+    spelling,
+    testthat (>= 3.0.0)
 URL: https://rishvish.github.io/DImodelsVis/, https://github.com/rishvish/DImodelsVis
 BugReports: https://github.com/rishvish/DImodelsVis/issues
 VignetteBuilder: knitr
 Language: en-US
+Config/testthat/edition: 3

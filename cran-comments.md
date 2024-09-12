@@ -1,3 +1,53 @@
+## Submission v1.0.1
+- I got an email stating that the package vignettes failed to rebuild for Fedora OS systems and to resubmit before 5th March 2023. I have fixed the bug causing this issue and have checked that package builds successfully now across different operating systems.
+
+## Test environments
+
+I checked that the package builds successfully on the following systems without any errors or warnings.
+
+- local Windows install, R 4.3.2
+- win-builder (devel and release)
+- macOS builder
+- rhub platforms
+  - debian-clang-devel (Debian Linux, R-devel, clang, ISO-8859-15 locale)
+  - debian-gcc-devel (Debian Linux, R-devel, GCC)
+  - debian-gcc-patched (Debian Linux, R-patched, GCC)
+  - debian-gcc-release (Debian Linux, R-release, GCC)
+  - fedora-clang-devel (Fedora Linux, R-devel, clang, gfortran)
+  - fedora-gcc-devel (Fedora Linux, R-devel, GCC)
+  - ubuntu-gcc-devel (Ubuntu Linux 20.04.1 LTS, R-devel, GCC)
+  - ubuntu-gcc-release (Ubuntu Linux 20.04.1 LTS, R-release, GCC)
+  - windows-x86_64-devel (Windows Server 2022, R-devel, 64 bit)
+  - windows-x86_64-oldrel (Windows Server 2022, R-oldrel, 32/64 bit)
+  - windows-x86_64-patched (Windows Server 2022, R-patched, 32/64 bit)
+  - windows-x86_64-release (Windows Server 2022, R-release, 32/64 bit)
+
+## R CMD check results
+
+There were no ERRORS or WARNINGS when building the package on my local machine. I encountered the following three notes.
+
+```
+checking CRAN incoming feasibility 
+  Maintainer: 'Rishabh Vishwakarma <vishwakr@tcd.ie>'
+  Days since last update: 7
+```
+- According to this [post](https://mailman.stat.ethz.ch/pipermail/r-devel/2014-March/068497.html) by Uwe Ligges this note should be ignored.
+```
+Checking HTML version of manual ... NOTE
+  Skipping checking math rendering: package 'V8' unavailable
+```
+- I think this is similar to to [R-hub issue #548](https://github.com/r-hub/rhub/issues/548) and is unrelated to my package.
+
+```
+* checking for detritus in the temp directory ... NOTE
+Found the following files/directories:
+  'lastMiKTeXException'
+```
+- As noted in [R-hub issue #503](https://github.com/r-hub/rhub/issues/503), this could be due to a bug/crash in MiKTeX and can likely be ignored.
+
+
+--------------------------------------------------------------------------------
+
 ## Resubmission 3
 This is a resubmission. Thanks for your feedback.
 
