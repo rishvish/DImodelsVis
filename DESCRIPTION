@@ -38,7 +38,8 @@ Suggests:
     rmarkdown,
     spelling,
     testthat (>= 3.0.0)
-URL: https://rishvish.github.io/DImodelsVis/
+URL: https://rishvish.github.io/DImodelsVis/, https://github.com/rishvish/DImodelsVis
+BugReports: https://github.com/rishvish/DImodelsVis/issues
 VignetteBuilder: knitr
 Language: en-US
 Config/testthat/edition: 3
