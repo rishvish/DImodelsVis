@@ -158,7 +158,7 @@ model_diagnostics <- function(model, which = c(1,2,3,5), prop = NULL, FG = NULL,
     if(inherits(model, "DImulti")){
       plot_data <- as.data.frame(attr(model, "data"))
     } else {
-      plot_data <- as.data.frame(insight::get_modelmatrix(model))
+      plot_data <- as.data.frame(insight::get_data(model))
     }
     plot_data <- plot_data %>%
       mutate(.fitted = fitted(model),
@@ -180,6 +180,7 @@ model_diagnostics <- function(model, which = c(1,2,3,5), prop = NULL, FG = NULL,
     }
   }
 
+  model_species <- NULL
   if(is.null(prop)){
     if(inherits(model, "DI") || inherits(model, "DImulti")){
       # Get original data used to fit the model
@@ -188,6 +189,7 @@ model_diagnostics <- function(model, which = c(1,2,3,5), prop = NULL, FG = NULL,
       # Get all species in the model
       model_species <- attr(model, "prop")
       pies <- TRUE
+
     }  else {
       pies <- FALSE
     }
@@ -212,6 +214,8 @@ model_diagnostics <- function(model, which = c(1,2,3,5), prop = NULL, FG = NULL,
 
   # Add prop as attribute to data
   attr(plot_data, "prop") <- model_species
+
+  # Add model rank to data
   attr(plot_data, "rank") <- model$rank
 
   # Decide which plots to show
@@ -262,6 +266,7 @@ model_diagnostics <- function(model, which = c(1,2,3,5), prop = NULL, FG = NULL,
   }
 
   # Colours for the pie-glyph slices
+  colours <- NULL
   if(pies && is.null(pie_colours)){
     colours <- get_colours(model_species, FG = if(is.null(FG)) attr(model, "FG") else FG)
   } else if (pies && !is.null(pie_colours)){
@@ -276,16 +281,16 @@ model_diagnostics <- function(model, which = c(1,2,3,5), prop = NULL, FG = NULL,
     colours <- pie_colours
   }
 
-  # To adjust the positioning of hanging text for extreme observations
-  pie_grob <- pieGrob(values = 1:4,
-                      radius = ifelse(pies, pie_radius, points_size/15))
+  # # To adjust the positioning of hanging text for extreme observations
+  # pie_grob <- pieGrob(values = 1:4,
+  #                     radius = ifelse(pies, pie_radius, points_size/15))
 
 
   if(isTRUE(plot)){
     plot <- model_diagnostics_plot(data = plot_data, which = which,
                                    prop = model_species, FG = FG,
                                    npoints = npoints, cook_levels = cook_levels,
-                                   pie_radius = pie_radius, pie_colours = pie_colours,
+                                   pie_radius = pie_radius, pie_colours = colours,
                                    only_extremes = only_extremes, label_size = label_size,
                                    points_size = points_size, nrow = nrow, ncol = ncol)
     return(plot)
@@ -555,9 +560,9 @@ model_diagnostics_plot <- function(data, which = c(1,2,3,5), prop = NULL, FG = N
 
   # Colours for the pie-glyph slices
   if(pies && is.null(pie_colours)){
-    if(!is.null(FG)) {
-      sanity_checks(data = plot_data, prop = FG)
-    }
+    # if(!is.null(FG)) {
+    #   sanity_checks(data = plot_data, prop = FG)
+    # }
     colours <- get_colours(model_species, FG = FG)
   } else if (pies && !is.null(pie_colours)){
     # sanity_checks(colours = pie_colours)
@@ -585,11 +590,20 @@ model_diagnostics_plot <- function(data, which = c(1,2,3,5), prop = NULL, FG = N
   plots <- list()
 
   if(show[1L]){
+    if(model_class == "non lm"){
+      cli::cli_alert("For generalised least squared (gls) models, standardised (pearson) residuals will be shown by default in \"Residuals vs Fitted\" plots.")
+      y_val <- ".stdresid"
+      y_lab <- "Std. Pearson residuals"
+    } else {
+      y_val <- ".resid"
+      y_lab <- " Raw residuals"
+    }
+
     # Best fit line across points
-    smoothing_line <- smoothing_fun(plot_data$.fitted,  plot_data$.resid)
+    smoothing_line <- smoothing_fun(plot_data$.fitted, plot_data[[y_val]])
 
     # Base plot with points and other aesthetics
-    pl <- ggplot(plot_data, aes(.data$.fitted, .data$.resid))+
+    pl <- ggplot(plot_data, aes(.data$.fitted, .data[[y_val]]))+
       theme_DI()+
       geom_point(size = 3)+
       geom_line(data = smoothing_line,
@@ -616,8 +630,8 @@ model_diagnostics_plot <- function(data, which = c(1,2,3,5), prop = NULL, FG = N
     pl <- add_label(pl = pl, data = show.r,
                     grob_obj = pie_grob,
                     label_size = label_size) +
-      labs(x = "Fitted Values", y = "Residuals",
-           title = "Residual vs Fitted", fill = "Variables")+
+      labs(x = "Fitted Values", y = y_lab,
+           title = "Residuals vs Fitted", fill = "Variables")+
       scale_y_continuous(expand = expansion(mult = 0.1))
 
     plots[["ResivsFit"]] <- pl

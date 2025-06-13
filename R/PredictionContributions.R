@@ -140,7 +140,7 @@ prediction_contributions_data <- function(data, model = NULL, coefficients = NUL
 
     # If bar labs is specified as a column then fetch values from data
     if(length(bar_labs) == 1){
-      bar_labs <- rlang::try_fetch(data %>% dplyr::select(bar_labs),
+      bar_labs <- rlang::try_fetch(dplyr::select(data, bar_labs)[, 1],
                                    error = function(cnd)
                                    rlang::abort("The value specified in `bar_labs` is invalid.",
                                       parent = cnd))

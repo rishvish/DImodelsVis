@@ -383,7 +383,7 @@ check_add_var <- function(model = NULL, add_var = NULL, call = caller_env()){
     }
 
     add_var <- sapply(names(add_var), function(x){
-      model_var <- model_data[, x]
+      model_var <- model_data[[x]]
       value <- add_var[[x]]
 
       # If variable in model was of type factor ensure levels are specified
@@ -436,7 +436,7 @@ check_add_var <- function(model = NULL, add_var = NULL, call = caller_env()){
     }, simplify = FALSE)
 
     check_values <- sapply(names(add_var), function(x){
-      model_var <- model_data[, x]
+      model_var <- model_data[[x]]
       values <- add_var[[x]]
       # Throwing error for a factor variable if value specified was not in the orignal data
       if(!is.numeric(model_var) && !all(values %in% unique(model_var))){
