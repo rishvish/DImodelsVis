@@ -3,7 +3,8 @@ pkgdown: 2.1.3
 pkgdown_sha: ~
 articles:
   DImodelsVis-with-complex-models: DImodelsVis-with-complex-models.html
-last_built: 2025-06-13T11:13Z
+  DImodelsVis-with-DImodelsMulti-models: DImodelsVis-with-DImodelsMulti-models.html
+last_built: 2025-07-18T09:46Z
 urls:
   reference: https://rishvish.github.io/DImodelsVis/reference
   article: https://rishvish.github.io/DImodelsVis/articles

@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">DImodelsVis</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.1.9001</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.1.9002</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -39,6 +39,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/DImodelsVis-with-complex-models.html">Using DImodelsVis with regression models not fit using the DImodels package</a></li>
+    <li><a class="dropdown-item" href="../articles/DImodelsVis-with-DImodelsMulti-models.html">Using DImodelsVis with regression models fit using the `DImodelsMulti` R package</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -74,12 +75,13 @@ R package. However, sometimes users could have more complicated models
 which couldn’t be fit using <a href="https://cran.r-project.org/package=DImodels" class="external-link"><code>DImodels</code></a>
 or they would prefer to have more flexibility and control in customising
 the plot or the underlying data.</p>
-<p>For these situations, each plotting function has a corresponding data
+<p>For these situations, each function has a corresponding data
 preparation and plotting function. The data preparation functions have
-an _data suffix while the plotting functions have an _plot suffix. This
-document describes how to use the data preparation functions to
-construct (and customise) the underlying data, which can then be passed
-to the plotting function for visualising the results.</p>
+an <code>_data</code> suffix while the plotting functions have an
+<code>_plot</code> suffix. This document describes how to use the data
+preparation functions to construct (and customise) the underlying data,
+which can then be passed to the plotting function for visualising the
+results.</p>
 <div class="section level3">
 <h3 id="load-libraries">Load libraries<a class="anchor" aria-label="anchor" href="#load-libraries"></a>
 </h3>
@@ -227,19 +229,19 @@ is missing.</i></p>
 <span>                                           model <span class="op">=</span> <span class="va">mod</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Finished data preparation.</span></span>
 <span><span class="va">plot_data</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 49 × 10</span></span></span>
-<span><span class="co">#&gt;    .Community richness treatment response    AV .Pred .Lower .Upper</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 1                 1 50            26.3     0  30.2   28.6   31.9</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 1                 1 50            26.3     0  30.2   28.6   31.9</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 1                 1 50            26.3     0  30.2   28.6   31.9</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 1                 1 50            26.3     0  30.2   28.6   31.9</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 1                 1 50            26.3     0  30.2   28.6   31.9</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 1                 1 50            26.3     0  30.2   28.6   31.9</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 1                 1 50            26.3     0  30.2   28.6   31.9</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 4                 1 50            17.4     0  20.2   18.5   21.9</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 4                 1 50            17.4     0  20.2   18.5   21.9</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 4                 1 50            17.4     0  20.2   18.5   21.9</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 49 × 11</span></span></span>
+<span><span class="co">#&gt;    .x_labs .Community  richness treatment response    AV .Pred .Lower .Upper</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 1       Community 1        1 50            26.3     0  30.2   28.6   31.9</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 1       Community 1        1 50            26.3     0  30.2   28.6   31.9</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 1       Community 1        1 50            26.3     0  30.2   28.6   31.9</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 1       Community 1        1 50            26.3     0  30.2   28.6   31.9</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 1       Community 1        1 50            26.3     0  30.2   28.6   31.9</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 1       Community 1        1 50            26.3     0  30.2   28.6   31.9</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 1       Community 1        1 50            26.3     0  30.2   28.6   31.9</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 4       Community 2        1 50            17.4     0  20.2   18.5   21.9</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 4       Community 2        1 50            17.4     0  20.2   18.5   21.9</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 4       Community 2        1 50            17.4     0  20.2   18.5   21.9</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 39 more rows</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2 more variables: .Contributions &lt;chr&gt;, .Value &lt;dbl&gt;</span></span></span></code></pre></div>
 <p><code>subset_data</code> is expanded to include the model predictions
@@ -304,15 +306,15 @@ model and use those to create our visualisations.</p>
 <span>                                           vcov <span class="op">=</span> <span class="va">vcov_mat</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Finished data preparation.</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">plot_data</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 6</span></span></span>
-<span><span class="co">#&gt;   .Community .Pred .Lower .Upper .Contributions .Value</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 1           30.2   28.6   31.9 p1               30.2</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 1           30.2   28.6   31.9 p2                0  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 1           30.2   28.6   31.9 p3                0  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 1           30.2   28.6   31.9 p4                0  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 1           30.2   28.6   31.9 p5                0  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 1           30.2   28.6   31.9 p6                0</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 7</span></span></span>
+<span><span class="co">#&gt;   .x_labs .Community  .Pred .Lower .Upper .Contributions .Value</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 1       Community 1  30.2   28.6   31.9 p1               30.2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 1       Community 1  30.2   28.6   31.9 p2                0  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 1       Community 1  30.2   28.6   31.9 p3                0  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 1       Community 1  30.2   28.6   31.9 p4                0  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 1       Community 1  30.2   28.6   31.9 p5                0  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> 1       Community 1  30.2   28.6   31.9 p6                0</span></span></code></pre></div>
 <p>This data can then be passed to the
 <code>prediction_contributions_plot</code> function to visualise the
 results.</p>
