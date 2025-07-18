@@ -743,7 +743,8 @@ visualise_effects <- function(model, data = NULL, var_interest = NULL,
                                    pie_colours = pie_colours,
                                    pie_radius = pie_radius,
                                    se = se,
-                                   average = average)
+                                   average = average,
+                                   nrow = nrow, ncol = ncol)
     return(plot)
   } else {
     return(plot_data)

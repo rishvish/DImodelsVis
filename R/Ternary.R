@@ -255,7 +255,7 @@ ternary_data <- function(prop = c(".P1", ".P2", ".P3"),
 #'                  (if `show = "contours"`). The default is maximum of the prediction.
 #' @param contour_text A boolean value indicating whether to include labels on
 #'                     the contour lines showing their values
-#'                     (if `show = "contours"`). The default is \code{TRUE}.
+#'                     (if `show = "contours"`). The default is \code{FALSE}.
 #' @param nrow Number of rows in which to arrange the final plot
 #'             (when `add_var` is specified).
 #' @param ncol Number of columns in which to arrange the final plot
@@ -346,7 +346,7 @@ ternary_plot <- function(data, prop = NULL,
                          colours = NULL,
                          lower_lim = NULL,
                          upper_lim = NULL,
-                         contour_text = TRUE,
+                         contour_text = FALSE,
                          nrow = 0,
                          ncol = 0){
   if(missing(data)){
@@ -465,7 +465,7 @@ ternary_plot_internal <- function(data, prop,
                                   upper_lim = NULL,
                                   tern_labels = c("P1", "P2", "P3"),
                                   show_contours = TRUE,
-                                  contour_text = TRUE,
+                                  contour_text = FALSE,
                                   show_axis_labels = TRUE,
                                   show_axis_guides = FALSE,
                                   points_size = 2,
@@ -600,7 +600,6 @@ ternary_plot_internal <- function(data, prop,
         geom_contour(breaks = breaks, colour = 'black')+
         guides(fill = guide_colorbar(frame.colour = 'black',
                                      ticks.colour = 'black',
-                                     title = 'Prediction',
                                      show.limits = T))+
         theme_void()+
         theme(legend.key.size = unit(0.1, 'npc'),
@@ -610,7 +609,8 @@ ternary_plot_internal <- function(data, prop,
               strip.text = element_text(size =14, vjust = 0.5),
               legend.text = element_text(size = 12, angle = 45,
                                          vjust = 1.2, hjust = 1.2),
-              legend.position = 'bottom')
+              legend.position = "bottom") +
+        labs(fill = "Prediction")
     } else {
       # Base of plot
       pl <- ggplot(data, aes(x = .data[[x]], y = .data[[y]])) +

@@ -43,7 +43,7 @@ sanity_checks <- function(data = NULL, prop = NULL, responses = NULL,
   # Ensure if model is specified it is a statistical regression model
   if(!is.null(model)){
     if(!insight::is_regression_model(model)){
-      cli::cli_abort(c("{.var model} should be a statistical model obejct.",
+      cli::cli_abort(c("{.var model} should be a statistical model object.",
                        "x" = "You specified an object with class {.cls {class(model)}}"),
                      call = call)
     }

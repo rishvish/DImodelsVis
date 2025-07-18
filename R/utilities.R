@@ -88,7 +88,8 @@ add_add_var <- function(data, add_var = NULL){
       colnames(data)[idx] <- paste0(colnames(data)[idx], ".data")
     }
     # Merge experimental structures with species communities
-    data <- merge(data, add_var_data, by = NULL)
+    data <- merge(data, add_var_data, by = NULL) %>%
+      copy_attributes(data)
     # data <- left_join(data, add_var_data, by = character())
   }
   return(data)
@@ -102,7 +103,7 @@ NULL
 colour_blind_friendly_cols <- function(n){
   # A safe colour-blind palette created by combining Okabe-Ito colours
   # and safe colour pallete from rcartocolor
-  safe_colorblind_palette <- c("#009E73", "#D55E00", "#AA4499",  "#0072B2", "#F0E442", "#661100",
+  safe_colorblind_palette <- c("#009E73", "#AA4499", "#0072B2", "#F0E442", "#D55E00", "#661100",
                                "#332288", "#CC6677", "#E69F00", "#88CCEE", "#882255", "#DDCC77",
                                "#56B4E9", "#117733", "#CC79A7", "#44AA99", "#484848", "#999933",
                                "#6699CC", "#000000")
@@ -195,6 +196,8 @@ get_shades <- function(colours = c("#808080"), shades = 3){
   # Map the shades of colours to the original colour
   names(new_cols) <- colours
 
+  # Desaturate colours
+  new_cols <- lapply(new_cols, function(x) colorspace::desaturate(x, 0.25))
   return(new_cols)
 }
 
@@ -1000,15 +1003,16 @@ add_prediction <- function(data, model = NULL,
     # Prediction with SE
     if(inherits(model, "DI")){
       if(interval != "none"){
-        preds <- suppressWarnings(predict(model, newdata = data,
-                                          interval = interval, level = conf.level)) %>%
+        preds <- predict(model, newdata = data,
+                         interval = interval,
+                         level = conf.level) %>%
           as.data.frame()
         data <- data %>%
           mutate(".Pred" := preds$fit,
                  ".Lower" = preds$lwr,
                  ".Upper" = preds$upr)
       } else{
-        preds <- suppressWarnings(predict(model, newdata = data, se.fit = FALSE))
+        preds <- predict(model, newdata = data, se.fit = FALSE)
         data <- data %>%
           mutate(".Pred" := preds)
       }
@@ -1017,22 +1021,46 @@ add_prediction <- function(data, model = NULL,
       data <- data %>%
         mutate(".Pred" := preds)
     } else {
-      preds <- suppressWarnings(suppressMessages(insight::get_predicted(x = model, data = data)))
+      # These are custom model objects
+      # First see if they are supported by insight and
+      if(isTRUE(insight::is_model_supported(model))){
+        preds <- suppressWarnings(suppressMessages(insight::get_predicted(x = model, data = data)))
 
-      data <- data %>%
-        mutate(".Pred" := as.numeric(preds))
+        data <- data %>%
+          mutate(".Pred" := as.numeric(preds))
 
-      if(interval != "none"){
-        CIs <- suppressWarnings(suppressMessages(insight::get_predicted_ci(x = model,
-                                                                           predictions = preds,
-                                                                           data = data,
-                                                                           ci = conf.level,
-                                                                           ci_type = interval)))
+        if(interval != "none"){
+          CIs <- suppressWarnings(suppressMessages(insight::get_predicted_ci(x = model,
+                                                                             predictions = preds,
+                                                                             data = data,
+                                                                             ci = conf.level,
+                                                                             ci_type = interval)))
 
-        if(ncol(CIs) > 1){
-          data <- data %>% mutate(".Lower" = CIs[, "CI_low"],
-                                  ".Upper" = CIs[, "CI_high"])
+          if(ncol(CIs) > 1){
+            data <- data %>% mutate(".Lower" = CIs[, "CI_low"],
+                                    ".Upper" = CIs[, "CI_high"])
+          }
         }
+      } else {
+        # Final hail mary for model objects not supported by insight
+        # to see if predictions can be made using the base predict function
+        tryCatch(
+          {
+            preds <- predict(model, data)
+            data <- data %>%
+              mutate(".Pred" := as.numeric(preds))
+
+            if(interval != "none"){
+              cli::cli_warn(c("It wasn't possible to automatically generate uncertainty intervals for the specified model object.",
+                              "i" = "Please generate them manually and add them to the data as a columns named {.val .Lower} and {.val .Upper}."))
+            }
+          },
+          error = function(e) {
+            cli::cli_abort(c("It wasn't possible to automatically generate predictions for the specified model object.",
+                             "i" = "Please generate the predictions manually and add them to the data as a column named {.val .Pred}.",
+                             "i" = "If this error is encountered from any data-preparation function, i.e. {.fn {col_green(\"*_data\")}}, rerun the function with {.var prediction = FALSE} and then manually add predictions to the data as a column named {.val .Pred}."))
+          }
+        )
       }
     }
   }
@@ -1699,10 +1727,23 @@ predict_from_DImulti <- function(model, newdata = model$original_data, ...){
   if(check_col_exists(newdata, ID_col)){
     newdata <- newdata %>% select(-ID_col)
   }
+  cols <- colnames(newdata)
+  if (any(c("AV", "E", "NULL", "NA") %in% cols)) {
+    cols_to_remove <- cols[cols %in% c("AV", "E", "NULL", "NA")]
+    newdata <- newdata %>% select(-all_of(cols_to_remove))
+  }
+  if (any(startsWith(colnames(newdata), c("FULL.", "FG.")))) {
+    cols_to_remove <- cols[startsWith(colnames(newdata), c("FULL.", "FG."))]
+    newdata <- newdata %>% select(-all_of(cols_to_remove))
+  }
+  if (any(endsWith(colnames(newdata), c("_add")))) {
+    cols_to_remove <- cols[endsWith(colnames(newdata), c("_add"))]
+    newdata <- newdata %>% select(-all_of(cols_to_remove))
+  }
   preds <- suppressWarnings(predict(object = model, newdata = newdata,
                                     stacked = F, ...))
   preds <- preds %>% mutate(across(everything(), function(x) ifelse(is.nan(x), 0, x)))
-  preds <- rowSums(preds[, -1])
+  preds <- if (ncol(preds) > 2) rowSums(preds[, -1]) else preds[, -1]
   return(preds)
 }
 

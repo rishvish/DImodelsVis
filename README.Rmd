@@ -120,7 +120,7 @@ head(my_data)
 ```
 
 ### Fit model with compositional data
-We fit different models with different interaction structures as described in [Moral et al 2023](https://doi.org/10.1111/2041-210X.14158). 
+We fit different models with different interaction structures as described in [Moral et al., 2023](https://doi.org/10.1111/2041-210X.14158). 
 ```{r}
 mod_ID <- DI(y = "yield", prop = 4:7, 
              DImodel = "ID", data = my_data)

@@ -521,7 +521,7 @@ simplex_path <- function(model, starts, ends, add_var = list(),
                               pie_colours = pie_colours, se = se,
                               pie_radius = pie_radius,
                               facet_var = facet_var,
-                              nrow = 0, ncol = 0)
+                              nrow = nrow, ncol = ncol)
     return(plot)
   } else {
     return(plot_data)

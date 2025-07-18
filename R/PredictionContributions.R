@@ -7,7 +7,7 @@
 #' `\link{prediction_contributions_plot}` function to visualise the results.
 #'
 #' @importFrom stats coef formula model.matrix
-#' @importFrom dplyr bind_cols ends_with row_number
+#' @importFrom dplyr bind_cols ends_with row_number pull
 #' @importFrom rlang := abort try_fetch
 #'
 #' @inheritParams prediction_contributions
@@ -140,7 +140,7 @@ prediction_contributions_data <- function(data, model = NULL, coefficients = NUL
 
     # If bar labs is specified as a column then fetch values from data
     if(length(bar_labs) == 1){
-      bar_labs <- rlang::try_fetch(dplyr::select(data, bar_labs)[, 1],
+      bar_labs <- rlang::try_fetch(dplyr::pull(data, bar_labs),
                                    error = function(cnd)
                                    rlang::abort("The value specified in `bar_labs` is invalid.",
                                       parent = cnd))
@@ -152,7 +152,8 @@ prediction_contributions_data <- function(data, model = NULL, coefficients = NUL
 
   # Add bar labs
   data <- data %>%
-    mutate(".Community" = bar_labs)
+    mutate(".Community" = paste0("Community ", seq_along(bar_labs)),
+           ".x_labs" = bar_labs)
 
   # Add any experimental structures specified by user
   # Ensure experimental structure are specified correctly
@@ -183,7 +184,7 @@ prediction_contributions_data <- function(data, model = NULL, coefficients = NUL
   }
   # Branch here if regression coefficients are specified
   else if(!is.null(coefficients)){
-    coeff_data <- data %>% select(-.data$.Community)
+    coeff_data <- data %>% select(-.data$.Community, -.data$.x_labs)
     if(check_col_exists(coeff_data, ".add_str_ID")){
       coeff_data <- data %>% select(-.data$.add_str_ID)
     }
@@ -207,7 +208,7 @@ prediction_contributions_data <- function(data, model = NULL, coefficients = NUL
       cli::cli_abort(c("The number of columns in {.var data} should be the same as
                          the number of coefficients.",
                        "i" = "The were {length(coefficients)} coefficients
-                         while data had {ncol(data)} columns.",
+                         while data had {ncol(X_matrix)} columns.",
                        "i" = "Consider giving names to the coefficient vector
                          specified in {.var coefficients} corresponding to the
                          respective data columns or providing a selection of
@@ -234,6 +235,7 @@ prediction_contributions_data <- function(data, model = NULL, coefficients = NUL
 
   # Add identifier for each row
   contr_data$.Community <- data$.Community
+  contr_data$.x_labs <- data$.x_labs
 
   # Check coefficients can be properly grouped if groups are specified
   check_coeff_groupings(coefficients, groups)
@@ -253,7 +255,7 @@ prediction_contributions_data <- function(data, model = NULL, coefficients = NUL
 
   # Name of the contributions prediction is split into
   contributions <- grouped_data %>%
-    select(-.data$.Community) %>%
+    select(-.data$.Community, -.data$.x_labs) %>%
     colnames()
 
   # If the data has an identifier for exp str then add that in and
@@ -425,7 +427,7 @@ prediction_contributions_plot <- function(data, colours = NULL, se = FALSE,
 #' @importFrom ggplot2 ggplot element_text aes geom_col labs geom_errorbar
 #'                     theme theme_bw facet_grid guides guide_legend coord_flip
 #'                     scale_fill_manual unit element_blank label_both
-#'                     scale_x_continuous
+#'                     scale_x_continuous scale_x_discrete
 #' @importFrom PieGlyph geom_pie_glyph
 #' @importFrom rlang !!! !! sym .data
 #' @importFrom stats predict
@@ -746,12 +748,21 @@ prediction_contributions_plot_internal <- function(data, colours = NULL,
 
   bar_orientation <- match.arg(bar_orientation)
 
+  # browser()
+  x_labs <- data %>%
+    group_by(.data$.Community) %>%
+    slice(1) %>%
+    ungroup() %>%
+    pull(.data$.x_labs) %>%
+    `names<-`(unique(data$.Community))
+
   plot <- ggplot(data, aes(x = .data$.Community, y = .data$.Value,
                            fill = fct_rev(fct_inorder(.data$.Contributions))))+
     geom_col(colour = "black")+
     theme_DI()+
     scale_fill_manual(values = rev(colours))+
     guides(fill = guide_legend(reverse = TRUE)) +
+    scale_x_discrete(labels = x_labs) +
     labs(y = 'Predicted Response',
          x = 'Community',
          fill = 'Contributions')
@@ -763,7 +774,8 @@ prediction_contributions_plot_internal <- function(data, colours = NULL,
 
     plot <- plot +
       geom_errorbar(aes(y = .data$.Pred,
-                        ymin = .data$.Lower, ymax = .data$.Upper),
+                        ymin = .data$.Lower,
+                        ymax = .data$.Upper),
                     colour = "black")
   }
 

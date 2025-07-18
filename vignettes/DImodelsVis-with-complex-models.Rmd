@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
 
 The `DImodelsVis` is very convenient to use with regression models fit using the [`DImodels`](https://cran.r-project.org/package=DImodels) R package. However, sometimes users could have more complicated models which couldn't be fit using [`DImodels`](https://cran.r-project.org/package=DImodels) or they would prefer to have more flexibility and control in customising the plot or the underlying data. 
 
-For these situations, each plotting function has a corresponding data preparation and plotting function. The data preparation functions have an _data suffix while the plotting functions have an _plot suffix. This document describes how to use the data preparation functions to construct (and customise) the underlying data, which can then be passed to the plotting function for visualising the results. 
+For these situations, each function has a corresponding data preparation and plotting function. The data preparation functions have an `_data` suffix while the plotting functions have an `_plot` suffix. This document describes how to use the data preparation functions to construct (and customise) the underlying data, which can then be passed to the plotting function for visualising the results. 
 
 ### Load libraries
 ```{r setup, message=FALSE, warning=FALSE}
