@@ -5,3 +5,11 @@ template:
     fig_width: 10
     fig_height: 8
 
+articles:
+  - title: "Use with `DImodelsMulti`"
+    contents:
+      - DImodelsVis-with-DImodelsMulti-models
+  - title: "Use with custom models"
+    contents:
+      - DImodelsVis-with-complex-models
+

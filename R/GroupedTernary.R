@@ -389,6 +389,11 @@ grouped_ternary_plot <- function(data,
                             output of {.help [{.fn {col_green(\"grouped_ternary_data\")}}](DImodelsVis::grouped_ternary_data)})."))
   }
 
+  # Check data for important columns
+  check_plot_data(data = data,
+                  cols_to_check = c(col_var, ".x", ".y"),
+                  calling_fun = "grouped_ternary")
+
   pl <- conditional_ternary_plot(data = data,
                                  col_var = col_var,
                                  nlevels = nlevels,
@@ -641,16 +646,16 @@ FG_sanity_checks <- function(prop, FG,
 
   if(is.null(values)){
     values <- get_FG_values(FG)
-    cli::cli_warn("The proportional split of species in the groups was not specified in {.var values},
-                  assuming an equal split for species in each group.")
+    cli::cli_warn("The proportional split of species in the groups was not specified in {.var values}.
+                  Assuming an equal split for species in each group.")
   } else {
     if(!is.numeric(values)){
-      cli::cli_abort(c("{.var values} should be a numeric vector with values between 0 and 1 specifying the proportion of each species within a function group.",
+      cli::cli_abort(c("{.var values} should be a numeric vector with values between 0 and 1 specifying the proportion of each species within a functional group.",
                        "i" = "{.var values} was specified as a {.cls {class(values)}} object."))
     }
 
     if(!all(between(values, 0, 1))){
-      cli::cli_abort(c("{.var values} should be a numeric vector with values between 0 and 1 specifying the proportion of each species within a function group.",
+      cli::cli_abort(c("{.var values} should be a numeric vector with values between 0 and 1 specifying the proportion of each species within a functional group.",
                        "i" = "{.var values} was specified with value{?s} {.val {as.character(values)}}."))
     }
 
@@ -664,7 +669,7 @@ FG_sanity_checks <- function(prop, FG,
     if(!all(sp_props_in_FG$bool)){
       faults <- sp_props_in_FG$sums[sp_props_in_FG$bool == F]
       cli::cli_abort(c("The species proportions within a functional group should sum to 1.",
-                       "i" = "The proportions for {names(faults)} equal {faults}. respectively."))
+                       "i" = "The sum of proportions specified in {.var values} corresponding to {.val {names(faults)}} sum to {faults}."))
     }
   }
 
@@ -729,7 +734,7 @@ FG_sanity_checks <- function(prop, FG,
 
   # Sanity checks for tern_vars
   if (!is.null(tern_vars) && !inherits(tern_vars, "character")){
-    cli::cli_abort("{.var tern_vars} should be a character vector of length 3,
+    cli::cli_abort("{.var tern_vars} should be a character vector of length 3
                    containing the names of the variables to be shown in the ternary.",
                    "i" = "{.var tern_vars} was specified as a
                           {.cls {tern_vars}}.")

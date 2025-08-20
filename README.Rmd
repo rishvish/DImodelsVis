@@ -13,15 +13,40 @@ knitr::opts_chunk$set(
   fig.height = 6,
   fig.path = "man/figures/README-"
 )
+
+library(knitr)
+
+# Hook to automatically detect the function used in the chunk and set alt text
+knit_hooks$set(plot = function(x, options) {
+  if (is.null(options$fig.alt)) {
+     # Combine the chunk code
+    code <- paste(options$code, collapse = "\n")
+    
+    # List of known functions
+    funs <- c("conditional_ternary", "grouped_ternary", "visualise_effects", "simplex_path", "gradient_change", "prediction_contributions", "model_diagnostics", "model_selection")
+    pattern <- paste(funs, collapse = "|")
+    
+    # Extract first matching function
+    matches <- regmatches(code, gregexpr(pattern, code))[[1]]
+    if (length(matches) > 0) {
+      options$fig.alt <- paste0("Output from ", matches[1], "() function")
+    } else {
+      options$fig.alt <- "Plot output"
+    }
+  }
+  knitr::hook_plot_md(x, options)
+  hook_plot_md(x, options)
+})
 ```
 
-# DImodelsVis <img src="man/figures/logo.png" align="right" height="139" />
+# DImodelsVis <img src="man/figures/logo.png" align="right" height="139" alt = "logo"/>
 
 
 <!-- badges: start -->
 [![CRAN status](https://www.r-pkg.org/badges/version/DImodelsVis)](https://CRAN.R-project.org/package=DImodelsVis)
 [![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 [![R-CMD-check](https://github.com/rishvish/DImodelsVis/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/rishvish/DImodelsVis/actions/workflows/R-CMD-check.yaml)
+[![Codecov test coverage](https://codecov.io/gh/rishvish/DImodelsVis/graph/badge.svg)](https://app.codecov.io/gh/rishvish/DImodelsVis)
 <!-- badges: end -->
 
 
@@ -44,11 +69,11 @@ devtools::install_github("rishvish/DImodelsVis")
 ## Details
 ### Introduction to Diversity-Interactions (DI) models:
 
-While sometimes it is of interest to model a compositional data response, there are times when the predictors of a response are compositional, rather than the response itself. Diversity-Interactions (DI) models ([Kirwan et al., 2009](https://doi.org/10.1890/08-1684.1), [Connolly et al., 2013](https://doi.org/10.1111/1365-2745.12052), [Moral et al., 2023](https://doi.org/10.1111/2041-210X.14158)) are a regression based modelling technique for analysing and interpreting data from biodiversity experiments that explore the effects of species diversity on the different outputs (called ecosystem functions) produced by an ecosystem. Traditional techniques for analysing diversity experiments quantify species diversity in terms of species richness (i.e., the number of species present in a community). The DI method builds on top of this richness approach by taking the relative abundances of the species within in the community into account, thus the predictors in the model are compositional in nature. The DI approach can differentiate among different species identities as well as between communities with same set of species but with different relative proportions, thereby enabling us to better capture the relationship between diversity and ecosystem functions within an ecosystem. The [`DImodels`](https://cran.r-project.org/package=DImodels) and [`DImodelsMulti`](https://cran.r-project.org/package=DImodelsMulti) R packages are available to aid the user in fitting these models. The `DImodelsVis` (DI models Visualisation) package is a complimentary package for visualising and interpreting the results from these models. However, the package is versatile and can be used with any standard statistical model object in R where the predictor space is compositional in nature.
+While sometimes it is of interest to model a compositional data response, there are times when the predictors of a response are compositional, rather than the response itself. Diversity-Interactions (DI) models ([Kirwan et al., 2009](<doi:10.1890/08-1684.1>), [Connolly et al., 2013](<doi:10.1111/1365-2745.12052>), [Moral et al., 2023](<doi:10.1111/2041-210X.14158>)) are a regression based modelling technique for analysing and interpreting data from biodiversity experiments that explore the effects of species diversity on the different outputs (called ecosystem functions) produced by an ecosystem. Traditional techniques for analysing diversity experiments quantify species diversity in terms of species richness (i.e., the number of species present in a community). The DI method builds on top of this richness approach by taking the relative abundances of the species within in the community into account, thus the predictors in the model are compositional in nature. The DI approach can differentiate among different species identities as well as between communities with same set of species but with different relative proportions, thereby enabling us to better capture the relationship between diversity and ecosystem functions within an ecosystem. The [`DImodels`](https://cran.r-project.org/package=DImodels) and [`DImodelsMulti`](https://cran.r-project.org/package=DImodelsMulti) R packages are available to aid the user in fitting these models. The `DImodelsVis` (DI models Visualisation) package is a complimentary package for visualising and interpreting the results from these models. However, the package is versatile and can be used with any standard statistical model object in R where the predictor space is compositional in nature.
 
 ### Package Map
 <div style="display: block; margin-left: auto; margin-right: auto;  width: 60%; max-width:75;">
-![](man/figures/DImodelsVis_workflow_package.png)
+![Package workflow](man/figures/DImodelsVisWorkflowPackage.png)
 </div>
 
 The functions in the package can be categorised as functions for visualising model selection and validation or functions to aid with model interpretation. Here is a list of important visualisation functions present in the package along with a short description.
@@ -112,7 +137,8 @@ library(DImodelsVis)
 ```
 
 ### Load data
-This dataset originates from a grassland biodiversity experiment conducted in Switzerland as part of the "Agrodiversity Experiment" [Kirwan et al 2014](https://doi.org/10.6084/m9.figshare.c.3307098.v1). In this study, 68 grassland plots consisting of 1 to 4 species were established across a gradient of species diversity. The proportions of four species were varied across the plots: there were plots with 100% of a single species (called the monoculture of a species), and 2- and 4-species mixtures with varying proportions (e.g., (0.5, 0.5, 0, 0) and (0.7, 0.1, 0.1, 0.1)). Nitrogen fertilizer (at 50 or 150 kg/ha/yr) and seeding density (low or high) treatments were also manipulated across the plots. The total annual yield per plot was recorded for the first year after establishment. The data is available in the [`DImodels`](https://cran.r-project.org/package=DImodels) R package. An analysis of the this dataset can be found in [Kirwan et al 2009](https://doi.org/10.1890/08-1684.1). For our example we only consider the plots that received the 150 kg nitrogen treatment. The four species proportions form our compositional predictors while the annual yield is our continuous response.
+
+This dataset originates from a grassland biodiversity experiment conducted in Switzerland as part of the "Agrodiversity Experiment" [Kirwan et al 2014](<doi:10.6084/m9.figshare.c.3307098.v1>). In this study, 68 grassland plots consisting of 1 to 4 species were established across a gradient of species diversity. The proportions of four species were varied across the plots: there were plots with 100% of a single species (called the monoculture of a species), and 2- and 4-species mixtures with varying proportions (e.g., (0.5, 0.5, 0, 0) and (0.7, 0.1, 0.1, 0.1)). Nitrogen fertilizer (at 50 or 150 kg/ha/yr) and seeding density (low or high) treatments were also manipulated across the plots. The total annual yield per plot was recorded for the first year after establishment. The data is available in the [`DImodels`](https://cran.r-project.org/package=DImodels) R package. An analysis of the this dataset can be found in [Kirwan et al., 2009](<doi:10.1890/08-1684.1>). For our example we only consider the plots that received the 150 kg nitrogen treatment. The four species proportions form our compositional predictors while the annual yield is our continuous response.
 ```{r}
 data(Switzerland)
 my_data <- Switzerland[Switzerland$nitrogen == 150, ]
@@ -120,7 +146,7 @@ head(my_data)
 ```
 
 ### Fit model with compositional data
-We fit different models with different interaction structures as described in [Moral et al., 2023](https://doi.org/10.1111/2041-210X.14158). 
+We fit different models with different interaction structures as described in [Moral et al., 2023](<doi:10.1111/2041-210X.14158>). 
 ```{r}
 mod_ID <- DI(y = "yield", prop = 4:7, 
              DImodel = "ID", data = my_data)
@@ -153,8 +179,10 @@ summary(mod_FG)
 ```
 
 #### Model diagnostics
+
 After choosing a model we can create diagnostics plot where the points are replaced by pie-glyphs showing the proportions of the compositional variables. 
 Run `?model_diagnostics` or see the associated [vignette](https://htmlpreview.github.io/?https://github.com/rishvish/DImodelsVis/blob/main/pkgdown/assets/coming_soon.html) for more information on customising the plot.
+
 ```{r model-diagnostics, fig.width = 8}
 model_diagnostics(model = mod_FG)
 ```
@@ -165,6 +193,7 @@ Replacing the points with pie-glyphs could help us to quickly identify any probl
 
 #### Predictor contributions to predicted response
 We visualise the predicted response for specific observations as a stacked bar-chart showing the contribution (predictor coefficient * predictor value) of each term in the model.
+
 ```{r prediction-contributions}
 prediction_contributions(model = mod_FG, 
                          data = my_data[c(1:5, 12:15),])

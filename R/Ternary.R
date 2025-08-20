@@ -145,13 +145,13 @@ ternary_data <- function(prop = c(".P1", ".P2", ".P3"),
                      for models with more than three compositonal predictors."))
   }
 
-  if(!isTRUE(all.equal(resolution, as.integer(resolution))) ||
-                                     !between(resolution, 1, 10)){
-    cli::cli_warn(c("{.var resolution} should be a whole number with values
-                    between 1 and 10",
+  if(!between(resolution, 0, 10)){
+    cli::cli_warn(c("{.var resolution} should be a number with values
+                    between 0 and 10",
                     "i" = "The value specified for {.var resolution} was
                           {as.character(resolution)}.",
                     "i" = "Reverting back to the default value of 3."))
+    resolution <- 3
   }
 
   # Column variables containing the projections
@@ -501,16 +501,17 @@ ternary_plot_internal <- function(data, prop,
                     and create the plot but it might not always be possible.",
                           "i" = "To avoid this, consider using the
                     {.help [{.fun copy_attributes}](DImodelsVis::copy_attributes)}
-                    function to ensure the specified data has the necessary attributes
-                    after performing any data manipulation."))
+                    function on the data after performing any data manipulation operation
+                          to ensure the it has the necessary attributes."))
         } else {
-          cli::cli_abort(c("x" = "Certain attributes of the data which are needed to prepare
-                    the plot are missing. This could happen if any data manipulation
+          cli::cli_abort(c("x" = "Certain attributes of the data which are needed for plotting
+                    the response contours are missing. This could happen if any data manipulation
                     performed by the user messes up the {.cls data.frame} attributes.",
-                          "i" = "Use the
+                          "i" = "If you intended to plot raw points set the {.var show} argument to {.val points}",
+                          "i" = "If you indeed wish to plot contours, use the
                     {.help [{.fun copy_attributes}](DImodelsVis::copy_attributes)}
-                    function to ensure the specified data has the necessary attributes
-                    after performing any data manipulation."))
+                    function on the data after performing any data manipulation operation
+                          to ensure the it has the necessary attributes."))
         }
 
       }
@@ -569,6 +570,7 @@ ternary_plot_internal <- function(data, prop,
         cli::cli_warn(c("More than three labels were specified for the ternary
                         diagram. The first three labels in {.var tern_labels}
                         will be chosen"))
+        tern_labels <- tern_labels[1:3]
       } else {
         cli::cli_abort(c("Three labels are needed for the ternary, only
                          {length(tern_labels)} were specified."))
@@ -671,11 +673,13 @@ ternary_plot_internal <- function(data, prop,
     pl <- pl +
       geom_text(data = tibble(x = c(0.5, 0, 1), y = c(sqrt(3)/2, 0,  0),
                               label = tern_labels,
-                              !! col_var := 0),
+                              !! col_var := 0) %>%
+                  mutate(nudge_x = c(0, -0.05, 0.05),
+                         nudge_y = c(0.05, 0, 0)) %>%
+                  mutate(x = .data$x + .data$nudge_x,
+                         y = .data$y + .data$nudge_y),
                 aes(x= .data$x, y= .data$y, label = .data$label),
-                size = vertex_label_size, fontface='plain',
-                nudge_x = c(0, -0.05, 0.05),
-                nudge_y = c(0.05, 0, 0))+
+                size = vertex_label_size, fontface='plain')+
       geom_segment(data = tibble(x = c(0, 0, 1), y = c(0,0,0),
                                  xend = c(1, 0.5, 0.5),
                                  yend = c(0, sqrt(3)/2, sqrt(3)/2),

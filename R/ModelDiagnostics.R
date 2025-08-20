@@ -172,11 +172,11 @@ model_diagnostics <- function(model, which = c(1,2,3,5), prop = NULL, FG = NULL,
                    "i" = "Only {.val Residual vs Fitted} ({.var which} = 1) and
                          {.val Normal QQ plot} ({.var which} = 2)
                           can be created for this object.")
-      if(length(which) > 0){
+      # if(length(which) > 0){
         cli::cli_warn(message)
-      } else {
-        cli::cli_abort(message)
-      }
+      # } else {
+      #   cli::cli_abort(message)
+      # }
     }
   }
 
@@ -275,7 +275,7 @@ model_diagnostics <- function(model, which = c(1,2,3,5), prop = NULL, FG = NULL,
       cli::cli_abort(c("The number of {.var colours} specified should be
                        same as the number of columns specified in {.var prop}.",
                        "i" = "There are {length(model_species)} in {.var prop}
-                              but only {length(colours)} colour{?s}
+                              but only {length(pie_colours)} colour{?s}
                               {?was/were} specified."))
     }
     colours <- pie_colours
@@ -488,11 +488,11 @@ model_diagnostics_plot <- function(data, which = c(1,2,3,5), prop = NULL, FG = N
                    "i" = "Only {.val Residual vs Fitted} ({.var which} = 1) and
                          {.val Normal QQ plot} ({.var which} = 2)
                           can be created for this object.")
-      if(length(which) > 0){
-        cli::cli_warn(message)
-      } else {
-        cli::cli_abort(message)
-      }
+      # if(length(which) > 0){
+      cli::cli_warn(message)
+      # } else {
+      #   cli::cli_abort(message)
+      # }
     }
   }
 
@@ -570,7 +570,7 @@ model_diagnostics_plot <- function(data, which = c(1,2,3,5), prop = NULL, FG = N
       cli::cli_abort(c("The number of {.var colours} specified should be
                        same as the number of columns specified in {.var prop}.",
                        "i" = "There are {length(model_species)} in {.var prop}
-                              but only {length(colours)} colour{?s}
+                              but only {length(pie_colours)} colour{?s}
                               {?was/were} specified."))
     }
     colours <- pie_colours
@@ -891,10 +891,10 @@ model_diagnostics_plot <- function(data, which = c(1,2,3,5), prop = NULL, FG = N
       xlab(str2expression("Leverage~h[ii]"))+
       ylab("Cook's Distance")+
       xlim(c(0, NA))+
-      scale_y_continuous(expand = expansion(mult = c(0.05, 0.1)),
-                         sec.axis = sec_axis(~ ., name = "",
-                                             breaks = abline_data$yi,
-                                             labels = abline_data$label))+
+      scale_y_continuous(expand = expansion(mult = c(0.05, 0.1)))+
+                         # sec.axis = sec_axis(~ ., name = "",
+                         #                     breaks = abline_data$yi,
+                         #                     labels = abline_data$label))+
       ggtitle(expression("Cook's dist vs Leverage* " * h[ii]/(1 - h[ii])))+
       theme(axis.text.y.right = element_text(colour = "black", size = 12),
             axis.ticks.y.right = element_blank())

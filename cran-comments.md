@@ -1,3 +1,35 @@
+## Submission v1.0.2
+
+- This is an update to the package which fixes bugs and add units tests.
+
+## Test environments
+
+I checked that the package builds successfully on the following systems without any errors or warnings.
+
+- local Windows install, R 4.3.2
+- win-builder (devel and release)
+- macOS builder
+- rhub platforms
+  - debian-clang-devel (Debian Linux, R-devel, clang, ISO-8859-15 locale)
+  - debian-gcc-devel (Debian Linux, R-devel, GCC)
+  - debian-gcc-patched (Debian Linux, R-patched, GCC)
+  - debian-gcc-release (Debian Linux, R-release, GCC)
+  - fedora-clang-devel (Fedora Linux, R-devel, clang, gfortran)
+  - fedora-gcc-devel (Fedora Linux, R-devel, GCC)
+  - ubuntu-gcc-devel (Ubuntu Linux 20.04.1 LTS, R-devel, GCC)
+  - ubuntu-gcc-release (Ubuntu Linux 20.04.1 LTS, R-release, GCC)
+  - windows-x86_64-devel (Windows Server 2022, R-devel, 64 bit)
+  - windows-x86_64-oldrel (Windows Server 2022, R-oldrel, 32/64 bit)
+  - windows-x86_64-patched (Windows Server 2022, R-patched, 32/64 bit)
+  - windows-x86_64-release (Windows Server 2022, R-release, 32/64 bit)
+
+## R CMD check results
+
+There were no ERRORS or WARNINGS when building the package on my local machine. I encountered the following two notes.
+
+
+--------------------------------------------------------------------------------
+
 ## Submission v1.0.1
 - I got an email stating that the package vignettes failed to rebuild for Fedora OS systems and to resubmit before 5th March 2023. I have fixed the bug causing this issue and have checked that package builds successfully now across different operating systems.
 
