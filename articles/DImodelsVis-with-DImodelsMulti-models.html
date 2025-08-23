@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">DImodelsVis</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -107,7 +107,7 @@ R package and an analysis of the this dataset can be found in <a href="https://d
 </h3>
 <p>We fit the average pairwise Diversity-Interactions model to all three
 ecosystem functions in the <code>Belgium</code> dataset using the
-<code><a href="https://rdrr.io/pkg/DImodelsMulti/man/DImulti.html" class="external-link">DImulti()</a></code> function from the <code>DImodelsMulti</code>
+<code><a href="https://di-laurabyrne.github.io/DImodelsMulti/reference/DImulti.html" class="external-link">DImulti()</a></code> function from the <code>DImodelsMulti</code>
 package. The main benefit of fitting a single model for all responses is
 that it allows us to capture covariances between the ecosystem
 functions.</p>
@@ -119,7 +119,7 @@ functions.</p>
 <span><span class="co"># Colours to be used for pie-glyphs for all figures</span></span>
 <span><span class="va">pie_cols</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_colours.html">get_colours</a></span><span class="op">(</span>vars <span class="op">=</span> <span class="va">species</span>, FG <span class="op">=</span> <span class="va">FG</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/DImodelsMulti/man/DImulti.html" class="external-link">DImulti</a></span><span class="op">(</span>prop <span class="op">=</span> <span class="va">species</span>, FG <span class="op">=</span> <span class="va">FG</span>, y <span class="op">=</span> <span class="st">"Y"</span>, </span>
+<span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://di-laurabyrne.github.io/DImodelsMulti/reference/DImulti.html" class="external-link">DImulti</a></span><span class="op">(</span>prop <span class="op">=</span> <span class="va">species</span>, FG <span class="op">=</span> <span class="va">FG</span>, y <span class="op">=</span> <span class="st">"Y"</span>, </span>
 <span>                 eco_func <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Var"</span>, <span class="st">"un"</span><span class="op">)</span>,</span>
 <span>                 unit_IDs <span class="op">=</span> <span class="st">"Plot"</span>, DImodel <span class="op">=</span> <span class="st">"AV"</span>,</span>
 <span>                 method <span class="op">=</span> <span class="st">"REML"</span>, data <span class="op">=</span> <span class="va">dataBEL</span><span class="op">)</span></span></code></pre></div>
