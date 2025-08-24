@@ -1,3 +1,23 @@
+## Submission v1.0.3
+
+- My sincerest apologies for submitting an update within such a short time period. But this update is necessary to ensure the package is compatible with upcoming ggplot v4.0.0 and has no rev dep failures, so that ggplot2 can be pushed to CRAN as soon as possible.
+
+## Test environments
+
+I checked that the package builds successfully on the following systems without any errors or warnings.
+
+- local Windows install, R 4.4.1
+- win-builder (devel and release)
+- macOS builder
+- rhub platforms
+  - debian
+  - linux
+  - ubuntu
+
+## R CMD check results
+
+There were no ERRORS or WARNINGS when building the package on my local machine. There were no new notes either.
+
 ## Submission v1.0.2
 
 - This is an update to the package which fixes bugs and add units tests.
