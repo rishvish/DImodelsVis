@@ -41,7 +41,7 @@ knit_hooks$set(plot = function(x, options) {
 
 ```
 
-### Loading necessary libraries
+### Loading necessary packages
 
 ```{r setup}
 library(DImodels)

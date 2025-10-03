@@ -2,9 +2,12 @@
 % Please edit documentation in R/utilities.R
 \name{add_ID_terms}
 \alias{add_ID_terms}
-\title{Add identity effect groups used in a Diversity-Interactions (DI) model to new data}
+\alias{add_interaction_terms}
+\title{Add identity and interaction terms used in a Diversity-Interactions (DI) model to new data}
 \usage{
 add_ID_terms(data, model)
+
+add_interaction_terms(data, model)
 }
 \arguments{
 \item{data}{A data-frame with species proportions that sum to 1 to
@@ -17,13 +20,13 @@ or \code{\link[DImodelsMulti:DImulti]{DImulti()}} from the
 \code{\link[DImodelsMulti:DImodelsMulti]{DImodelsMulti}} R packages.}
 }
 \value{
-A data-frame with additional columns appended to the end that contain
-the grouped species proportions.
+The original data-frame with additional columns appended at the end
+describing the identity and interactions terms present in the model object.
 }
 \description{
-Utility function that accepts a fitted Diversity-Interactions (DI) model
-object along with a data frame and adds the appropriate species identity
-effect groupings to the data for making predictions.
+Utility functions that accept a fitted Diversity-Interactions (DI) model
+object along with a data frame and adds the necessary identity and interaction structures to
+the data for making predictions using the model object specified in \code{`model`}.
 }
 \examples{
 library(DImodels)
@@ -46,4 +49,22 @@ print(head(newdata))
 add_ID_terms(data = newdata, model = mod1)
 add_ID_terms(data = newdata, model = mod2)
 add_ID_terms(data = newdata, model = mod3)
+library(DImodels)
+data(sim1)
+
+# Fit different DI models
+mod1 <- DI(y = "response", prop = 3:6, data = sim1, DImodel = "AV")
+mod2 <- DI(y = "response", prop = 3:6, data = sim1, DImodel = "FULL")
+mod3 <- DI(y = "response", prop = 3:6, data = sim1, DImodel = "ADD")
+mod4 <- DI(y = "response", prop = 3:6, data = sim1,
+           FG = c("G", "G", "H", "H"), DImodel = "FG")
+
+# Create new data for adding interaction terms
+newdata <- sim1[sim1$block == 1, 3:6]
+print(head(newdata))
+
+add_interaction_terms(data = newdata, model = mod1)
+add_interaction_terms(data = newdata, model = mod2)
+add_interaction_terms(data = newdata, model = mod3)
+add_interaction_terms(data = newdata, model = mod4)
 }

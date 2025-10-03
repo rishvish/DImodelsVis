@@ -6,10 +6,16 @@ template:
     fig_height: 8
 
 articles:
-  - title: "Use with `DImodelsMulti`"
+  - title: "Use with `DImodels`"
     contents:
-      - DImodelsVis-with-DImodelsMulti-models
+      - articles/DImodelsVis-with-DImodels-objects
   - title: "Use with custom models"
     contents:
       - DImodelsVis-with-complex-models
+  - title: "Use with `DImodelsMulti`"
+    contents:
+      - DImodelsVis-with-DImodelsMulti-models
+  - title: "Use with black-box models"
+    contents:
+      - DImodelsVis-with-black-box-models
 
