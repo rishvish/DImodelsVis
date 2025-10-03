@@ -15,7 +15,7 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       # Skip vdiff tests on github actions
-      VDIFFR_RUN_TESTS: false
+      VDIFFR_RUN_TESTS: true
 
     steps:
       - uses: actions/checkout@v4
