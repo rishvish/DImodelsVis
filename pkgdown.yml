@@ -2,9 +2,11 @@ pandoc: 3.1.11
 pkgdown: 2.1.3
 pkgdown_sha: ~
 articles:
+  DImodelsVis-with-black-box-models: DImodelsVis-with-black-box-models.html
   DImodelsVis-with-complex-models: DImodelsVis-with-complex-models.html
+  articles/DImodelsVis-with-DImodels-objects: DImodelsVis-with-DImodels-objects.html
   DImodelsVis-with-DImodelsMulti-models: DImodelsVis-with-DImodelsMulti-models.html
-last_built: 2025-08-24T08:29Z
+last_built: 2025-10-03T17:42Z
 urls:
   reference: https://rishvish.github.io/DImodelsVis/reference
   article: https://rishvish.github.io/DImodelsVis/articles

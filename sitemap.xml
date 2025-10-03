@@ -1,18 +1,19 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>https://rishvish.github.io/DImodelsVis/404.html</loc></url>
 <url><loc>https://rishvish.github.io/DImodelsVis/LICENSE.html</loc></url>
+<url><loc>https://rishvish.github.io/DImodelsVis/articles/DImodelsVis-with-DImodels-objects.html</loc></url>
 <url><loc>https://rishvish.github.io/DImodelsVis/articles/DImodelsVis-with-DImodelsMulti-models.html</loc></url>
+<url><loc>https://rishvish.github.io/DImodelsVis/articles/DImodelsVis-with-black-box-models.html</loc></url>
 <url><loc>https://rishvish.github.io/DImodelsVis/articles/DImodelsVis-with-complex-models.html</loc></url>
 <url><loc>https://rishvish.github.io/DImodelsVis/articles/index.html</loc></url>
 <url><loc>https://rishvish.github.io/DImodelsVis/authors.html</loc></url>
 <url><loc>https://rishvish.github.io/DImodelsVis/coming_soon.html</loc></url>
 <url><loc>https://rishvish.github.io/DImodelsVis/index.html</loc></url>
 <url><loc>https://rishvish.github.io/DImodelsVis/news/index.html</loc></url>
+<url><loc>https://rishvish.github.io/DImodelsVis/reference/DI_ID_and_ints.html</loc></url>
 <url><loc>https://rishvish.github.io/DImodelsVis/reference/DImodelsVis-package.html</loc></url>
 <url><loc>https://rishvish.github.io/DImodelsVis/reference/Simplex_projection.html</loc></url>
-<url><loc>https://rishvish.github.io/DImodelsVis/reference/add_ID_terms.html</loc></url>
 <url><loc>https://rishvish.github.io/DImodelsVis/reference/add_add_var.html</loc></url>
-<url><loc>https://rishvish.github.io/DImodelsVis/reference/add_interaction_terms.html</loc></url>
 <url><loc>https://rishvish.github.io/DImodelsVis/reference/add_prediction.html</loc></url>
 <url><loc>https://rishvish.github.io/DImodelsVis/reference/conditional_ternary.html</loc></url>
 <url><loc>https://rishvish.github.io/DImodelsVis/reference/conditional_ternary_data.html</loc></url>

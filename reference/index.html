@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">DImodelsVis</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -43,46 +43,40 @@
 
       <dl><dt>
 
+          <code><a href="DI_ID_and_ints.html">add_ID_terms()</a></code> <code><a href="DI_ID_and_ints.html">add_interaction_terms()</a></code>
+
+        </dt>
+        <dd>Add identity and interaction terms used in a Diversity-Interactions (DI) model to new data</dd>
+      </dl><dl><dt>
+
           <code><a href="Simplex_projection.html">prop_to_tern_proj()</a></code> <code><a href="Simplex_projection.html">tern_to_prop_proj()</a></code>
 
         </dt>
         <dd>Project 3-d compositional data onto x-y plane and vice versa</dd>
       </dl><dl><dt>
 
-          <code><a href="add_ID_terms.html">add_ID_terms()</a></code>
-
-        </dt>
-        <dd>Add identity effect groups used in a Diversity-Interactions (DI) model to new data</dd>
-      </dl><dl><dt>
-
           <code><a href="add_add_var.html">add_add_var()</a></code>
 
         </dt>
-        <dd>Add additional variables to the data</dd>
-      </dl><dl><dt>
-
-          <code><a href="add_interaction_terms.html">add_interaction_terms()</a></code>
-
-        </dt>
-        <dd>Add interaction terms used in a Diversity-Interactions (DI) model to new data</dd>
+        <dd>Add additional variables to data via cartesian product</dd>
       </dl><dl><dt>
 
           <code><a href="add_prediction.html">add_prediction()</a></code>
 
         </dt>
-        <dd>Add predictions and confidence interval to data using either a model object or model coefficients.</dd>
+        <dd>Add predictions and uncertainty interval to data using either a model object or model coefficients.</dd>
       </dl><dl><dt>
 
           <code><a href="conditional_ternary.html">conditional_ternary()</a></code>
 
         </dt>
-        <dd>Conditional ternary diagrams</dd>
+        <dd>DI specific wrapper for conditional ternary diagrams</dd>
       </dl><dl><dt>
 
           <code><a href="conditional_ternary_data.html">conditional_ternary_data()</a></code>
 
         </dt>
-        <dd>Conditional ternary diagrams</dd>
+        <dd>Data preparation for conditional ternary diagrams</dd>
       </dl><dl><dt>
 
           <code><a href="conditional_ternary_plot.html">conditional_ternary_plot()</a></code>
@@ -124,19 +118,19 @@
           <code><a href="gradient_change.html">gradient_change()</a></code>
 
         </dt>
-        <dd>Visualise change in (predicted) response over diversity gradient</dd>
+        <dd>DI specific wrapper for visualising change in response over diversity gradient</dd>
       </dl><dl><dt>
 
           <code><a href="gradient_change_data.html">gradient_change_data()</a></code>
 
         </dt>
-        <dd>Calculate change in predicted response over diversity gradient</dd>
+        <dd>Data preparation for visualising change in response over diversity gradient</dd>
       </dl><dl><dt>
 
           <code><a href="gradient_change_plot.html">gradient_change_plot()</a></code>
 
         </dt>
-        <dd>Visualise change in (predicted) response over diversity gradient</dd>
+        <dd>Visualise change in response over diversity gradient</dd>
       </dl><dl><dt>
 
           <code><a href="group_prop.html">group_prop()</a></code>
@@ -148,43 +142,43 @@
           <code><a href="grouped_ternary.html">grouped_ternary()</a></code>
 
         </dt>
-        <dd>Conditional ternary diagrams at functional group level</dd>
+        <dd>DI specific wrapper for grouped ternary diagrams</dd>
       </dl><dl><dt>
 
           <code><a href="grouped_ternary_data.html">grouped_ternary_data()</a></code>
 
         </dt>
-        <dd>Grouped ternary diagrams</dd>
+        <dd>Prepare data for grouped ternary diagrams</dd>
       </dl><dl><dt>
 
           <code><a href="grouped_ternary_plot.html">grouped_ternary_plot()</a></code>
 
         </dt>
-        <dd>Conditional ternary diagrams at functional group level</dd>
+        <dd>Grouped ternary diagrams</dd>
       </dl><dl><dt>
 
           <code><a href="model_diagnostics.html">model_diagnostics()</a></code>
 
         </dt>
-        <dd>Regression diagnostics plots with pie-glyphs</dd>
+        <dd>DI specific wrapper of diagnostics plots for regression models with compositional predictors</dd>
       </dl><dl><dt>
 
           <code><a href="model_diagnostics_data.html">model_diagnostics_data()</a></code>
 
         </dt>
-        <dd>Data preparation for regression diagnostics plots with pie-glyphs</dd>
+        <dd>Data preparation of diagnostics plots for regression models with compositional predictors</dd>
       </dl><dl><dt>
 
           <code><a href="model_diagnostics_plot.html">model_diagnostics_plot()</a></code>
 
         </dt>
-        <dd>Regression diagnostics plots with pie-glyphs</dd>
+        <dd>Diagnostics plots for regression models with compositional predictors</dd>
       </dl><dl><dt>
 
           <code><a href="model_selection.html">model_selection()</a></code>
 
         </dt>
-        <dd>Visualising model selection</dd>
+        <dd>DI specific wrapper for visualising model selection</dd>
       </dl><dl><dt>
 
           <code><a href="model_selection_data.html">model_selection_data()</a></code>
@@ -220,19 +214,19 @@
           <code><a href="simplex_path.html">simplex_path()</a></code>
 
         </dt>
-        <dd>Visualising the change in a response variable between two points in the simplex space</dd>
+        <dd>DI specific for visualising change in response across points in the simplex space</dd>
       </dl><dl><dt>
 
           <code><a href="simplex_path_data.html">simplex_path_data()</a></code>
 
         </dt>
-        <dd>Creating data for visualising the change in a response variable between two points in the simplex space</dd>
+        <dd>Prepare data for visualising change in response across points in the simplex space</dd>
       </dl><dl><dt>
 
           <code><a href="simplex_path_plot.html">simplex_path_plot()</a></code>
 
         </dt>
-        <dd>Visualising the change in a response variable between two points in the simplex space</dd>
+        <dd>Visualising change in response across points in the simplex space</dd>
       </dl><dl><dt>
 
           <code><a href="ternary_data.html">ternary_data()</a></code>
@@ -256,19 +250,19 @@
           <code><a href="visualise_effects.html">visualise_effects()</a></code>
 
         </dt>
-        <dd>Effects plot for compositional data</dd>
+        <dd>DI specific wrapper of effects plot for compositional variables</dd>
       </dl><dl><dt>
 
           <code><a href="visualise_effects_data.html">visualise_effects_data()</a></code>
 
         </dt>
-        <dd>Prepare data for effects plots for compositional data</dd>
+        <dd>Prepare data for effects plots of compositional predictors</dd>
       </dl><dl><dt>
 
           <code><a href="visualise_effects_plot.html">visualise_effects_plot()</a></code>
 
         </dt>
-        <dd>Effects plot for compositional data</dd>
+        <dd>Effects plot for compositional predictors</dd>
       </dl></div>
   </main></div>
 

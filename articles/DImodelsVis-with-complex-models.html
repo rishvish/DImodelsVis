@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">DImodelsVis</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -110,9 +110,9 @@ created with a regression model fit using <code>glm</code> but the exact
 same principles would apply for creating visualisations using any other
 regression modelling tool kit.</p>
 <div class="section level3">
-<h3 id="load-libraries">Load libraries<a class="anchor" aria-label="anchor" href="#load-libraries"></a>
+<h3 id="loading-necessary-packages">Loading necessary packages<a class="anchor" aria-label="anchor" href="#loading-necessary-packages"></a>
 </h3>
-<p>The following libraries will be used for data processing and
+<p>The following R packages will be used for data processing and
 generating visualisations.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dimodels.com/" class="external-link">DImodels</a></span><span class="op">)</span>     <span class="co"># For loading the dataset</span></span>
@@ -320,11 +320,10 @@ the results.</p>
 <h3 id="visualisations">Visualisations<a class="anchor" aria-label="anchor" href="#visualisations"></a>
 </h3>
 <p>The model object stored in <code>cust_model</code> will be used for
-creating all the visualisations shown in this section. We will follow
-the “Modular plotting” workflow shown on the right side in Figure 3 from
-the main manuscript where the data needed for each visualisation will be
-created first and modified as per our needs and then passed on to the
-respective plotting function to create the visualisation.</p>
+creating all the visualisations shown in this section. We will follow a
+modular plotting workflow where the data needed for each visualisation
+will be created first and modified as per our needs and then passed on
+to the respective plotting function to create the visualisation.</p>
 <p>We first define a common set of variables which will be used across
 the board for ease of use</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
@@ -344,9 +343,9 @@ to ensure there are no severe problems with the model assumptions.</p>
 <p>The data needed for creating the diagnostics plot is prepared using
 the <code><a href="../reference/model_diagnostics_data.html">model_diagnostics_data()</a></code> function. The primary
 difference here (and in all other functions) compared to using the
-“Direct plotting” functions (workflow on left site of Figure 3 in main
-manuscript) is that the names of the compositional predictors should to
-be specified in the <code>prop</code> parameter.</p>
+wrapper functions designed for use with <code>DImodels</code> objects is
+that the names of the compositional predictors should to be specified in
+the <code>prop</code> parameter.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">diag_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/model_diagnostics_data.html">model_diagnostics_data</a></span><span class="op">(</span></span>
 <span>  model <span class="op">=</span> <span class="va">cust_model</span>,  <span class="co"># Regression model object</span></span>
@@ -403,7 +402,7 @@ visualisation as follows.</p>
 <span>    pie_colours <span class="op">=</span> <span class="va">var_cols</span> <span class="co"># Colours for the pie-slices</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Created all plots.</span></span></code></pre></div>
-<p><img src="DImodelsVis-with-complex-models_files/figure-html/diag_plot-1.png" alt="Output from model_diagnostics() function" width="960"></p>
+<p><img src="DImodelsVis-with-complex-models_files/figure-html/diag_plot-1.png" alt="Output from model_diagnostics() function" width="960" style="display: block; margin: auto;"></p>
 <p><br></p>
 <p>It might be desirable to reduce over-plotting by showing only the
 extreme observations as pie-glyphs and rendering the remaining as
@@ -417,7 +416,7 @@ points. The <code>only_extremes</code> in conjunction with the
 <span>    only_extremes <span class="op">=</span> <span class="cn">TRUE</span>, <span class="co"># Show only extreme points as pie-glyphs</span></span>
 <span>    npoints <span class="op">=</span> <span class="fl">5</span><span class="op">)</span> <span class="co"># Show the five most extreme points as pie-glyphs (default is 3)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Created all plots.</span></span></code></pre></div>
-<p><img src="DImodelsVis-with-complex-models_files/figure-html/diag_plot2-1.png" alt="Output from model_diagnostics() function" width="960"></p>
+<p><img src="DImodelsVis-with-complex-models_files/figure-html/diag_plot2-1.png" alt="Output from model_diagnostics() function" width="960" style="display: block; margin: auto;"></p>
 <p>The “Residual vs Fitted” plot in the above figure indicates that the
 residuals are centered around the <code>y = 0</code> line and have a
 relatively constant variance across the board. The “QQ-Plot” indicates
@@ -450,7 +449,7 @@ shown below:</p>
 <span><span class="va">diag_plot</span> <span class="op">+</span> </span>
 <span>  <span class="co"># Manually add pie-glyphs using the subsetted data from above</span></span>
 <span>  <span class="fu"><a href="https://rishvish.github.io/PieGlyph/reference/geom_pie_glyph.html" class="external-link">geom_pie_glyph</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data_250</span>, slices <span class="op">=</span> <span class="va">species</span>, colour <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="DImodelsVis-with-complex-models_files/figure-html/diag_plot3-1.png" alt="Output from model_diagnostics() function" width="768"></p>
+<p><img src="DImodelsVis-with-complex-models_files/figure-html/diag_plot3-1.png" alt="Output from model_diagnostics() function" width="768" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level4">
 <h4 id="prediction-contributions">Prediction contributions<a class="anchor" aria-label="anchor" href="#prediction-contributions"></a>
@@ -603,7 +602,7 @@ informative.</p>
 <span>              <span class="co"># Colours for nitrogen treatment</span></span>
 <span>              <span class="fu"><a href="../reference/get_shades.html">get_shades</a></span><span class="op">(</span><span class="st">"#505050"</span>, shades <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Created plot.</span></span></code></pre></div>
-<p><img src="DImodelsVis-with-complex-models_files/figure-html/pred_cont1-1.png" alt="Output from prediction_contributions_plot() function" width="768"></p>
+<p><img src="DImodelsVis-with-complex-models_files/figure-html/pred_cont1-1.png" alt="Output from prediction_contributions_plot() function" width="768" style="display: block; margin: auto;"></p>
 <p>The above figure shows the G1 monoculture performs best among
 monocultures and has comparable performance to the six-species centroid
 mixture. Additionally, the within grass interaction (“wfg_G”) is
@@ -662,7 +661,7 @@ individual functional group level.</p>
 <span>              <span class="st">"#0072B2"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Created plot.</span></span>
 <span><span class="va">grouped_cont_plot</span></span></code></pre></div>
-<p><img src="DImodelsVis-with-complex-models_files/figure-html/pred_cont2-1.png" alt="Output from prediction_contributions_plot() function" width="768"></p>
+<p><img src="DImodelsVis-with-complex-models_files/figure-html/pred_cont2-1.png" alt="Output from prediction_contributions_plot() function" width="768" style="display: block; margin: auto;"></p>
 <p>Finally, the output visualisation can also be customised with
 additional annotations if desired. For example, if the user wishes to
 overlay a reference line on the plot for comparisons purposes and
@@ -675,7 +674,7 @@ The output visualisation with these aesthetic changes is shown below</p>
 <span>             colour <span class="op">=</span> <span class="st">"black"</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_grid.html" class="external-link">facet_grid</a></span><span class="op">(</span><span class="op">~</span><span class="va">richness</span>, labeller <span class="op">=</span> <span class="va">label_both</span>,</span>
 <span>             space <span class="op">=</span> <span class="st">"free_x"</span>, scale <span class="op">=</span> <span class="st">"free_x"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="DImodelsVis-with-complex-models_files/figure-html/pred_cont3-1.png" alt="Plot output" width="768"></p>
+<p><img src="DImodelsVis-with-complex-models_files/figure-html/pred_cont3-1.png" alt="Plot output" width="768" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level4">
 <h4 id="conditional-ternary-diagrams">Conditional ternary diagrams<a class="anchor" aria-label="anchor" href="#conditional-ternary-diagrams"></a>
@@ -923,14 +922,14 @@ same upper and lower limits across the two using the
 <span>                         lower_lim <span class="op">=</span> <span class="va">lwr_lim</span>,</span>
 <span>                         upper_lim <span class="op">=</span> <span class="va">upr_lim</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Created plot.</span></span></code></pre></div>
-<p><img src="DImodelsVis-with-complex-models_files/figure-html/cond_tern1-1.png" alt="Output from conditional_ternary_plot() function" width="672"></p>
+<p><img src="DImodelsVis-with-complex-models_files/figure-html/cond_tern1-1.png" alt="Output from conditional_ternary_plot() function" width="672" style="display: block; margin: auto;"></p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/conditional_ternary_plot.html">conditional_ternary_plot</a></span><span class="op">(</span><span class="va">cond_tern_template250</span>,</span>
 <span>                         contour_text <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>                         lower_lim <span class="op">=</span> <span class="va">lwr_lim</span>,</span>
 <span>                         upper_lim <span class="op">=</span> <span class="va">upr_lim</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Created plot.</span></span></code></pre></div>
-<p><img src="DImodelsVis-with-complex-models_files/figure-html/cond_tern2-1.png" alt="Output from conditional_ternary_plot() function" width="672"></p>
+<p><img src="DImodelsVis-with-complex-models_files/figure-html/cond_tern2-1.png" alt="Output from conditional_ternary_plot() function" width="672" style="display: block; margin: auto;"></p>
 <p>The contours appear to have the same structure across the two
 treatment levels, but the predicted yields are higher for the
 communities receiving 250 kg of N/ha/annum. Within a given level of the
@@ -1030,7 +1029,7 @@ using the <code><a href="https://ggplot2.tidyverse.org/reference/geom_point.html
 <span>             colour <span class="op">=</span> <span class="st">"#505050"</span>, shape <span class="op">=</span> <span class="fl">18</span>, size <span class="op">=</span> <span class="fl">4.5</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="co"># Reduce size of legend so they fit</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.key.width <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html" class="external-link">unit</a></span><span class="op">(</span><span class="fl">0.07</span>, <span class="st">"npc"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="DImodelsVis-with-complex-models_files/figure-html/group_tern-1.png" alt="Output from grouped_ternary_plot() function" width="768"></p>
+<p><img src="DImodelsVis-with-complex-models_files/figure-html/group_tern-1.png" alt="Output from grouped_ternary_plot() function" width="768" style="display: block; margin: auto;"></p>
 <p>The contours appear to have the same structure across the two
 treatment levels, but the predicted yields are higher for the
 communities receiving 250 kg of N/annum. Within a given level of the
@@ -1161,7 +1160,7 @@ as the <code><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="
 <span><span class="co">#&gt; Adding another scale for <span style="color: #00BB00;">y</span>, which will replace the existing scale.</span></span>
 <span><span class="co">#&gt; Scale for <span style="color: #00BB00;">y</span> is already present.</span></span>
 <span><span class="co">#&gt; Adding another scale for <span style="color: #00BB00;">y</span>, which will replace the existing scale.</span></span></code></pre></div>
-<p><img src="DImodelsVis-with-complex-models_files/figure-html/path-plot-1.png" alt="Output from simplex_path_plot() function" width="960"></p>
+<p><img src="DImodelsVis-with-complex-models_files/figure-html/path-plot-1.png" alt="Output from simplex_path_plot() function" width="960" style="display: block; margin: auto;"></p>
 <p>The predicted yield for every community is higher at the 250
 treatment level compared to the 150 level. At each level of treatment,
 compared to the centroid community the predicted yield increases as the
@@ -1255,7 +1254,7 @@ each compositional predictor.</p>
 <span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>y <span class="op">=</span> <span class="st">"Predicted yield"</span>, fill <span class="op">=</span> <span class="st">"Species"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Created plot.</span></span></code></pre></div>
-<p><img src="DImodelsVis-with-complex-models_files/figure-html/effect-plot-1.png" alt="Output from visualise_effects_plot() function" width="1152"></p>
+<p><img src="DImodelsVis-with-complex-models_files/figure-html/effect-plot-1.png" alt="Output from visualise_effects_plot() function" width="1152" style="display: block; margin: auto;"></p>
 <p>The average effect of increasing the proportion of each species
 follows a quadratic curve (solid black line). The average effect of
 increasing the sown proportion of G1 is stronger compared to the all
