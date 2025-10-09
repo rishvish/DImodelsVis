@@ -1,8 +1,8 @@
 ---
-title: "Using DImodelsVis with regression models not fit using the DImodels package"
+title: "DImodelsVis with regression models not fit using the DImodels package"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Using DImodelsVis with regression models not fit using the DImodels package}
+  %\VignetteIndexEntry{DImodelsVis with regression models not fit using the DImodels package}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

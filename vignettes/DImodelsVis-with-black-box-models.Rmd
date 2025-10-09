@@ -235,13 +235,12 @@ Increasing the proportion of sand lowers SOC, while increasing clay raises it. T
 
 We also show an example of using `DImodelsVis` with random forest models. The same pipeline as depicted above can be used with random forest models to create visualisations from `DImodelsVis`. 
 
-We first a random forest model using the proportions of sand, silt, and clay as well as their pairwise interactions as predictors.
+We first a random forest model using the proportions of sand, silt, and clay.
 
 ```{r, forest_model}
 
 forest_model <- randomForest(# Predictor for random forest model
-                             SOC ~ Sand + Silt + Clay + 
-                               Sand:Silt + Silt:Clay + Sand:Clay,
+                             SOC ~ Sand + Silt + Clay,
                              # Data
                              data = soil_data, 
                              # 5000 trees to be used random forest
@@ -269,7 +268,7 @@ ternary_data(# Names of compositional predictors
              model = forest_model,
              # Add predictions directly
              prediction = TRUE) %>% 
-  ternary_plot(lower_lim = 1.5,       # Lower limit of fill scale
+ternary_plot(lower_lim = 1.5,       # Lower limit of fill scale
              upper_lim = 9.5,       # Upper limit of fill scale
              nlevels = 8,           # Number of colours for fill scale
              # Labels for ternary axes
