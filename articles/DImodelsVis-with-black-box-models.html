@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">DImodelsVis</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3.9001</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -363,12 +363,11 @@ forest models. The same pipeline as depicted above can be used with
 random forest models to create visualisations from
 <code>DImodelsVis</code>.</p>
 <p>We first a random forest model using the proportions of sand, silt,
-and clay as well as their pairwise interactions as predictors.</p>
+and clay.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">forest_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/randomForest/man/randomForest.html" class="external-link">randomForest</a></span><span class="op">(</span><span class="co"># Predictor for random forest model</span></span>
-<span>                             <span class="va">SOC</span> <span class="op">~</span> <span class="va">Sand</span> <span class="op">+</span> <span class="va">Silt</span> <span class="op">+</span> <span class="va">Clay</span> <span class="op">+</span> </span>
-<span>                               <span class="va">Sand</span><span class="op">:</span><span class="va">Silt</span> <span class="op">+</span> <span class="va">Silt</span><span class="op">:</span><span class="va">Clay</span> <span class="op">+</span> <span class="va">Sand</span><span class="op">:</span><span class="va">Clay</span>,</span>
+<span>                             <span class="va">SOC</span> <span class="op">~</span> <span class="va">Sand</span> <span class="op">+</span> <span class="va">Silt</span> <span class="op">+</span> <span class="va">Clay</span>,</span>
 <span>                             <span class="co"># Data</span></span>
 <span>                             data <span class="op">=</span> <span class="va">soil_data</span>, </span>
 <span>                             <span class="co"># 5000 trees to be used random forest</span></span>
@@ -376,7 +375,7 @@ and clay as well as their pairwise interactions as predictors.</p>
 <span><span class="va">forest_model</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Call:</span></span>
-<span><span class="co">#&gt;  randomForest(formula = SOC ~ Sand + Silt + Clay + Sand:Silt +      Silt:Clay + Sand:Clay, data = soil_data, ntree = 5000) </span></span>
+<span><span class="co">#&gt;  randomForest(formula = SOC ~ Sand + Silt + Clay, data = soil_data,      ntree = 5000) </span></span>
 <span><span class="co">#&gt;                Type of random forest: regression</span></span>
 <span><span class="co">#&gt;                      Number of trees: 5000</span></span>
 <span><span class="co">#&gt; No. of variables tried at each split: 1</span></span>
@@ -411,7 +410,7 @@ defaults.</p>
 <span>             model <span class="op">=</span> <span class="va">forest_model</span>,</span>
 <span>             <span class="co"># Add predictions directly</span></span>
 <span>             prediction <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="../reference/ternary_plot.html">ternary_plot</a></span><span class="op">(</span>lower_lim <span class="op">=</span> <span class="fl">1.5</span>,       <span class="co"># Lower limit of fill scale</span></span>
+<span><span class="fu"><a href="../reference/ternary_plot.html">ternary_plot</a></span><span class="op">(</span>lower_lim <span class="op">=</span> <span class="fl">1.5</span>,       <span class="co"># Lower limit of fill scale</span></span>
 <span>             upper_lim <span class="op">=</span> <span class="fl">9.5</span>,       <span class="co"># Upper limit of fill scale</span></span>
 <span>             nlevels <span class="op">=</span> <span class="fl">8</span>,           <span class="co"># Number of colours for fill scale</span></span>
 <span>             <span class="co"># Labels for ternary axes</span></span>
