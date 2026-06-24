@@ -43,12 +43,6 @@
 <polyline points='188.06,465.82 186.44,465.20 181.93,463.28 177.82,461.32 177.42,461.13 172.91,458.75 169.58,456.83 168.41,456.14 163.90,453.29 162.49,452.33 159.39,450.20 156.21,447.84 154.88,446.85 150.49,443.34 ' style='stroke-width: 1.07; stroke-linecap: butt;' />
 <polyline points='438.89,226.61 437.94,227.62 434.38,231.38 433.67,232.11 429.88,236.06 429.34,236.61 425.37,240.66 424.93,241.10 420.86,245.19 420.44,245.60 416.35,249.63 415.88,250.09 411.84,253.99 411.22,254.58 407.33,258.27 406.46,259.08 402.83,262.46 401.60,263.57 398.32,266.57 396.62,268.07 393.81,270.58 391.53,272.56 389.30,274.50 386.29,277.06 384.79,278.33 380.91,281.55 380.29,282.07 375.78,285.71 375.35,286.04 371.27,289.25 369.57,290.54 366.76,292.69 363.59,295.03 362.25,296.03 357.75,299.27 357.37,299.53 353.24,302.40 350.81,304.02 348.73,305.42 344.22,308.33 343.92,308.52 339.71,311.13 336.55,313.01 335.21,313.82 330.70,316.39 328.63,317.50 326.19,318.84 321.68,321.17 319.97,322.00 317.17,323.37 312.67,325.45 310.25,326.49 308.16,327.40 303.65,329.22 299.14,330.91 298.90,330.99 294.63,332.46 290.12,333.87 285.62,335.14 284.22,335.48 281.11,336.26 276.60,337.24 272.09,338.06 267.58,338.73 263.08,339.25 258.57,339.60 254.06,339.79 249.55,339.82 245.04,339.67 240.54,339.36 236.03,338.86 231.52,338.19 227.01,337.33 222.50,336.28 219.60,335.48 218.00,335.04 ' style='stroke-width: 1.07; stroke-linecap: butt;' />
 <polyline points='285.62,213.98 290.12,213.50 294.63,212.86 299.14,212.08 303.65,211.15 308.16,210.09 309.81,209.64 312.67,208.88 317.17,207.55 321.68,206.08 324.30,205.15 326.19,204.48 330.70,202.75 335.21,200.90 335.77,200.65 339.71,198.93 344.22,196.83 345.59,196.16 348.73,194.62 353.24,192.29 354.39,191.67 357.75,189.85 362.25,187.29 362.46,187.17 366.76,184.63 369.93,182.68 371.27,181.86 375.78,178.98 376.98,178.18 380.29,176.00 383.65,173.69 384.79,172.91 389.30,169.73 390.03,169.19 393.81,166.44 396.13,164.70 398.32,163.06 402.02,160.21 402.83,159.59 ' style='stroke-width: 1.07; stroke-linecap: butt;' />
-<text x='360.00' y='61.89' text-anchor='middle' style='font-size: 14.23px; font-family: sans;' textLength='15.81px' lengthAdjust='spacingAndGlyphs'>Gr</text>
-<text x='114.53' y='470.71' text-anchor='middle' style='font-size: 14.23px; font-family: sans;' textLength='15.83px' lengthAdjust='spacingAndGlyphs'>Le</text>
-<text x='605.47' y='470.71' text-anchor='middle' style='font-size: 14.23px; font-family: sans;' textLength='18.19px' lengthAdjust='spacingAndGlyphs'>He</text>
-<line x1='136.85' y1='465.82' x2='583.15' y2='465.82' style='stroke-width: 2.13; stroke-linecap: butt;' />
-<line x1='136.85' y1='465.82' x2='360.00' y2='79.31' style='stroke-width: 2.13; stroke-linecap: butt;' />
-<line x1='583.15' y1='465.82' x2='360.00' y2='79.31' style='stroke-width: 2.13; stroke-linecap: butt;' />
 <text x='226.11' y='494.28' text-anchor='middle' style='font-size: 11.38px; font-family: sans;' textLength='15.82px' lengthAdjust='spacingAndGlyphs'>0.2</text>
 <text x='315.37' y='494.28' text-anchor='middle' style='font-size: 11.38px; font-family: sans;' textLength='15.82px' lengthAdjust='spacingAndGlyphs'>0.4</text>
 <text x='404.63' y='494.28' text-anchor='middle' style='font-size: 11.38px; font-family: sans;' textLength='15.82px' lengthAdjust='spacingAndGlyphs'>0.6</text>
@@ -61,6 +55,12 @@
 <text x='473.81' y='213.28' text-anchor='middle' style='font-size: 11.38px; font-family: sans;' textLength='15.82px' lengthAdjust='spacingAndGlyphs'>0.6</text>
 <text x='518.44' y='290.58' text-anchor='middle' style='font-size: 11.38px; font-family: sans;' textLength='15.82px' lengthAdjust='spacingAndGlyphs'>0.4</text>
 <text x='563.07' y='367.88' text-anchor='middle' style='font-size: 11.38px; font-family: sans;' textLength='15.82px' lengthAdjust='spacingAndGlyphs'>0.2</text>
+<text x='360.00' y='61.89' text-anchor='middle' style='font-size: 14.23px; font-family: sans;' textLength='15.81px' lengthAdjust='spacingAndGlyphs'>Gr</text>
+<text x='114.53' y='470.71' text-anchor='middle' style='font-size: 14.23px; font-family: sans;' textLength='15.83px' lengthAdjust='spacingAndGlyphs'>Le</text>
+<text x='605.47' y='470.71' text-anchor='middle' style='font-size: 14.23px; font-family: sans;' textLength='18.19px' lengthAdjust='spacingAndGlyphs'>He</text>
+<line x1='136.85' y1='465.82' x2='583.15' y2='465.82' style='stroke-width: 2.13; stroke-linecap: butt;' />
+<line x1='136.85' y1='465.82' x2='360.00' y2='79.31' style='stroke-width: 2.13; stroke-linecap: butt;' />
+<line x1='583.15' y1='465.82' x2='360.00' y2='79.31' style='stroke-width: 2.13; stroke-linecap: butt;' />
 </g>
 <g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
 <text x='146.13' y='532.20' style='font-size: 14.00px; font-family: sans;' textLength='62.26px' lengthAdjust='spacingAndGlyphs'>Prediction</text>

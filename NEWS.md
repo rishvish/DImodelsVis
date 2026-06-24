@@ -1,3 +1,9 @@
+# DImodelsVis 1.0.5
+
+* Ternary plots now also work with model containing log-transformed (for example, alr, clr, and ilr) compositional predictors.
+* Conditional ternary plots now have a `scale_ternaries` argument which, when set to TRUE, allows conditional ternaries to be scaled according to the size of the corresponding slice within the original simplex.
+* Some other bug minor bug fixes.
+
 # DImodelsVis 1.0.4
 
 * Added new vignettes showcasing how to use `DImodelsVis` with different models such as random-forests, neural networks, nlme, etc.

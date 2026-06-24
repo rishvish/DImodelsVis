@@ -27,6 +27,7 @@ test_that("Grouped ternary works as expected", {
                                             add_var = list("treatment" = c(50)),
                                             nrow = 2) %>% suppressMessages() %>% suppressWarnings())
 
+
   # Function also works with single FG in any group with manual splits
   expect_doppelganger(title = "GT manual split, single species in FG",
                       fig =   grouped_ternary(model = mod,
@@ -42,6 +43,15 @@ test_that("Grouped ternary works as expected", {
                                             values = c(1, 1, 0.5,0.5, 0.75, 0.25),
                                             add_var = list("treatment" = c(50)),
                                             resolution = 0.5) %>% suppressMessages() %>%
+                        suppressWarnings())
+
+  # Ensure scale_ternaries works as intended
+  expect_doppelganger(title = "GT with scale ternaries",
+                      fig = grouped_ternary(model = mod,
+                                            FG = c("G1", "G2", "L", "L", "H", "H"),
+                                            values = c(1, 1, 0.5,0.5, 0.75, 0.25),
+                                            add_var = list("treatment" = c(50)),
+                                            resolution = 0.5, scale_ternaries = TRUE) %>% suppressMessages() %>%
                         suppressWarnings())
 
   # Choose communities to show in ternary, also leave one empty so it's assumed 0

@@ -15,6 +15,7 @@ conditional_ternary_plot(
   contour_text = FALSE,
   show_axis_labels = TRUE,
   show_axis_guides = FALSE,
+  scale_ternaries = FALSE,
   points_size = 2,
   axis_label_size = 4,
   vertex_label_size = 5,
@@ -64,6 +65,12 @@ is \code{TRUE}.}
 guides within the interior of the ternary. The
 default is \code{FALSE}.}
 
+\item{scale_ternaries}{Accepts boolean values. If TRUE, each ternary is
+scaled by \eqn{1 - P}, where \eqn{P} is the sum of the
+conditioning proportions and \eqn{0 \le P \le 1}.
+Note that ternaries may become very small when `P` is
+close to 1. Default is FALSE.}
+
 \item{points_size}{If showing points, then a numeric value specifying the size
 of the points.}
 
@@ -108,6 +115,7 @@ plot_data <- conditional_ternary_data(prop = c("p1", "p2", "p3", "p4", "p5", "p6
 
 ## Create plot
 conditional_ternary_plot(data = plot_data)
+
 
 ## Condition on multiple variables
 cond <- data.frame(p4 = c(0, 0.2), p5 = c(0.5, 0.1), p6 = c(0, 0.3))

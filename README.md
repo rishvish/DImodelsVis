@@ -147,6 +147,7 @@ functions present in the package along with a short description.
 
 ``` r
 library(DImodels)
+#> Warning: package 'DImodels' was built under R version 4.4.3
 library(DImodelsVis)
 ```
 
@@ -214,10 +215,8 @@ mod_FULL <- DI(y = "yield", prop = 4:7,
 
 We can visualise model selection by passing our models as a list to the
 `model_selection` function and visualising the best performing metric
-across different information criteria. Run `?model_selection` or see the
-associated
-[vignette](https://htmlpreview.github.io/?https://github.com/rishvish/DImodelsVis/blob/main/pkgdown/assets/coming_soon.html)
-for more information on customising the plot.
+across different information criteria. Run `?model_selection` for more
+information on customising the plot.
 
 ``` r
 mods = list("ID" = mod_ID, "AV" = mod_AV, "FG" = mod_FG, 
@@ -264,9 +263,8 @@ summary(mod_FG)
 
 After choosing a model we can create diagnostics plot where the points
 are replaced by pie-glyphs showing the proportions of the compositional
-variables. Run `?model_diagnostics` or see the associated
-[vignette](https://htmlpreview.github.io/?https://github.com/rishvish/DImodelsVis/blob/main/pkgdown/assets/coming_soon.html)
-for more information on customising the plot.
+variables. Run `?model_diagnostics` for more information on customising
+the plot.
 
 ``` r
 model_diagnostics(model = mod_FG)
@@ -311,10 +309,8 @@ higher predictions. For example, we can see that higher predictions are
 primarily driven by the `p3_ID` and `p4_ID` terms and hence the `p1` and
 `p2` monocultures have low predictions as the all the other terms have a
 value of zero here. Similarly, we can also see that mixtures dominated
-by `p3` perform the best. Run `?prediction_contributions` or see the
-associated
-[vignette](https://htmlpreview.github.io/?https://github.com/rishvish/DImodelsVis/blob/main/pkgdown/assets/coming_soon.html)
-for more information on creating and customising the plot.
+by `p3` perform the best. Run `?prediction_contributions` for more
+information on creating and customising the plot.
 
 #### Average change in respone over diversity gradient
 
@@ -337,10 +333,8 @@ gradient_change(mod_FG, data = plot_data)
 <img src="man/figures/README-gradient-change-1.png" alt="Output from gradient_change() function" style="display: block; margin: auto;" />
 
 This shows that on average the predicted response increases as richness
-increases but at a saturating rate. Run `?gradient_change` or see the
-associated
-[vignette](https://htmlpreview.github.io/?https://github.com/rishvish/DImodelsVis/blob/main/pkgdown/assets/coming_soon.html)
-for more information on creating and customising the plot.
+increases but at a saturating rate. Run `?gradient_change` for more
+information on creating and customising the plot.
 
 #### Conditional ternary diagrams
 
@@ -370,9 +364,8 @@ conditional_ternary(model = mod_FG,
 
 This figure shows that the predicted response decreases as we increase
 the proportion of `p2` and is maximised as we increase the proportion of
-`p3`. Run `?conditional_ternary` or see the associated
-[vignette](https://htmlpreview.github.io/?https://github.com/rishvish/DImodelsVis/blob/main/pkgdown/assets/coming_soon.html)
-for more information on creating and customising the plot.
+`p3`. Run `?conditional_ternary` for more information on creating and
+customising the plot.
 
 #### Effects plots for models with compositional predictors
 
@@ -404,9 +397,8 @@ black line shows the average effect of increasing the proportion of a
 species on the predicted response. It can be seen that for all
 communities increasing `p2` results in a decrease in the predicted
 response while increasing `p3` has a positive effect on the predicted
-response. Run `?visualise_effects` or see the associated
-[vignette](https://htmlpreview.github.io/?https://github.com/rishvish/DImodelsVis/blob/main/pkgdown/assets/coming_soon.html)
-for more information on creating and customising the plot.
+response. Run `?visualise_effects` for more information on creating and
+customising the plot.
 
 #### Simplex path
 
@@ -432,10 +424,8 @@ simplex_path(model = mod_FG,
 
 We can see that moving from the centroid community to `p1`, `p2`, and
 `p4` decreases the predicted response, while moving towards a
-monoculture of `p3` increases the response. Run `?simplex_path` or see
-the associated
-[vignette](https://htmlpreview.github.io/?https://github.com/rishvish/DImodelsVis/blob/main/pkgdown/assets/coming_soon.html)
-for more information on creating and customising the plot.
+monoculture of `p3` increases the response. Run `?simplex_path` for more
+information on creating and customising the plot.
 
 ## See Also
 

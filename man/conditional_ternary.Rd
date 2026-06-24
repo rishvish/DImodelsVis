@@ -20,6 +20,7 @@ conditional_ternary(
   contour_text = FALSE,
   show_axis_labels = TRUE,
   show_axis_guides = FALSE,
+  scale_ternaries = FALSE,
   axis_label_size = 4,
   vertex_label_size = 5,
   nrow = 0,
@@ -100,6 +101,12 @@ is \code{TRUE}.}
 guides within the interior of the ternary. The
 default is \code{FALSE}.}
 
+\item{scale_ternaries}{Accepts boolean values. If TRUE, each ternary is
+scaled by \eqn{1 - P}, where \eqn{P} is the sum of the
+conditioning proportions and \eqn{0 \le P \le 1}.
+Note that ternaries may become very small when `P` is
+close to 1. Default is FALSE.}
+
 \item{axis_label_size}{A numeric value to adjust the size of the axis labels
 in the ternary plot. The default size is 4.}
 
@@ -137,11 +144,15 @@ library(dplyr)
 data(sim2)
 m1 <- DI(y = "response", data = sim2, prop = 3:6, DImodel = "FULL")
 
-#' ## Create data for slicing
 ## We only condition on the variable "p3"
 conditional_ternary(model = m1, tern_vars = c("p1", "p2", "p4"),
                     conditional = data.frame("p3" = c(0, 0.2, 0.5)),
                     resolution = 1)
+
+## Allow ternary size to scale based on value of conditioning variable
+conditional_ternary(model = m1, tern_vars = c("p1", "p2", "p4"),
+                    conditional = data.frame("p3" = c(0, 0.2, 0.5)),
+                    resolution = 1, scale_ternaries = TRUE)
 
 ## Slices for experiments for over 4 variables
 data(sim4)

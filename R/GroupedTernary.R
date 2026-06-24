@@ -306,6 +306,8 @@ grouped_ternary_data <- function(prop, FG,
 #' species in a ecosystem based on the functions they perform, or grouping
 #' political parties based on their national alliances.
 #'
+#' @param data A data-frame which is the output of the
+#'             `\link{grouped_ternary_data}` function.
 #' @inheritParams conditional_ternary_plot
 #'
 #' @inherit ternary_plot return
@@ -380,6 +382,7 @@ grouped_ternary_plot <- function(data,
                                  contour_text = FALSE,
                                  show_axis_labels = TRUE,
                                  show_axis_guides = FALSE,
+                                 scale_ternaries = FALSE,
                                  axis_label_size = 4,
                                  vertex_label_size = 5,
                                  nrow = 0, ncol = 0){
@@ -404,6 +407,7 @@ grouped_ternary_plot <- function(data,
                                  contour_text = contour_text,
                                  show_axis_labels = show_axis_labels,
                                  show_axis_guides = show_axis_guides,
+                                 scale_ternaries = scale_ternaries,
                                  axis_label_size = axis_label_size,
                                  vertex_label_size = vertex_label_size,
                                  nrow = nrow, ncol = ncol)
@@ -438,6 +442,11 @@ grouped_ternary_plot <- function(data,
 #'              \code{\link[DImodels:DI]{DI()}} function from the
 #'              \code{\link[DImodels:DImodels-package]{DImodels}} package.
 #' @inheritParams grouped_ternary_data
+#' @param scale_ternaries Accepts boolean values. If TRUE, each ternary is
+#'                        scaled by \eqn{1 - P}, where \eqn{P} is the sum of the
+#'                        conditioning proportions and \eqn{0 \le P \le 1}.
+#'                        Note that ternaries may become very small when `P` is
+#'                        close to 1. Default is FALSE.
 #' @inheritParams ternary_plot
 #' @inheritParams model_diagnostics
 #'
@@ -512,6 +521,7 @@ grouped_ternary <- function(model,
                             contour_text = FALSE,
                             show_axis_labels = TRUE,
                             show_axis_guides = FALSE,
+                            scale_ternaries = FALSE,
                             axis_label_size = 4,
                             vertex_label_size = 5,
                             nrow = 0, ncol = 0){
@@ -567,6 +577,7 @@ grouped_ternary <- function(model,
                                  contour_text = contour_text,
                                  show_axis_labels = show_axis_labels,
                                  show_axis_guides = show_axis_guides,
+                                 scale_ternaries = scale_ternaries,
                                  axis_label_size = axis_label_size,
                                  vertex_label_size = vertex_label_size,
                                  nrow = nrow, ncol = ncol)

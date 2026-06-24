@@ -342,7 +342,8 @@ gradient_change_plot <- function(data, prop = NULL,
                                                     average = average,
                                                     pie_data = pie_data)+
                         labs(subtitle = ids[i]) +
-                        ylim(min(data[, y_var]), max(data[, y_var]))
+                        ylim(min(data[, y_var], na.rm = T),
+                             max(data[, y_var], na.rm = T))
                     })
     if(length(plots) > 1){
       plot <- new("ggmultiplot", plots = plots, nrow = nrow, ncol = ncol)
@@ -662,8 +663,8 @@ gradient_change_plot_internal <- function(data, prop = NULL,
   # Choose a proper scale for x-axis
   xlab <- strsplit(gradient_var, split = "")[[1]][-1] %>% paste0(collapse = "")
   pie_max <- ifelse(is.null(pie_data) || !check_col_exists(pie_data, ".Richness"),
-                    -Inf, max(pie_data$.Richness))
-  xmax <- max(max(data$.Richness), pie_max)
+                    -Inf, max(pie_data$.Richness, na.rm = T))
+  xmax <- max(max(data$.Richness), pie_max, na.rm = T)
   x_scale <- if(gradient_var == ".Richness")
     ggplot2::scale_x_continuous(breaks = seq(1:xmax))
   else

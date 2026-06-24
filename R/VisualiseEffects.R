@@ -476,8 +476,8 @@ visualise_effects_plot <- function(data, prop, pie_colours = NULL,
 
   if(check_col_exists(data, ".add_str_ID")){
     ids <- unique(data$.add_str_ID)
-    lwr_lim <- ifelse(check_col_exists(data, ".Lower"), min(data$.Lower), min(data$.Pred))
-    upr_lim <- ifelse(check_col_exists(data, ".Upper"), max(data$.Upper), max(data$.Pred))
+    lwr_lim <- ifelse(check_col_exists(data, ".Lower") & isTRUE(se), min(data$.Lower, na.rm = T), min(data$.Pred, na.rm = T))
+    upr_lim <- ifelse(check_col_exists(data, ".Upper") & isTRUE(se), max(data$.Upper, na.rm = T), max(data$.Pred, na.rm = T))
     plots <- lapply(cli_progress_along(1:length(ids), name = "Creating plot",
                                        format = paste0(
                                          "{cli::pb_spin} Creating plot ",

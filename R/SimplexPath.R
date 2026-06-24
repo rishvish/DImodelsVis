@@ -333,8 +333,8 @@ simplex_path_plot <- function(data, prop = NULL,
 
   if(check_col_exists(data, ".add_str_ID")){
     ids <- unique(data$.add_str_ID)
-    lwr_lim <- ifelse(check_col_exists(data, ".Lower"), min(data$.Lower), min(data$.Pred))
-    upr_lim <- ifelse(check_col_exists(data, ".Upper"), max(data$.Upper), max(data$.Pred))
+    lwr_lim <- ifelse(check_col_exists(data, ".Lower"), min(data$.Lower, na.rm = T), min(data$.Pred, na.rm = T))
+    upr_lim <- ifelse(check_col_exists(data, ".Upper"), max(data$.Upper, na.rm = T), max(data$.Pred, na.rm = T))
     plots <- lapply(cli_progress_along(1:length(ids), name = "Creating plot",
                                        format = paste0(
                                          "{cli::pb_spin} Creating plot ",

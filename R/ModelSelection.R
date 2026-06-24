@@ -218,7 +218,7 @@ model_selection <- function(models,
 
   # Dashed lines for rule of 2
   if(length(metric) == 1){
-    rule_of_2 <- min(plot_data[, metric]) + c(0, 2)
+    rule_of_2 <- min(plot_data[, metric], na.rm = T) + c(0, 2)
   }
 
 
@@ -504,7 +504,7 @@ model_selection_plot <- function(data){
 
     # Dashed lines for rule of 2
     if(length(metric) == 1){
-      rule_of_2 <- min(data$Value) + c(0, 2)
+      rule_of_2 <- min(data$Value, na.rm = T) + c(0, 2)
 
       pl <- pl +
         geom_hline(yintercept = rule_of_2, linetype = 3, linewidth = 0.75)

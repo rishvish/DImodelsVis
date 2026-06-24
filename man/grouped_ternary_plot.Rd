@@ -15,6 +15,7 @@ grouped_ternary_plot(
   contour_text = FALSE,
   show_axis_labels = TRUE,
   show_axis_guides = FALSE,
+  scale_ternaries = FALSE,
   axis_label_size = 4,
   vertex_label_size = 5,
   nrow = 0,
@@ -23,7 +24,7 @@ grouped_ternary_plot(
 }
 \arguments{
 \item{data}{A data-frame which is the output of the
-`\link{conditional_ternary_data}` function.}
+`\link{grouped_ternary_data}` function.}
 
 \item{col_var}{The column name containing the variable to be used for
 colouring the contours or points. The default is ".Pred".}
@@ -62,6 +63,12 @@ is \code{TRUE}.}
 \item{show_axis_guides}{A boolean value indicating whether to show axis
 guides within the interior of the ternary. The
 default is \code{FALSE}.}
+
+\item{scale_ternaries}{Accepts boolean values. If TRUE, each ternary is
+scaled by \eqn{1 - P}, where \eqn{P} is the sum of the
+conditioning proportions and \eqn{0 \le P \le 1}.
+Note that ternaries may become very small when `P` is
+close to 1. Default is FALSE.}
 
 \item{axis_label_size}{A numeric value to adjust the size of the axis labels
 in the ternary plot. The default size is 4.}

@@ -748,9 +748,9 @@ model_diagnostics_plot <- function(data, which = c(1,2,3,5), prop = NULL, FG = N
     r.hat <- range(hii, na.rm = TRUE)
     isConst.hat <- all(r.hat == 0) ||
       diff(r.hat) < 1e-10 * mean(hii, na.rm = TRUE)
-    y_thresh <- max(abs(plot_data$.stdresid)) + 0.5
+    y_thresh <- max(abs(plot_data$.stdresid), na.rm = T) + 0.5
     p <- attr(plot_data, "rank")
-    xmax <- max(hii) + 0.01
+    xmax <- max(hii, na.rm = T) + 0.01
     hh <- seq.int(min(r.hat[1L], r.hat[2L]/100), xmax, length.out = 101)
     cook_contours <- data.frame(x = vector(),
                                 y = vector(),
@@ -784,7 +784,7 @@ model_diagnostics_plot <- function(data, which = c(1,2,3,5), prop = NULL, FG = N
         geom_line(data = cook_contours,
                   aes(x = .data$x, y = .data$y, group = group),
                   colour = 'grey20', linetype = 2) +
-        geom_text(data = cook_contours %>% filter(x == max(x)),
+        geom_text(data = cook_contours %>% filter(x == max(x, na.rm = T)),
                   aes(x = .data$x + 0.01, y = .data$y, label = .data$label),
                   size = label_size, colour = 'grey20')
     }
@@ -822,8 +822,8 @@ model_diagnostics_plot <- function(data, which = c(1,2,3,5), prop = NULL, FG = N
     p <- attr(plot_data, "rank")
     g <- dropInf(hii/(1 - hii), hii)
     bval <- pretty(sqrt(p * plot_data$.cooksd/g), 5)
-    xmax <- max(plot_data$.hat)
-    ymax <- max(plot_data$.cooksd)
+    xmax <- max(plot_data$.hat, na.rm = T)
+    ymax <- max(plot_data$.cooksd, na.rm = T)
 
     smoothing_line <- smoothing_fun(plot_data$.hat, plot_data$.cooksd)
 

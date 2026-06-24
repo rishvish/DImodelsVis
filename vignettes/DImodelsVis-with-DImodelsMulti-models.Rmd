@@ -211,8 +211,11 @@ In this example, density was not included as a predictor in the model, so the tw
 Currently, the prediction contributions plot does not work directly with a `DImulti` object. However, this functionality will soon be added. For the time being, here is how the prediction contributions plot can be created for a `DImulti` model. 
 
 These steps should be followed:
+
 1. Create a data.frame containing the species communities for which you wish to visualise prediction contributions and a column containing names of the ecosystem functions for which you wish to generate predictions (the `add_add_var()` function helps with this). Ensure this data also contains any other additional predictors from the model such as nitrogen treatment, seeding density, etc.
+
 2. Prepare the data needed for the prediction contributions plot using the `prediction_contributions_data()` function. The important steps here is to create a manual grouping for the coefficients using the `coeff_groups` parameter ensuring that identical coefficients repeated across functions are assigned the same group and thus share a single colour in the plot. For example, the G1 identity effect (G1_ID) or the average interaction effect (AV) across all three ecosystem functions are grouped to be a single term. This grouping can be done either by coefficient indices or their names and it is not mandatory to group all coefficients. The user can decide a grouping that best suits their example.
+
 3. Pass the prepared data to the `prediction_contributions_plot()` function to visualise the prediction contributions.
 
 ```{r, pred-cont, fig.width=8, fig.height=14}

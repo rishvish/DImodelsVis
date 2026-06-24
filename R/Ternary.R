@@ -387,13 +387,15 @@ ternary_plot <- function(data, prop = NULL,
       # If user didn't specify lower limit assume it to be min of predicted response
       if(is.null(lower_lim)){
         # Ensure rounding includes all values in range
-        lower_lim <- round(min(data[, col_var]), 2) - 0.01
+        vals <- data[, col_var]
+        lower_lim <- round(min(vals[is.finite(vals)], na.rm = T), 2) - 0.01
       }
 
       # If user didn't specify upper limit assume it to be max of predicted response
       if(is.null(upper_lim)){
         # Ensure rounding includes all values in range
-        upper_lim <- round(max(data[, col_var]), 2) + 0.01
+        vals <- data[, col_var]
+        upper_lim <- round(max(vals[is.finite(vals)], na.rm = T), 2) + 0.01
       }
     }
 
@@ -452,7 +454,7 @@ ternary_plot <- function(data, prop = NULL,
 #' @keywords internal
 #' Internal function for creating a ternary plot
 #'
-#' @importFrom ggplot2 scale_colour_gradientn scale_color_manual element_line element_rect
+#' @importFrom ggplot2 geom_tile geom_raster scale_colour_gradientn scale_color_manual element_line element_rect
 #'
 #' @usage NULL
 NULL
@@ -468,6 +470,7 @@ ternary_plot_internal <- function(data, prop,
                                   contour_text = FALSE,
                                   show_axis_labels = TRUE,
                                   show_axis_guides = FALSE,
+                                  scale_ternaries = FALSE,
                                   points_size = 2,
                                   axis_label_size = 4,
                                   vertex_label_size = 5){
@@ -480,6 +483,7 @@ ternary_plot_internal <- function(data, prop,
                                   "vertex_label_size" = vertex_label_size,
                                   "points_size" = points_size),
                   booleans = list("contour_text" = contour_text,
+                                  "scale_ternaries" = scale_ternaries,
                                   "show_axis_guides" = show_axis_guides,
                                   "show_axis_labels" = show_axis_labels,
                                   "show_contours" = show_contours),
@@ -529,12 +533,14 @@ ternary_plot_internal <- function(data, prop,
 
       # If user didn't specify lower limit assume it to be min of predicted response
       if(is.null(lower_lim)){
-        lower_lim <- round(min(data[, col_var]), 2) - 0.01
+        vals <- data[, col_var]
+        lower_lim <- round(min(vals[is.finite(vals)], na.rm = T), 2) - 0.01
       }
 
       # If user didn't specify upper limit assume it to be max of predicted response
       if(is.null(upper_lim)){
-        upper_lim <- round(max(data[, col_var]), 2) + 0.01
+        vals <- data[, col_var]
+        upper_lim <- round(max(vals[is.finite(vals)], na.rm = T), 2) + 0.01
       }
     } else {
       # Calculate x-y projection if it's not present in data
@@ -589,9 +595,22 @@ ternary_plot_internal <- function(data, prop,
         colours <- terrain.colors(nlevels, rev = T)
       }
 
+      # When shrinking the ternaries, geom_tile is the better option
+      # because geom_raster expects data points across entire data to
+      # be spaced equally and if we shrink the ternaries this assumption
+      # is violated.
+      tiling_layer <- function(...) {
+        if (isTRUE(scale_ternaries)) {
+          geom_tile(...)
+        } else {
+          geom_raster(...)
+        }
+      }
+
+
       pl <- ggplot(data, aes(x = .data[[x]], y = .data[[y]],
                              z = .data[[col_var]])) +
-        geom_raster(aes(fill = .data[[col_var]]))+
+        tiling_layer(aes(fill = .data[[col_var]])) +
         scale_fill_stepsn(colours = colours, breaks = breaks,
                           labels = function(val){
                             val
@@ -633,28 +652,160 @@ ternary_plot_internal <- function(data, prop,
     }
 
     # Labels for the ternary axes
-    axis_labels <- tibble(x1 = seq(0.2,0.8,0.2),
-                          y1 = c(0,0,0,0),
-                          x2 = .data$x1/2,
-                          y2 = .data$x1*sqrt(3)/2,
-                          x3 = (1-.data$x1)*0.5+.data$x1,
-                          y3 = sqrt(3)/2-.data$x1*sqrt(3)/2,
-                          label = .data$x1,
-                          rev_label = rev(.data$label),
+    # First check if this is a conditional ternary and if we
+    # need to condition on anything and get appropriate values
+    if(check_col_exists(data, ".Facet")){
+      conditional <- unique(data$.Sp)
+      values <- unique(data$.Value)
+
+      c_x <- 1/2
+      c_y <- sqrt(3)/6
+
+      axis_labels <- lapply(values, function(val){
+          cond_sp <- strsplit(conditional, ", ")[[1]]
+          cond_vals <- as.numeric(strsplit(val, ", ")[[1]])
+          k <- sum(cond_vals)
+          label_positions <- tibble(x1 = seq(0.2,0.8,0.2),
+                                    y1 = c(0,0,0,0),
+                                    x2 = .data$x1/2,
+                                    y2 = .data$x1*sqrt(3)/2,
+                                    x3 = (1-.data$x1)*0.5+.data$x1,
+                                    y3 = sqrt(3)/2-.data$x1*sqrt(3)/2,
+                                    x3_rev = rev(.data$x3),
+                                    y3_rev = rev(.data$y3),
+                                    label = .data$x1*(1-k),
+                                    rev_label = rev(.data$label),
+                                    .Facet = paste0(cond_sp, " = ", cond_vals,
+                                                    collapse = "; "),
+                                    !! sym(col_var) := 0) %>%
+            mutate(x1_pos = .data$x1 + 0,
+                   x2_pos = .data$x2 - 0.055,
+                   x3_pos = .data$x3 + 0.055,
+                   y1_pos = .data$y1 - 0.055,
+                   y2_pos = .data$y2 + 0.055,
+                   y3_pos = .data$y3 + 0.055)
+
+
+          # If ternaries are shrunk then adjust label positions
+          if(isTRUE(scale_ternaries)){
+            label_positions <- label_positions %>%
+              mutate(
+                across(c(.data$x1, .data$x2, .data$x3, .data$x3_rev,
+                         .data$x1_pos, .data$x2_pos, .data$x3_pos),
+                       ~ c_x + (1 - k) * (.x - c_x)),
+                across(c(.data$y1, .data$y2, .data$y3, .data$y3_rev,
+                         .data$y1_pos, .data$y2_pos, .data$y3_pos),
+                       ~ c_y + (1 - k) * (.x - c_y))
+              )
+          }
+          label_positions
+        }) %>% bind_rows()
+
+      vertex_data <- lapply(values, function(val){
+        cond_sp <- strsplit(conditional, ", ")[[1]]
+        cond_vals <- as.numeric(strsplit(val, ", ")[[1]])
+        k <- sum(cond_vals)
+
+        vertex_positions <- tibble(x = c(0.5, 0, 1),
+                                   y = c(sqrt(3)/2, 0, 0),
+                                   label = tern_labels,
+                                   nudge_x = c(0, -0.05, 0.05),
+                                   nudge_y = c(0.05, 0, 0),
+                                   .Facet = paste0(cond_sp, " = ", cond_vals,
+                                                   collapse = "; "),
+                                   !! col_var := 0) %>%
+                              mutate(x = .data$x + .data$nudge_x,
+                                     y = .data$y + .data$nudge_y)
+
+
+        # If ternaries are shrunk then adjust vertex positions
+        if(isTRUE(scale_ternaries)){
+          vertex_positions <- vertex_positions %>%
+          mutate(
+            # affine transform about centroid
+            x = c_x + (1 - k) * (.data$x - c_x),
+            y = c_y + (1 - k) * (.data$y - c_y)
+          )
+        }
+        vertex_positions
+      }) %>% bind_rows()
+
+      edge_data <- lapply(values, function(val){
+        cond_sp <- strsplit(conditional, ", ")[[1]]
+        cond_vals <- as.numeric(strsplit(val, ", ")[[1]])
+        k <- sum(cond_vals)
+
+        edge_positions <- tibble(
+          x    = c(0, 0, 1),
+          y    = c(0, 0, 0),
+          xend = c(1, 0.5, 0.5),
+          yend = c(0, sqrt(3)/2, sqrt(3)/2),
+          .Facet = paste0(cond_sp, " = ", cond_vals,
+                          collapse = "; "),
+          !! col_var := 0
+        )
+
+        # If ternaries are shrunk then adjust edge positions
+        if(isTRUE(scale_ternaries)){
+          edge_positions <- edge_positions %>%
+            mutate(
+              x    = c_x + (1 - k) * (.data$x - c_x),
+              y    = c_y + (1 - k) * (.data$y - c_y),
+              xend = c_x + (1 - k) * (.data$xend - c_x),
+              yend = c_y + (1 - k) * (.data$yend - c_y)
+            )
+        }
+        edge_positions
+      }) %>% bind_rows()
+
+    # If it's regular ternary then things can be calculated directly
+    } else {
+      axis_labels <- tibble(x1 = seq(0.2,0.8,0.2),
+                            y1 = c(0,0,0,0),
+                            x2 = .data$x1/2,
+                            y2 = .data$x1*sqrt(3)/2,
+                            x3 = (1-.data$x1)*0.5+.data$x1,
+                            y3 = sqrt(3)/2-.data$x1*sqrt(3)/2,
+                            x3_rev = rev(.data$x3),
+                            y3_rev = rev(.data$y3),
+                            label = .data$x1,
+                            rev_label = rev(.data$label),
+                            !! col_var := 0) %>%
+        mutate(x1_pos = .data$x1 + 0,
+               x2_pos = .data$x2 - 0.055,
+               x3_pos = .data$x3 + 0.055,
+               y1_pos = .data$y1 - 0.055,
+               y2_pos = .data$y2 + 0.055,
+               y3_pos = .data$y3 + 0.055)
+
+      vertex_data <- tibble(x = c(0.5, 0, 1),
+                            y = c(sqrt(3)/2, 0, 0),
+                            label = tern_labels,
+                            nudge_x = c(0, -0.05, 0.05),
+                            nudge_y = c(0.05, 0, 0),
+                            !! col_var := 0) %>%
+        mutate(x = .data$x + .data$nudge_x,
+               y = .data$y + .data$nudge_y)
+
+      edge_data <- tibble(x = c(0, 0, 1),
+                          y    = c(0, 0, 0),
+                          xend = c(1, 0.5, 0.5),
+                          yend = c(0, sqrt(3)/2, sqrt(3)/2),
                           !! col_var := 0)
+    }
 
     # Showing axis labels
     if(show_axis_labels){
       pl <- pl +
         geom_text(data = axis_labels,
-                  aes(x=.data$x1, y=.data$y1, label=.data$label),
-                  nudge_y=-0.055, size = axis_label_size)+
+                  aes(x=.data$x1_pos, y=.data$y1_pos, label=.data$label),
+                  size = axis_label_size)+
         geom_text(data = axis_labels,
-                  aes(x=.data$x2, y=.data$y2, label=.data$rev_label),
-                  nudge_x=-0.055, nudge_y=0.055, size = axis_label_size)+
+                  aes(x=.data$x2_pos, y=.data$y2_pos, label=.data$rev_label),
+                  size = axis_label_size)+
         geom_text(data = axis_labels,
-                  aes(x=.data$x3, y=.data$y3, label=.data$rev_label),
-                  nudge_x=0.055, nudge_y=0.055, size = axis_label_size)
+                  aes(x=.data$x3_pos, y=.data$y3_pos, label=.data$rev_label),
+                  size = axis_label_size)
     }
 
     # Showing axis guides
@@ -670,28 +821,19 @@ ternary_plot_internal <- function(data, prop,
                      linetype='dashed', linewidth=1, alpha = .75)+
         geom_segment(data = axis_labels,
                      aes(x = .data$x2, y = .data$y2,
-                         xend = rev(.data$x3), yend = rev(.data$y3)),
+                         xend = .data$x3_rev, yend = .data$y3_rev),
                      colour='grey',
                      linetype='dashed', linewidth=1, alpha = .75)
     }
 
     # Layering plot
     pl <- pl +
-      geom_text(data = tibble(x = c(0.5, 0, 1), y = c(sqrt(3)/2, 0,  0),
-                              label = tern_labels,
-                              !! col_var := 0) %>%
-                  mutate(nudge_x = c(0, -0.05, 0.05),
-                         nudge_y = c(0.05, 0, 0)) %>%
-                  mutate(x = .data$x + .data$nudge_x,
-                         y = .data$y + .data$nudge_y),
+      geom_text(data = vertex_data,
                 aes(x= .data$x, y= .data$y, label = .data$label),
                 size = vertex_label_size, fontface='plain')+
-      geom_segment(data = tibble(x = c(0, 0, 1), y = c(0,0,0),
-                                 xend = c(1, 0.5, 0.5),
-                                 yend = c(0, sqrt(3)/2, sqrt(3)/2),
-                                 !! col_var := 0),
+      geom_segment(data = edge_data,
                    aes(x=.data$x, y=.data$y, xend=.data$xend, yend=.data$yend),
-                   linewidth = 1)+
+                   linewidth = 1) +
       #facet_wrap(~ Value, ncol = length(values))+
       coord_fixed()
 

@@ -163,8 +163,7 @@ mod_FULL <- DI(y = "yield", prop = 4:7,
 
 ### Model selection and validation
 #### Visualising model selection
-We can visualise model selection by passing our models as a list to the `model_selection` function and visualising the best performing metric across
-different information criteria. Run `?model_selection` or see the associated [vignette](https://htmlpreview.github.io/?https://github.com/rishvish/DImodelsVis/blob/main/pkgdown/assets/coming_soon.html) for more information on customising the plot.
+We can visualise model selection by passing our models as a list to the `model_selection` function and visualising the best performing metric across different information criteria. Run `?model_selection` for more information on customising the plot.
 ```{r model-selection, fig.height=5}
 mods = list("ID" = mod_ID, "AV" = mod_AV, "FG" = mod_FG, 
             "ADD" = mod_ADD, "FULL" = mod_FULL)
@@ -181,7 +180,7 @@ summary(mod_FG)
 #### Model diagnostics
 
 After choosing a model we can create diagnostics plot where the points are replaced by pie-glyphs showing the proportions of the compositional variables. 
-Run `?model_diagnostics` or see the associated [vignette](https://htmlpreview.github.io/?https://github.com/rishvish/DImodelsVis/blob/main/pkgdown/assets/coming_soon.html) for more information on customising the plot.
+Run `?model_diagnostics` for more information on customising the plot.
 
 ```{r model-diagnostics, fig.width = 8}
 model_diagnostics(model = mod_FG)
@@ -202,7 +201,7 @@ prediction_contributions(model = mod_FG,
 The coloured bars show the contributions of the different terms in the model. The contribution is defined as the product of the coefficient and value for each predictor variable. Thus, the contribution for a term would be zero if it's value in an observation is zero regardless of it's coefficient value (e.g. prediction bars for the monocultures at the right of the graph).
 
 This plot would aid in understanding why certain observations have higher predictions. For example, we can see that higher predictions are primarily driven by the `p3_ID` and `p4_ID` terms and hence the `p1` and `p2` monocultures have low predictions as the all the other terms have a value of zero here. Similarly, we can also see that mixtures dominated by `p3` perform the best. 
-Run `?prediction_contributions` or see the associated [vignette](https://htmlpreview.github.io/?https://github.com/rishvish/DImodelsVis/blob/main/pkgdown/assets/coming_soon.html) for more information on creating and customising the plot.
+Run `?prediction_contributions` for more information on creating and customising the plot.
 
 
 #### Average change in respone over diversity gradient
@@ -216,7 +215,7 @@ gradient_change(mod_FG, data = plot_data)
 ```
 
 This shows that on average the predicted response increases as richness increases but at a saturating rate. 
-Run `?gradient_change` or see the associated [vignette](https://htmlpreview.github.io/?https://github.com/rishvish/DImodelsVis/blob/main/pkgdown/assets/coming_soon.html) for more information on creating and customising the plot.
+Run `?gradient_change` for more information on creating and customising the plot.
 
 #### Conditional ternary diagrams
 Ternary diagrams are a great tool for visualising the change in a continuous response, however they can only be created for examples with three compositional variables. If we have more than three compositional variables we create conditional ternary diagrams where fix n-3 compositional variables to have specific values and visualise the change in the predicted response across the remaining three variables as a contour plot in a ternary diagram.
@@ -229,7 +228,7 @@ conditional_ternary(model = mod_FG,
 ```
 
 This figure shows that the predicted response decreases as we increase the proportion of `p2` and is maximised as we increase the proportion of `p3`.
-Run `?conditional_ternary` or see the associated [vignette](https://htmlpreview.github.io/?https://github.com/rishvish/DImodelsVis/blob/main/pkgdown/assets/coming_soon.html) for more information on creating and customising the plot.
+Run `?conditional_ternary` for more information on creating and customising the plot.
 
 
 #### Effects plots for models with compositional predictors
@@ -243,7 +242,7 @@ visualise_effects(model = mod_FG, data = my_data[1:15, ],
 ```
 
 The grey lines show the effect (on the predicted response) of increasing the species of interest within a particular community while the solid black line shows the average effect of increasing the proportion of a species on the predicted response. It can be seen that for all communities increasing `p2` results in a decrease in the predicted response while increasing `p3` has a positive effect on the predicted response. 
-Run `?visualise_effects` or see the associated [vignette](https://htmlpreview.github.io/?https://github.com/rishvish/DImodelsVis/blob/main/pkgdown/assets/coming_soon.html) for more information on creating and customising the plot.
+Run `?visualise_effects` for more information on creating and customising the plot.
 
 #### Simplex path
 The concept used in `visualise_effects` can be extended to look at the change in the predicted response as we move in a straight line between any two points within the simplex space. The interpolation constant (shown on the X-axis) is a number between 0 and 1 identifying points along the straight line between the start and end points. We can even traverse a path comprising of multiple points within the simplex and see the change in the predicted response.
@@ -255,7 +254,7 @@ simplex_path(model = mod_FG,
 ```
 
 We can see that moving from the centroid community to `p1`, `p2`, and `p4` decreases the predicted response, while moving towards a monoculture of `p3` increases the response.
-Run `?simplex_path` or see the associated [vignette](https://htmlpreview.github.io/?https://github.com/rishvish/DImodelsVis/blob/main/pkgdown/assets/coming_soon.html) for more information on creating and customising the plot.
+Run `?simplex_path` for more information on creating and customising the plot.
 
 ## See Also
 #### Useful links:

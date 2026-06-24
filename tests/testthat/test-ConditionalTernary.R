@@ -27,6 +27,14 @@ test_that("Conditional ternary works as expected", {
                                                 add_var = list("treatment" = c(50)),
                                                 nrow = 2) %>% suppressMessages() %>% suppressWarnings())
 
+  # Ensure scale_ternaries works as intended
+  expect_doppelganger(title = "CT with scale ternaries",
+                      fig = conditional_ternary(model = mod,
+                                                tern_vars = c("p1", "p2", "p5"),
+                                                conditional = data.frame("p6" = c(0, 0.25)),
+                                                add_var = list("treatment" = c(50)),
+                                                resolution = 0.5, scale_ternaries = TRUE) %>% suppressMessages())
+
   # Function also works as grouped_ternary if FG is specified
   expect_doppelganger(title = "CT manual split, single FG species",
                       fig =   conditional_ternary(model = mod,

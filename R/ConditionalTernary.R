@@ -328,6 +328,11 @@ conditional_ternary_data <- function(prop, FG = NULL,
 #'
 #' @param data A data-frame which is the output of the
 #'             `\link{conditional_ternary_data}` function.
+#' @param scale_ternaries Accepts boolean values. If TRUE, each ternary is
+#'                        scaled by \eqn{1 - P}, where \eqn{P} is the sum of the
+#'                        conditioning proportions and \eqn{0 \le P \le 1}.
+#'                        Note that ternaries may become very small when `P` is
+#'                        close to 1. Default is FALSE.
 #' @inheritParams ternary_plot
 #'
 #' @inherit ternary_plot return
@@ -353,6 +358,7 @@ conditional_ternary_data <- function(prop, FG = NULL,
 #'
 #' ## Create plot
 #' conditional_ternary_plot(data = plot_data)
+#'
 #'
 #' ## Condition on multiple variables
 #' cond <- data.frame(p4 = c(0, 0.2), p5 = c(0.5, 0.1), p6 = c(0, 0.3))
@@ -392,6 +398,7 @@ conditional_ternary_plot <- function(data,
                                      contour_text = FALSE,
                                      show_axis_labels = TRUE,
                                      show_axis_guides = FALSE,
+                                     scale_ternaries = FALSE,
                                      points_size = 2,
                                      axis_label_size = 4,
                                      vertex_label_size = 5,
@@ -411,13 +418,15 @@ conditional_ternary_plot <- function(data,
     # If user didn't specify lower limit assume it to be min of predicted response
     if(is.null(lower_lim)){
       # Ensure rounding includes all values in range
-      lower_lim <- round(min(data[, col_var]), 2) - 0.01
+      vals <- data[, col_var]
+      lower_lim <- round(min(vals[is.finite(vals)], na.rm = T), 2) - 0.01
     }
 
     # If user didn't specify upper limit assume it to be max of predicted response
     if(is.null(upper_lim)){
       # Ensure rounding includes all values in range
-      upper_lim <- round(max(data[, col_var]), 2) + 0.01
+      vals <- data[, col_var]
+      upper_lim <- round(max(vals[is.finite(vals)], na.rm = T), 2) + 0.01
     }
 
     plots <- lapply(cli_progress_along(1:length(ids), name = "Creating plot",
@@ -437,6 +446,7 @@ conditional_ternary_plot <- function(data,
                                                                 contour_text = contour_text,
                                                                 show_axis_labels = show_axis_labels,
                                                                 show_axis_guides = show_axis_guides,
+                                                                scale_ternaries = scale_ternaries,
                                                                 axis_label_size = axis_label_size,
                                                                 vertex_label_size = vertex_label_size) +
                         labs(subtitle = ids[i])
@@ -458,6 +468,7 @@ conditional_ternary_plot <- function(data,
                                               contour_text = contour_text,
                                               show_axis_labels = show_axis_labels,
                                               show_axis_guides = show_axis_guides,
+                                              scale_ternaries = scale_ternaries,
                                               axis_label_size = axis_label_size,
                                               vertex_label_size = vertex_label_size)
     cli::cli_alert_success("Created plot.")
@@ -494,6 +505,11 @@ conditional_ternary_plot <- function(data,
 #' @param model A Diversity Interactions model object fit by using the
 #'              \code{\link[DImodels:DI]{DI()}} function from the
 #'              \code{\link[DImodels:DImodels-package]{DImodels}} package.
+#' @param scale_ternaries Accepts boolean values. If TRUE, each ternary is
+#'                        scaled by \eqn{1 - P}, where \eqn{P} is the sum of the
+#'                        conditioning proportions and \eqn{0 \le P \le 1}.
+#'                        Note that ternaries may become very small when `P` is
+#'                        close to 1. Default is FALSE.
 #' @inheritParams ternary_plot
 #' @inheritParams conditional_ternary_data
 #' @inheritParams model_diagnostics
@@ -508,11 +524,15 @@ conditional_ternary_plot <- function(data,
 #' data(sim2)
 #' m1 <- DI(y = "response", data = sim2, prop = 3:6, DImodel = "FULL")
 #'
-#' #' ## Create data for slicing
 #' ## We only condition on the variable "p3"
 #' conditional_ternary(model = m1, tern_vars = c("p1", "p2", "p4"),
 #'                     conditional = data.frame("p3" = c(0, 0.2, 0.5)),
 #'                     resolution = 1)
+#'
+#' ## Allow ternary size to scale based on value of conditioning variable
+#' conditional_ternary(model = m1, tern_vars = c("p1", "p2", "p4"),
+#'                     conditional = data.frame("p3" = c(0, 0.2, 0.5)),
+#'                     resolution = 1, scale_ternaries = TRUE)
 #'
 #' ## Slices for experiments for over 4 variables
 #' data(sim4)
@@ -559,6 +579,7 @@ conditional_ternary <- function(model,
                                 contour_text = FALSE,
                                 show_axis_labels = TRUE,
                                 show_axis_guides = FALSE,
+                                scale_ternaries = FALSE,
                                 axis_label_size = 4,
                                 vertex_label_size = 5,
                                 nrow = 0, ncol = 0){
@@ -604,6 +625,7 @@ conditional_ternary <- function(model,
                                      contour_text = contour_text,
                                      show_axis_labels = show_axis_labels,
                                      show_axis_guides = show_axis_guides,
+                                     scale_ternaries = scale_ternaries,
                                      axis_label_size = axis_label_size,
                                      vertex_label_size = vertex_label_size,
                                      nrow = nrow, ncol = ncol)
@@ -629,8 +651,19 @@ conditional_ternary_plot_internal <- function(data,
                                               contour_text = FALSE,
                                               show_axis_labels = TRUE,
                                               show_axis_guides = FALSE,
+                                              scale_ternaries = FALSE,
                                               axis_label_size = 4,
                                               vertex_label_size = 5){
+
+  # If user wishes to shrink ternaries, then grid is compressed
+  if(check_col_exists(data, ".Facet") & isTRUE(scale_ternaries)){
+    c_x <-  0.5
+    c_y <-  sqrt(3)/6
+
+    data <- data %>%
+      mutate(.x = c_x + (1 - as.numeric(.data$.Value))*(.data$.x - c_x),
+             .y = c_y + (1 - as.numeric(.data$.Value))*(.data$.y - c_y))
+  }
 
   # Create the simple ternary plot
   pl <- ternary_plot_internal(data = data,
@@ -641,8 +674,9 @@ conditional_ternary_plot_internal <- function(data,
                               lower_lim = lower_lim,
                               upper_lim = upper_lim,
                               contour_text = contour_text,
-                              show_axis_labels = FALSE,
+                              show_axis_labels = show_axis_labels,
                               show_axis_guides = show_axis_guides,
+                              scale_ternaries = scale_ternaries,
                               axis_label_size = axis_label_size,
                               vertex_label_size = vertex_label_size)
 
@@ -660,39 +694,39 @@ conditional_ternary_plot_internal <- function(data,
     values <- "0"
   }
 
-  # Show appropriate labels for for the ternary axes
-  if(show_axis_labels){
-    # Labels for the ternary axes
-    # (because they'll be scaled for conditional panels)
-    axis_labels <- # lapply(conditional, function(sp){
-      lapply(values, function(val){
-        cond_sp <- strsplit(conditional, ", ")[[1]]
-        cond_vals <- as.numeric(strsplit(val, ", ")[[1]])
-        x <- sum(cond_vals)
-        positions <- tibble(x1 = seq(0.2,0.8,0.2),
-                            y1 = c(0,0,0,0),
-                            x2 = .data$x1/2,
-                            y2 = .data$x1*sqrt(3)/2,
-                            x3 = (1-.data$x1)*0.5+.data$x1,
-                            y3 = sqrt(3)/2-.data$x1*sqrt(3)/2,
-                            label = .data$x1*(1-x),
-                            rev_label = rev(.data$label),
-                            .Facet = paste0(cond_sp, " = ", cond_vals,
-                                            collapse = "; "),
-                            !! sym(col_var) := 0)
-      }) %>% bind_rows()
-
-    pl <- pl +
-      geom_text(data = axis_labels,
-                aes(x=.data$x1, y=.data$y1, label=.data$label),
-                nudge_y=-0.055, size = axis_label_size)+
-      geom_text(data = axis_labels,
-                aes(x=.data$x2, y=.data$y2, label=.data$rev_label),
-                nudge_x=-0.055, nudge_y=0.055, size = axis_label_size)+
-      geom_text(data = axis_labels,
-                aes(x=.data$x3, y=.data$y3, label=.data$rev_label),
-                nudge_x=0.055, nudge_y=0.055, size = axis_label_size)
-  }
+  # # Show appropriate labels for for the ternary axes
+  # if(show_axis_labels){
+  #   # Labels for the ternary axes
+  #   # (because they'll be scaled for conditional panels)
+  #   axis_labels <- # lapply(conditional, function(sp){
+  #     lapply(values, function(val){
+  #       cond_sp <- strsplit(conditional, ", ")[[1]]
+  #       cond_vals <- as.numeric(strsplit(val, ", ")[[1]])
+  #       x <- sum(cond_vals)
+  #       positions <- tibble(x1 = seq(0.2,0.8,0.2),
+  #                           y1 = c(0,0,0,0),
+  #                           x2 = .data$x1/2,
+  #                           y2 = .data$x1*sqrt(3)/2,
+  #                           x3 = (1-.data$x1)*0.5+.data$x1,
+  #                           y3 = sqrt(3)/2-.data$x1*sqrt(3)/2,
+  #                           label = .data$x1*(1-x),
+  #                           rev_label = rev(.data$label),
+  #                           .Facet = paste0(cond_sp, " = ", cond_vals,
+  #                                           collapse = "; "),
+  #                           !! sym(col_var) := 0)
+  #     }) %>% bind_rows()
+  #
+  #   pl <- pl +
+  #     geom_text(data = axis_labels,
+  #               aes(x=.data$x1, y=.data$y1, label=.data$label),
+  #               nudge_y=-0.055, size = axis_label_size)+
+  #     geom_text(data = axis_labels,
+  #               aes(x=.data$x2, y=.data$y2, label=.data$rev_label),
+  #               nudge_x=-0.055, nudge_y=0.055, size = axis_label_size)+
+  #     geom_text(data = axis_labels,
+  #               aes(x=.data$x3, y=.data$y3, label=.data$rev_label),
+  #               nudge_x=0.055, nudge_y=0.055, size = axis_label_size)
+  # }
 
   return(pl)
 }
