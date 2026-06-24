@@ -12,8 +12,8 @@
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="DImodelsVis with black-box models">
 </head>
@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">DImodelsVis</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.5.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -164,7 +164,7 @@ lower values given shades of pink and white.</p>
 <span>  <span class="co"># Colour points by SOC variable</span></span>
 <span>  col_var <span class="op">=</span> <span class="st">"SOC"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Created plot.</span></span></code></pre></div>
-<p><img src="DImodelsVis-with-black-box-models_files/figure-html/raw_data-1.png" alt="Plot of raw data in ternary" width="480" style="display: block; margin: auto;"></p>
+<p><img src="DImodelsVis-with-black-box-models_files/figure-html/raw_data-1.png" class="r-plt" alt="Plot of raw data in ternary" width="480" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
 <h3 id="neural-network">Neural network<a class="anchor" aria-label="anchor" href="#neural-network"></a>
@@ -276,7 +276,7 @@ function.</p>
 <span>  <span class="co"># ggplot function to add labels on plot</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="st">"Predicted\nSOC"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Created plot.</span></span></code></pre></div>
-<p><img src="DImodelsVis-with-black-box-models_files/figure-html/visualise_nn_model-1.png" alt="Ternary diagram showing SOC" width="480" style="display: block; margin: auto;"></p>
+<p><img src="DImodelsVis-with-black-box-models_files/figure-html/visualise_nn_model-1.png" class="r-plt" alt="Ternary diagram showing SOC" width="480" style="display: block; margin: auto;"></p>
 <p>The predicted SOC is higher in soil containing high proportions of
 clay and lower in soil containing high amounts of sand.</p>
 <p><br></p>
@@ -348,7 +348,7 @@ shown in the random-forest example later in the vignette.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>  0.05  0.95     0 Sand         0.05      1 increase  4.91</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 4,539 more rows</span></span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Created plot.</span></span></code></pre></div>
-<p><img src="DImodelsVis-with-black-box-models_files/figure-html/nn_model_effects-1.png" alt="Effects plot for compositional predictors" width="864" style="display: block; margin: auto;"></p>
+<p><img src="DImodelsVis-with-black-box-models_files/figure-html/nn_model_effects-1.png" class="r-plt" alt="Effects plot for compositional predictors" width="864" style="display: block; margin: auto;"></p>
 <p>Increasing the proportion of sand lowers SOC, while increasing clay
 raises it. The effect of silt depends on the soil context: it tends to
 increase SOC in sand-rich soils but reduce it in clay-rich soils,
@@ -418,7 +418,7 @@ defaults.</p>
 <span>  <span class="co"># ggplot function to add labels on plot</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="st">"Predicted\nSOC"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Created plot.</span></span></code></pre></div>
-<p><img src="DImodelsVis-with-black-box-models_files/figure-html/visualise_forest_model-1.png" alt="Response surface from random forest" width="480" style="display: block; margin: auto;"></p>
+<p><img src="DImodelsVis-with-black-box-models_files/figure-html/visualise_forest_model-1.png" class="r-plt" alt="Response surface from random forest" width="480" style="display: block; margin: auto;"></p>
 <p>A similar inference can be drawn as the neural network: predicted SOC
 is higher in soils with greater clay content and lower in those with
 higher sand content. However, the predicted response surface is
@@ -439,7 +439,7 @@ post-processing smoothing operation over the predicted values.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>

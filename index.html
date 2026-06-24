@@ -12,8 +12,8 @@
 <link rel="icon" sizes="any" href="favicon.ico">
 <link rel="manifest" href="site.webmanifest">
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Visualising and Interpreting Statistical Models Fit to Compositional Data">
 <meta name="description" content="Statistical models fit to compositional data are often difficult to interpret due to the sum to 1 constraint on data variables. DImodelsVis provides novel visualisations tools to aid with the interpretation of models fit to compositional data. All visualisations in the package are created using the ggplot2 plotting framework and can be extended like every other ggplot object.">
@@ -28,7 +28,7 @@
 
     <a class="navbar-brand me-2" href="index.html">DImodelsVis</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.5.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -141,6 +141,7 @@ Package workflow
 </h3>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dimodels.com/" class="external-link">DImodels</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: package 'DImodels' was built under R version 4.4.3</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rishvish.github.io/DImodelsVis/">DImodelsVis</a></span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
@@ -187,7 +188,7 @@ Package workflow
 <div class="section level4">
 <h4 id="visualising-model-selection">Visualising model selection<a class="anchor" aria-label="anchor" href="#visualising-model-selection"></a>
 </h4>
-<p>We can visualise model selection by passing our models as a list to the <code>model_selection</code> function and visualising the best performing metric across different information criteria. Run <code><a href="reference/model_selection.html">?model_selection</a></code> or see the associated <a href="https://htmlpreview.github.io/?https://github.com/rishvish/DImodelsVis/blob/main/pkgdown/assets/coming_soon.html" class="external-link">vignette</a> for more information on customising the plot.</p>
+<p>We can visualise model selection by passing our models as a list to the <code>model_selection</code> function and visualising the best performing metric across different information criteria. Run <code><a href="reference/model_selection.html">?model_selection</a></code> for more information on customising the plot.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mods</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"ID"</span> <span class="op">=</span> <span class="va">mod_ID</span>, <span class="st">"AV"</span> <span class="op">=</span> <span class="va">mod_AV</span>, <span class="st">"FG"</span> <span class="op">=</span> <span class="va">mod_FG</span>, </span>
 <span>            <span class="st">"ADD"</span> <span class="op">=</span> <span class="va">mod_ADD</span>, <span class="st">"FULL"</span> <span class="op">=</span> <span class="va">mod_FULL</span><span class="op">)</span></span>
@@ -224,7 +225,7 @@ Package workflow
 <div class="section level4">
 <h4 id="model-diagnostics">Model diagnostics<a class="anchor" aria-label="anchor" href="#model-diagnostics"></a>
 </h4>
-<p>After choosing a model we can create diagnostics plot where the points are replaced by pie-glyphs showing the proportions of the compositional variables. Run <code><a href="reference/model_diagnostics.html">?model_diagnostics</a></code> or see the associated <a href="https://htmlpreview.github.io/?https://github.com/rishvish/DImodelsVis/blob/main/pkgdown/assets/coming_soon.html" class="external-link">vignette</a> for more information on customising the plot.</p>
+<p>After choosing a model we can create diagnostics plot where the points are replaced by pie-glyphs showing the proportions of the compositional variables. Run <code><a href="reference/model_diagnostics.html">?model_diagnostics</a></code> for more information on customising the plot.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/model_diagnostics.html">model_diagnostics</a></span><span class="op">(</span>model <span class="op">=</span> <span class="va">mod_FG</span><span class="op">)</span></span>
 <span><span class="co">#&gt; ✔ Created all plots.</span></span></code></pre></div>
@@ -246,7 +247,7 @@ Package workflow
 <span><span class="co">#&gt; ✔ Created plot.</span></span></code></pre></div>
 <p><img src="reference/figures/README-prediction-contributions-1.png" alt="Output from prediction_contributions() function" style="display: block; margin: auto;"></p>
 <p>The coloured bars show the contributions of the different terms in the model. The contribution is defined as the product of the coefficient and value for each predictor variable. Thus, the contribution for a term would be zero if it’s value in an observation is zero regardless of it’s coefficient value (e.g. prediction bars for the monocultures at the right of the graph).</p>
-<p>This plot would aid in understanding why certain observations have higher predictions. For example, we can see that higher predictions are primarily driven by the <code>p3_ID</code> and <code>p4_ID</code> terms and hence the <code>p1</code> and <code>p2</code> monocultures have low predictions as the all the other terms have a value of zero here. Similarly, we can also see that mixtures dominated by <code>p3</code> perform the best. Run <code><a href="reference/prediction_contributions.html">?prediction_contributions</a></code> or see the associated <a href="https://htmlpreview.github.io/?https://github.com/rishvish/DImodelsVis/blob/main/pkgdown/assets/coming_soon.html" class="external-link">vignette</a> for more information on creating and customising the plot.</p>
+<p>This plot would aid in understanding why certain observations have higher predictions. For example, we can see that higher predictions are primarily driven by the <code>p3_ID</code> and <code>p4_ID</code> terms and hence the <code>p1</code> and <code>p2</code> monocultures have low predictions as the all the other terms have a value of zero here. Similarly, we can also see that mixtures dominated by <code>p3</code> perform the best. Run <code><a href="reference/prediction_contributions.html">?prediction_contributions</a></code> for more information on creating and customising the plot.</p>
 </div>
 <div class="section level4">
 <h4 id="average-change-in-respone-over-diversity-gradient">Average change in respone over diversity gradient<a class="anchor" aria-label="anchor" href="#average-change-in-respone-over-diversity-gradient"></a>
@@ -261,7 +262,7 @@ Package workflow
 <span><span class="co">#&gt; ✔ Finished data preparation</span></span>
 <span><span class="co">#&gt; ✔ Created plot.</span></span></code></pre></div>
 <p><img src="reference/figures/README-gradient-change-1.png" alt="Output from gradient_change() function" style="display: block; margin: auto;"></p>
-<p>This shows that on average the predicted response increases as richness increases but at a saturating rate. Run <code><a href="reference/gradient_change.html">?gradient_change</a></code> or see the associated <a href="https://htmlpreview.github.io/?https://github.com/rishvish/DImodelsVis/blob/main/pkgdown/assets/coming_soon.html" class="external-link">vignette</a> for more information on creating and customising the plot.</p>
+<p>This shows that on average the predicted response increases as richness increases but at a saturating rate. Run <code><a href="reference/gradient_change.html">?gradient_change</a></code> for more information on creating and customising the plot.</p>
 </div>
 <div class="section level4">
 <h4 id="conditional-ternary-diagrams">Conditional ternary diagrams<a class="anchor" aria-label="anchor" href="#conditional-ternary-diagrams"></a>
@@ -275,7 +276,7 @@ Package workflow
 <span><span class="co">#&gt; ✔ Finished data preparation.</span></span>
 <span><span class="co">#&gt; ✔ Created plot.</span></span></code></pre></div>
 <p><img src="reference/figures/README-cond-ternary-1.png" alt="Output from conditional_ternary() function" style="display: block; margin: auto;"></p>
-<p>This figure shows that the predicted response decreases as we increase the proportion of <code>p2</code> and is maximised as we increase the proportion of <code>p3</code>. Run <code><a href="reference/conditional_ternary.html">?conditional_ternary</a></code> or see the associated <a href="https://htmlpreview.github.io/?https://github.com/rishvish/DImodelsVis/blob/main/pkgdown/assets/coming_soon.html" class="external-link">vignette</a> for more information on creating and customising the plot.</p>
+<p>This figure shows that the predicted response decreases as we increase the proportion of <code>p2</code> and is maximised as we increase the proportion of <code>p3</code>. Run <code><a href="reference/conditional_ternary.html">?conditional_ternary</a></code> for more information on creating and customising the plot.</p>
 </div>
 <div class="section level4">
 <h4 id="effects-plots-for-models-with-compositional-predictors">Effects plots for models with compositional predictors<a class="anchor" aria-label="anchor" href="#effects-plots-for-models-with-compositional-predictors"></a>
@@ -288,7 +289,7 @@ Package workflow
 <span><span class="co">#&gt; ✔ Finished data preparation.</span></span>
 <span><span class="co">#&gt; ✔ Created plot.</span></span></code></pre></div>
 <p><img src="reference/figures/README-effects-plot-1.png" alt="Output from visualise_effects() function" style="display: block; margin: auto;"></p>
-<p>The grey lines show the effect (on the predicted response) of increasing the species of interest within a particular community while the solid black line shows the average effect of increasing the proportion of a species on the predicted response. It can be seen that for all communities increasing <code>p2</code> results in a decrease in the predicted response while increasing <code>p3</code> has a positive effect on the predicted response. Run <code><a href="reference/visualise_effects.html">?visualise_effects</a></code> or see the associated <a href="https://htmlpreview.github.io/?https://github.com/rishvish/DImodelsVis/blob/main/pkgdown/assets/coming_soon.html" class="external-link">vignette</a> for more information on creating and customising the plot.</p>
+<p>The grey lines show the effect (on the predicted response) of increasing the species of interest within a particular community while the solid black line shows the average effect of increasing the proportion of a species on the predicted response. It can be seen that for all communities increasing <code>p2</code> results in a decrease in the predicted response while increasing <code>p3</code> has a positive effect on the predicted response. Run <code><a href="reference/visualise_effects.html">?visualise_effects</a></code> for more information on creating and customising the plot.</p>
 </div>
 <div class="section level4">
 <h4 id="simplex-path">Simplex path<a class="anchor" aria-label="anchor" href="#simplex-path"></a>
@@ -301,7 +302,7 @@ Package workflow
 <span><span class="co">#&gt; ✔ Finished data preparation.</span></span>
 <span><span class="co">#&gt; ✔ Created plot.</span></span></code></pre></div>
 <p><img src="reference/figures/README-simplex-path-1.png" alt="Output from simplex_path() function" style="display: block; margin: auto;"></p>
-<p>We can see that moving from the centroid community to <code>p1</code>, <code>p2</code>, and <code>p4</code> decreases the predicted response, while moving towards a monoculture of <code>p3</code> increases the response. Run <code><a href="reference/simplex_path.html">?simplex_path</a></code> or see the associated <a href="https://htmlpreview.github.io/?https://github.com/rishvish/DImodelsVis/blob/main/pkgdown/assets/coming_soon.html" class="external-link">vignette</a> for more information on creating and customising the plot.</p>
+<p>We can see that moving from the centroid community to <code>p1</code>, <code>p2</code>, and <code>p4</code> decreases the predicted response, while moving towards a monoculture of <code>p3</code> increases the response. Run <code><a href="reference/simplex_path.html">?simplex_path</a></code> for more information on creating and customising the plot.</p>
 </div>
 </div>
 </div>
@@ -395,7 +396,7 @@ Package workflow
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>

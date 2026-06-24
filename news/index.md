@@ -1,0 +1,50 @@
+# Changelog
+
+## DImodelsVis 1.0.5
+
+- Ternary plots now also work with model containing log-transformed (for
+  example, alr, clr, and ilr) compositional predictors.
+- Conditional ternary plots now have a `scale_ternaries` argument which,
+  when set to TRUE, allows conditional ternaries to be scaled according
+  to the size of the corresponding slice within the original simplex.
+- Some other bug minor bug fixes.
+
+## DImodelsVis 1.0.4
+
+CRAN release: 2025-10-08
+
+- Added new vignettes showcasing how to use `DImodelsVis` with different
+  models such as random-forests, neural networks, nlme, etc.
+- Prediction contribution plots now have `bar_width` and `eb_width`
+  parameters to allow adjusting the widths of the prediction and error
+  bars, respectively.
+- Cleaned up package documentation a bit.
+
+## DImodelsVis 1.0.3
+
+CRAN release: 2025-08-23
+
+- Updated to code base to ensure compatibility with upcoming ggplot
+  v4.0.0
+
+## DImodelsVis 1.0.2
+
+CRAN release: 2025-08-21
+
+- Added functionality allowing the package to work seamlessly with model
+  objects fit using `DImodelsMulti`.
+- Units tests added for all functions.
+- Additional bug fixes.
+
+## DImodelsVis 1.0.1
+
+CRAN release: 2024-02-26
+
+- Fixed a bug that caused vignette building to fail on Fedora systems.
+- Additional bug fixes to streamline the code.
+
+## DImodelsVis 1.0.0
+
+CRAN release: 2024-02-19
+
+- Initial CRAN submission.
