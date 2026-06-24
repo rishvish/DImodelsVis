@@ -52,7 +52,7 @@ predictions, so the user can set this to \code{FALSE} and
 manually call the `\link{add_prediction}` function.}
 
 \item{...}{
-  Arguments passed on to \code{\link[=add_prediction]{add_prediction}}
+  Arguments passed on to \code{\link{add_prediction}}
   \describe{
     \item{\code{model}}{A regression model object which will be used to make predictions
 for the observations in `data`. Will override `coefficients`

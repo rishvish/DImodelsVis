@@ -82,9 +82,9 @@ test_that("Prediction contributions works as expected", {
   # expect_equal(ret_data, exp_data)
 
   # Also make sure function works with _data and _plot function
-  expect_doppelganger(title = "PC with data manually prepared",
+  expect_doppelganger(title = "PC with data manually prepared exp",
                       fig = prediction_contributions_plot(data = exp_data) %>% suppressMessages() %>% suppressWarnings())
-  expect_doppelganger(title = "PC with data manually prepared",
+  expect_doppelganger(title = "PC with data manually prepared ret",
                       fig = prediction_contributions_plot(data = ret_data) %>% suppressMessages() %>% suppressWarnings())
   # Given figures same title. So if they'd be different a warning would be thrown
 

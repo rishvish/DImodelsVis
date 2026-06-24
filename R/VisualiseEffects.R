@@ -530,8 +530,7 @@ visualise_effects_plot <- function(data, prop, pie_colours = NULL,
 #' \code{\link{visualise_effects_plot}}. If your model object isn't fit using
 #' DImodels, users can call the data and plot functions manually, one by one.
 #'
-#' @importFrom ggplot2 geom_line labs scale_colour_manual geom_ribbon labeller
-#'                     stat_summary scale_x_reverse facet_wrap geom_smooth
+#' @importFrom ggplot2 geom_line labs scale_colour_manual geom_ribbon labeller stat_summary scale_x_reverse facet_wrap geom_smooth
 #' @importFrom dplyr %>% select filter all_of everything slice mutate bind_rows summarise
 #' @importFrom PieGlyph geom_pie_glyph
 #' @importFrom rlang :=
@@ -746,11 +745,11 @@ visualise_effects <- function(model, data = NULL, var_interest = NULL,
   }
 }
 
-#' @keywords internal
 #' Internal function for creating effects plot
 #'
-#' @usage NULL
-NULL
+#' @keywords internal
+#'
+#' @noRd
 visualise_effects_plot_internal <- function(data, prop, pie_colours = NULL,
                                             pie_radius = 0.3,
                                             se = FALSE, average = TRUE){

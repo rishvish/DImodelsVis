@@ -98,7 +98,7 @@ test_that("Common errors are thrown", {
                "works only for models with three compositional predictors")
 
   expect_warning(ternary_data(prop = species, prediction = FALSE,
-                              resolution = 100),
+                              resolution = 100) %>% suppressMessages(),
                  "`resolution` should be a number with values between 0 and 10")
 
 
@@ -112,13 +112,13 @@ test_that("Common errors are thrown", {
                "Three labels are needed for the ternary, only 2 were specified")
   expect_warning(ternary_plot(data = sim0, show = "points",
                               prop = species,
-                              tern_labels = c("p1", "p2", "p3", "P4")),
+                              tern_labels = c("p1", "p2", "p3", "P4")) %>% suppressMessages(),
                "More than three labels were specified")
 
   expect_error(ternary_plot(contour_data %>% `attr<-`("x_proj", NULL) %>% select(-.x)),
                "Certain attributes of the data which are needed for plotting the response contours")
 
-  expect_warning(ternary_plot(contour_data %>% `attr<-`("x_proj", NULL)),
+  expect_warning(ternary_plot(contour_data %>% `attr<-`("x_proj", NULL)) %>% suppressMessages(),
                  "Certain attributes of the data which")
 
 

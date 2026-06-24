@@ -1,6 +1,6 @@
 Package: DImodelsVis
 Title: Visualising and Interpreting Statistical Models Fit to Compositional Data
-Version: 1.0.5.9000
+Version: 1.0.5.9001
 Authors@R: 
     c(person("Rishabh", "Vishwakarma", email = "vishwakr@tcd.ie", role = c("aut", "cre"),
              comment = c(ORCID = "0000-0002-4847-3494")),
@@ -32,7 +32,7 @@ Imports:
     stats,
     tidyr,
     utils
-RoxygenNote: 7.3.3
+RoxygenNote: 8.0.0
 Suggests: 
     DImodelsMulti (>= 1.0.0),
     knitr,

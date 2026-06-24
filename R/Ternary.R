@@ -451,13 +451,13 @@ ternary_plot <- function(data, prop = NULL,
   return(plot)
 }
 
-#' @keywords internal
 #' Internal function for creating a ternary plot
 #'
 #' @importFrom ggplot2 geom_tile geom_raster scale_colour_gradientn scale_color_manual element_line element_rect
 #'
-#' @usage NULL
-NULL
+#' @keywords internal
+#'
+#' @noRd
 ternary_plot_internal <- function(data, prop,
                                   col_var = ".Pred",
                                   show = c("contours", "points"),
@@ -690,11 +690,11 @@ ternary_plot_internal <- function(data, prop,
           if(isTRUE(scale_ternaries)){
             label_positions <- label_positions %>%
               mutate(
-                across(c(.data$x1, .data$x2, .data$x3, .data$x3_rev,
-                         .data$x1_pos, .data$x2_pos, .data$x3_pos),
+                across(c("x1", "x2", "x3", "x3_rev",
+                         "x1_pos", "x2_pos", "x3_pos"),
                        ~ c_x + (1 - k) * (.x - c_x)),
-                across(c(.data$y1, .data$y2, .data$y3, .data$y3_rev,
-                         .data$y1_pos, .data$y2_pos, .data$y3_pos),
+                across(c("y1", "y2", "y3", "y3_rev",
+                         "y1_pos", "y2_pos", "y3_pos"),
                        ~ c_y + (1 - k) * (.x - c_y))
               )
           }

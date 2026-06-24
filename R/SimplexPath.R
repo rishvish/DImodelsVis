@@ -527,12 +527,12 @@ simplex_path <- function(model, starts, ends, add_var = list(),
 }
 
 
-#' @keywords internal
 #' Internal function for creating a plot showing the change in response between
 #' any two points in the simplex
 #'
-#' @usage NULL
-NULL
+#' @keywords internal
+#'
+#' @noRd
 simplex_path_plot_internal <- function(data, prop, pie_colours = NULL,
                                        pie_radius = 0.3,
                                        pie_positions = c(0, 0.5, 1),
@@ -625,13 +625,13 @@ simplex_path_plot_internal <- function(data, prop, pie_colours = NULL,
   return(plot)
 }
 
-#' @keywords internal
 #' Utility function that accepts any two points in the simplex space as
 #' two numeric vectors and returns a data-frame containing `ncomms` number of
 #' intermediate communities across a straight line between the two points.
 #'
-#' @usage NULL
-NULL
+#' @keywords internal
+#'
+#' @noRd
 interpolate_communities <- function(start, end, prop, ncomms = 101){
   ts <- seq(0, 1, length.out = ncomms)
   points <- sapply(ts, function(t) {

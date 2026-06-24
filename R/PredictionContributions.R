@@ -460,14 +460,10 @@ prediction_contributions_plot <- function(data, colours = NULL, se = FALSE,
 #' \code{\link{prediction_contributions_plot}}. If your model object isn't fit using
 #' DImodels, the associated data and plot functions can instead be called manually.
 #'
-#' @importFrom dplyr mutate %>% group_by distinct across
-#'                   all_of slice_head ungroup near
+#' @importFrom dplyr mutate %>% group_by distinct across all_of slice_head ungroup near
 #' @importFrom tidyr pivot_longer
 #' @importFrom forcats fct_rev fct_inorder
-#' @importFrom ggplot2 ggplot element_text aes geom_col labs geom_errorbar
-#'                     theme theme_bw facet_grid guides guide_legend coord_flip
-#'                     scale_fill_manual unit element_blank label_both
-#'                     scale_x_continuous scale_x_discrete
+#' @importFrom ggplot2 ggplot element_text aes geom_col labs geom_errorbar theme theme_bw facet_grid guides guide_legend coord_flip scale_fill_manual unit element_blank label_both scale_x_continuous scale_x_discrete
 #' @importFrom PieGlyph geom_pie_glyph
 #' @importFrom rlang !!! !! sym .data
 #' @importFrom stats predict
@@ -758,11 +754,11 @@ prediction_contributions <- function(model, data = NULL,
 
 }
 
-#' @keywords internal
 #' Utility function for creating prediction_contributions plot
 #'
-#' @usage NULL
-NULL
+#' @keywords internal
+#'
+#' @noRd
 prediction_contributions_plot_internal <- function(data, colours = NULL,
                                                    se = FALSE,
                                                    bar_orientation = c("vertical", "horizontal"),

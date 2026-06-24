@@ -385,8 +385,7 @@ gradient_change_plot <- function(data, prop = NULL,
 #' DImodels, the associated data and plot functions can instead be called manually.
 #'
 #' @importFrom dplyr mutate %>% group_by distinct across all_of
-#' @importFrom ggplot2 ggplot geom_line aes geom_point position_dodge
-#'                     position_identity labs theme theme_bw
+#' @importFrom ggplot2 ggplot geom_line aes geom_point position_dodge position_identity labs theme theme_bw
 #' @importFrom PieGlyph geom_pie_glyph
 #' @importFrom rlang !!! !! sym .data
 #' @importFrom DImodels DI_data_E_AV
@@ -609,11 +608,9 @@ gradient_change <- function(model, data = NULL,
   }
 }
 
-#' @keywords internal
 #' Internal function for the gradient change plot
 #'
-#' @usage NULL
-NULL
+#' @noRd
 gradient_change_plot_internal <- function(data, prop = NULL,
                                           pie_data = NULL,
                                           pie_colours = NULL,

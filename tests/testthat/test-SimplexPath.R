@@ -99,13 +99,13 @@ test_that("Common errors are thrown", {
 
   expect_error(simplex_path(mod = mod,
                             ends = data.frame(p5 = 1),
-                            starts = data.frame(p5 = 1)),
+                            starts = data.frame(p5 = 1)) %>% suppressMessages(),
                "are not present in the data.")
 
   expect_error(simplex_path(starts = starts,
                             ends = ends %>% slice(1),
                             model = mod,
-                            pie_positions = c(1, 2)),
+                            pie_positions = c(1, 2)) %>% suppressMessages(),
                "`pie_positions` should be a")
 
 })

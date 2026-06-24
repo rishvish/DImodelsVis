@@ -7,8 +7,7 @@
 #' deviance (goodness-of-fit) and penalty terms for each model. This could aid in
 #' understanding why a parsimonious model could be preferable over a more complex model.
 #'
-#' @importFrom ggplot2 geom_line geom_point geom_label aes scale_colour_identity
-#'                     scale_colour_manual geom_hline geom_segment arrow
+#' @importFrom ggplot2 geom_line geom_point geom_label aes scale_colour_identity scale_colour_manual geom_hline geom_segment arrow
 #' @importFrom dplyr %>% mutate rename arrange sym group_by ungroup rename_with across
 #' @importFrom tidyr pivot_longer
 #' @importFrom insight is_regression_model

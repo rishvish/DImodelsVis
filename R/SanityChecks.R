@@ -1,14 +1,14 @@
-#' @keywords internal
 #' Performing sanity checks to ensure user input is appropriate and return
 #' informative error messages if anything is wrong
+#'
+#' @keywords internal
 #'
 #' @importFrom insight is_regression_model get_data
 #' @importFrom cli cli_abort cli_warn cli_alert col_green
 #' @importFrom rlang caller_env
 #' @importFrom dplyr near
 #'
-#' @usage NULL
-NULL
+#' @noRd
 sanity_checks <- function(data = NULL, prop = NULL, responses = NULL,
                           facet = NULL, treatments = NULL, DImodel = NULL,
                           model = NULL, colours = NULL,
@@ -303,13 +303,11 @@ sanity_checks <- function(data = NULL, prop = NULL, responses = NULL,
   return(TRUE)
 }
 
-#' @keywords internal
 #' Ensure the model or coefficients specified in the data preparation
 #' functions are appropriate
 #'
 #' @keywords internal
-#' @usage NULL
-NULL
+#' @noRd
 check_data_functions <- function(model, coefficients,
                                  call = caller_env()){
   # One of model or coefficients should be specified
@@ -346,12 +344,12 @@ check_data_functions <- function(model, coefficients,
   return(TRUE)
 }
 
-#' @keywords internal
 #' Ensure the experimental structures specified in plotting functions are
 #' present in the model and have the appropriate type and values
 #'
-#' @usage NULL
-NULL
+#' @keywords internal
+#'
+#' @noRd
 check_add_var <- function(model = NULL, add_var = NULL, call = caller_env()){
   if(!is.null(add_var) && !is.list(add_var)){
     cli::cli_abort(c("{.var add_var} should be a list or data.frame containing the names and
@@ -496,11 +494,11 @@ check_add_var <- function(model = NULL, add_var = NULL, call = caller_env()){
   return(add_var)
 }
 
-#' @keywords internal
 #' Ensure the coefficient groupings specified for response contributions are appropriate
 #'
-#' @usage NULL
-NULL
+#' @keywords internal
+#'
+#' @noRd
 check_coeff_groupings <- function(coefficients, groups, call = caller_env()){
   if(length(groups) > 0){
     # Ensure groups are specified as a list
@@ -556,13 +554,13 @@ check_coeff_groupings <- function(coefficients, groups, call = caller_env()){
   return(TRUE)
 }
 
-#' @keywords internal
 #' Utility function to ensure specified value is an appropriate colour
 #'
 #' @importFrom grDevices col2rgb
 #'
-#' @usage NULL
-NULL
+#' @keywords internal
+#'
+#' @noRd
 areColours <- function(colours) {
   sapply(colours, function(colour) {
     tryCatch(is.matrix(col2rgb(colour)),

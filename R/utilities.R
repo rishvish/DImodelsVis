@@ -95,11 +95,11 @@ add_add_var <- function(data, add_var = NULL){
   return(data)
 }
 
-#' @keywords internal
 #' Utility function to return colour-blind friendly colours/palette
 #'
-#' @usage NULL
-NULL
+#' @keywords internal
+#'
+#' @noRd
 colour_blind_friendly_cols <- function(n){
   # A safe colour-blind palette created by combining Okabe-Ito colours
   # and safe colour pallete from rcartocolor
@@ -377,12 +377,12 @@ get_equi_comms <- function(nvars,
   return(comms)
 }
 
-#' @keywords internal
 #' Utility function to return the richness of each community in the data.
 #' Particularly useful in dplyr pipeline.
 #'
-#' @usage NULL
-NULL
+#' @keywords internal
+#'
+#' @noRd
 get_richness <- function(data, prop = NULL){
   # Special situation if funtion is called in dplyr pipeline as .data doesn't
   # allow to select over multiple columns
@@ -397,12 +397,12 @@ get_richness <- function(data, prop = NULL){
   return(rowSums(data[, prop] != 0))
 }
 
-#' @keywords internal
 #' Utility function to return the evenness of each community in the data.
 #' Particularly useful in dplyr pipeline.
 #'
-#' @usage NULL
-NULL
+#' @keywords internal
+#'
+#' @noRd
 get_evenness <- function(data, prop = NULL){
   # Special situation if funtion is called in dplyr pipeline as .data doesn't
   # allow to select over multiple columns
@@ -417,12 +417,12 @@ get_evenness <- function(data, prop = NULL){
   return(DImodels::DI_data_E_AV(prop = prop, data = data)$E)
 }
 
-#' @keywords internal
 #' Utility function to return the sum of species proportions in each community
 #' in the data. Particularly useful in dplyr pipeline.
 #'
-#' @usage NULL
-NULL
+#' @keywords internal
+#'
+#' @noRd
 get_comm_sum <- function(data, prop = NULL){
   # Special situation if function is called in dplyr pipeline as .data doesn't
   # allow to select over multiple columns
@@ -437,11 +437,11 @@ get_comm_sum <- function(data, prop = NULL){
   return(rowSums(data[, prop], na.rm = TRUE))
 }
 
-#' @keywords internal
 #' Utility function to check if community is equi-proportional
 #'
-#' @usage NULL
-NULL
+#' @keywords internal
+#'
+#' @noRd
 check_equi <- function(comm){
   comm <- comm[which(comm != 0)]
   ret_value <- (abs(max(comm) - min(comm)) < 0.00001)
@@ -451,8 +451,7 @@ check_equi <- function(comm){
 #' @keywords internal
 #' @importFrom stats AIC BIC logLik fitted residuals median model.frame terms
 #' @importFrom insight n_obs n_parameters
-#' @usage NULL
-NULL
+#' @noRd
 AICc <- function(model) {
   aic <- AIC(model)
   p <- insight::n_parameters(x = model, remove_nonestimable = TRUE) + 1
@@ -461,8 +460,7 @@ AICc <- function(model) {
   return(aicc)
 }
 #' @keywords internal
-#' @usage NULL
-NULL
+#' @noRd
 BICc <- function(model) {
   bic <- BIC(model)
   p <- insight::n_parameters(x = model, remove_nonestimable = TRUE) + 1
@@ -473,36 +471,27 @@ BICc <- function(model) {
 
 # Create vectorized versions of the functions of information criteria
 #' @keywords internal
-#' @usage NULL
-NULL
+#' @noRd
 AIC_vec <- Vectorize(AIC)
 #' @keywords internal
-#' @usage NULL
-NULL
+#' @noRd
 BIC_vec <- Vectorize(BIC)
+
 #' @keywords internal
-#' @usage NULL
-NULL
-#' @keywords internal
-#' @usage NULL
-NULL
+#' @noRd
 AICc_vec <- Vectorize(AICc)
 #' @keywords internal
-#' @usage NULL
-NULL
+#' @noRd
 BICc_vec <- Vectorize(BICc)
 #' @keywords internal
-#' @usage NULL
-NULL
+#' @noRd
 logLik_vec <- Vectorize(logLik)
 #' @keywords internal
-#' @usage NULL
-NULL
+#' @noRd
 deviance_vec <- Vectorize(deviance)
 
 #' @keywords internal
-#' @usage NULL
-NULL
+#' @noRd
 dropInf <- function(x, h) {
   if (any(isInf <- h >= 1)) {
     warning(gettextf("not plotting observations with leverage one:\n  %s",
@@ -513,32 +502,32 @@ dropInf <- function(x, h) {
   x
 }
 
-#' @keywords internal
 #' Function to return a smoothed curve over data points in a plot.
 #' Useful for diagnostics plots
 #'
-#' @usage NULL
-NULL
+#' @keywords internal
+#'
+#' @noRd
 smoothing_fun <- function(x, y) {
   as.data.frame(stats::lowess(x, y, f = 2/3, iter = 3))
 }
 
-#' @keywords internal
 #' Utility function for rescaling a vector between a specified min and max value
 #'
-#' @usage NULL
-NULL
+#' @keywords internal
+#'
+#' @noRd
 rescale <- function(x, min = 0, max = 1){
   ((x - min(x))/(max(x) - min(x)) * (max - min)) + min
 }
 
-#' @keywords internal
 #' Function for checking for the presence of certain columns in the data
 #' and print appropriate error message. Useful for plotting function to
 #' ensure necessary columns are present in the data.
 #'
-#' @usage NULL
-NULL
+#' @keywords internal
+#'
+#' @noRd
 check_presence <- function(data, col, message = NULL){
   # Check if any columns are not present
   data_cols <- colnames(data)
@@ -562,11 +551,12 @@ check_presence <- function(data, col, message = NULL){
   return(TRUE)
 }
 
-#' @keywords internal
 #' Wrapper function for adding a facet layer to a plot
 #' @importFrom stats as.formula
-#' @usage NULL
-NULL
+#'
+#' @keywords internal
+#'
+#' @noRd
 add_facet <- function(plot, data, facet_var, ...){
   facet_var <- rlang::try_fetch(data %>% dplyr::select(all_of(facet_var)),
                                 error = function(cnd)
@@ -1618,12 +1608,12 @@ copy_attributes <- function(target, source){
 
 
 # Function to print generic message if model is not DI
-#' @keywords internal
 #' Utility function to check if model is a DImodel and print an appropriate
 #' help message accordingly
 #'
-#' @usage NULL
-NULL
+#' @keywords internal
+#'
+#' @noRd
 model_not_DI <- function(call_fn){
   data_fn <- paste0(call_fn, "_data")
   plot_fn <- paste0(call_fn, "_plot")
@@ -1645,11 +1635,11 @@ model_not_DI <- function(call_fn){
                      {.help [{.fn {col_green(plot_fn)}}]({plot_fn_link})}) function to create the plot."))
 }
 
-#' @keywords internal
 #' Utility function to check if a particular column exists in the data
 #'
-#' @usage NULL
-NULL
+#' @keywords internal
+#'
+#' @noRd
 check_col_exists <- function(data, col){
   col_names <- colnames(data)
   if(all(col %in% col_names)){
@@ -1659,12 +1649,12 @@ check_col_exists <- function(data, col){
   }
 }
 
-#' @keywords internal
 #' Utility function to check if all columns necessary for creating
 #' a plot exist in the data
 #'
-#' @usage NULL
-NULL
+#' @keywords internal
+#'
+#' @noRd
 check_plot_data <- function(data, cols_to_check, calling_fun,
                             data_name = "data"){
   check_res <- check_col_exists(data, cols_to_check)
@@ -1688,11 +1678,11 @@ check_plot_data <- function(data, cols_to_check, calling_fun,
   }
 }
 
-#' @keywords internal
 #' Utility function to ensure plots work for a model of class DImulti
 #'
-#' @usage NULL
-NULL
+#' @keywords internal
+#'
+#' @noRd
 link_DImodelsMulti <- function(model, add_var = list()){
   if(!inherits(model, "DImulti")){
     cli::cli_abort(c("The model object provided should be of class
@@ -1726,11 +1716,11 @@ link_DImodelsMulti <- function(model, add_var = list()){
   return(add_var)
 }
 
-#' @keywords internal
 #' Utility function to predict from a DImodelsMulti model object
 #'
-#' @usage NULL
-NULL
+#' @keywords internal
+#'
+#' @noRd
 predict_from_DImulti <- function(model, newdata = model$original_data, ...){
   # Get ID_col
   ID_col <- attr(model, "unitIDs")
@@ -1757,11 +1747,11 @@ predict_from_DImulti <- function(model, newdata = model$original_data, ...){
   return(preds)
 }
 
-#' @keywords internal
 #' Utility function to add experimental structures from a DImodels object to data
 #'
-#' @usage NULL
-NULL
+#' @keywords internal
+#'
+#' @noRd
 add_exp_str <- function(data, model){
 
   if(missing(data)){
@@ -1916,11 +1906,11 @@ add_exp_str <- function(data, model){
 }
 
 # Code copied over from fortify.lm
-#' @keywords internal
 #' Utility function to supplement data with information from an lm model
 #'
-#' @usage NULL
-NULL
+#' @keywords internal
+#'
+#' @noRd
 fortify_lm_copy <- function (model, data = model$model, ...) {
     infl <- stats::influence(model, do.coef = FALSE)
     data$.hat <- infl$hat

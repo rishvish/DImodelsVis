@@ -44,7 +44,7 @@ can set this to FALSE and manually call the `add_prediction`
 function.}
 
 \item{...}{
-  Arguments passed on to \code{\link[=add_prediction]{add_prediction}}
+  Arguments passed on to \code{\link{add_prediction}}
   \describe{
     \item{\code{model}}{A regression model object which will be used to make predictions
 for the observations in `data`. Will override `coefficients`

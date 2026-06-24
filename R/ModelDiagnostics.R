@@ -7,13 +7,9 @@
 #' to quickly identify any observations with unusual residuals, hat values, etc.
 #'
 #' @importFrom PieGlyph geom_pie_glyph pieGrob
-#' @importFrom dplyr bind_rows desc filter arrange slice
-#'                   select all_of mutate .data as_tibble
+#' @importFrom dplyr bind_rows desc filter arrange slice select all_of mutate .data as_tibble
 #' @importFrom stats family residuals qqnorm weights quantile qnorm
-#' @importFrom ggplot2 fortify xlim ylim xlab ylab ggtitle geom_hline
-#'                     geom_text geom_abline geom_linerange geom_segment
-#'                     aes ggplot scale_fill_manual unit labs guides
-#'                     scale_y_continuous expansion sec_axis
+#' @importFrom ggplot2 fortify xlim ylim xlab ylab ggtitle geom_hline geom_text geom_abline geom_linerange geom_segment aes ggplot scale_fill_manual unit labs guides scale_y_continuous expansion sec_axis
 #' @importFrom methods new
 #' @importFrom ggtext geom_richtext
 #' @importFrom cli cli_progress_bar cli_progress_update cli_process_done cli_bullets

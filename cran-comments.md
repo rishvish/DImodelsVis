@@ -1,3 +1,21 @@
+## Submission v1.0.5
+
+### Test environments
+
+I checked that the package builds successfully on the following systems without any errors or warnings.
+
+- local Windows install, R 4.6.0
+- win-builder (devel and release)
+- macOS builder
+- rhub platforms
+  - debian
+  - linux
+  - ubuntu
+
+### R CMD check results
+
+There were no ERRORS or WARNINGS when building the package on my local machine. There were no new notes either.
+
 ## Submission v1.0.4
 
 ### Test environments

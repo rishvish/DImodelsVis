@@ -499,8 +499,7 @@ conditional_ternary_plot <- function(data,
 #' @importFrom metR geom_text_contour
 #' @importFrom grDevices terrain.colors
 #' @importFrom dplyr tibble between
-#' @importFrom ggplot2 geom_raster scale_fill_stepsn geom_contour
-#'                     theme_void guide_colorbar coord_fixed
+#' @importFrom ggplot2 geom_raster scale_fill_stepsn geom_contour theme_void guide_colorbar coord_fixed
 #'
 #' @param model A Diversity Interactions model object fit by using the
 #'              \code{\link[DImodels:DI]{DI()}} function from the
@@ -636,8 +635,7 @@ conditional_ternary <- function(model,
   }
 }
 
-#' @keywords internal
-#' Internal function for creating a ternary plot
+#' @keywords internal Internal function for creating a ternary plot
 #'
 #' @usage NULL
 NULL

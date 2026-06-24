@@ -84,10 +84,10 @@ test_that("Conditional ternary works as expected", {
   expect_equal(conditional_ternary_data(prop = species[1:3],
                                         tern_vars = species[1:3],
                                         resolution = 0.5,
-                                        prediction = FALSE),
+                                        prediction = FALSE) %>% suppressMessages(),
                ternary_data(prop = species[1:3],
                             resolution = 0.5,
-                            prediction = FALSE))
+                            prediction = FALSE) %>% suppressMessages())
 
 })
 

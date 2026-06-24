@@ -114,7 +114,7 @@ test_that("Common errors are thrown", {
   expect_error(model_diagnostics(mod = mod, npoints = -1), "`npoints` should be an integer between")
   expect_error(model_diagnostics(mod = mod, pie_colours = get_colours(3)),
                "The number of `colours` specified should")
-  expect_warning(model_diagnostics(mod_lm, only_extremes = TRUE, which = 1),
+  expect_warning(model_diagnostics(mod_lm, only_extremes = TRUE, which = 1) %>% suppressMessages(),
                  "No compositional variables were specified in `prop`")
 
   # model_diagnostics_plot()
@@ -124,7 +124,7 @@ test_that("Common errors are thrown", {
   expect_error(model_diagnostics_plot(exp_data, pie_colours = get_colours(3)),
                "The number of `colours` specified should")
 
-  expect_warning(model_diagnostics_plot(exp_data %>% `attr<-`("prop", NULL), only_extremes = TRUE),
+  expect_warning(model_diagnostics_plot(exp_data %>% `attr<-`("prop", NULL), only_extremes = TRUE) %>% suppressMessages(),
                  "No compositional variables were specified in `prop`")
 
 
