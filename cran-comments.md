@@ -14,7 +14,18 @@ I checked that the package builds successfully on the following systems without 
 
 ### R CMD check results
 
-There were no ERRORS or WARNINGS when building the package on my local machine. There were no new notes either.
+0 errors | 0 warnings | 1 note
+
+* Checking HTML version of manual ... NOTE
+    Skipping checking math rendering: package 'V8' unavailable
+    
+This note is unrelated to my package.    
+
+
+## Reverse dependency check results
+
+We checked 1 reverse dependency and compared R CMD check results across CRAN and dev versions of this package. We found no issues.
+
 
 ## Submission v1.0.4
 
