@@ -2,6 +2,8 @@
 
 ## DImodelsVis 1.0.5
 
+CRAN release: 2026-06-29
+
 - Ternary plots now also work with model containing log-transformed (for
   example, alr, clr, and ilr) compositional predictors.
 - Conditional ternary plots now have a `scale_ternaries` argument which,
